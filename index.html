@@ -977,7 +977,27 @@ window.addEventListener("appinstalled",function(){deferredPrompt=null;document.g
 async function installPWA(){if(!deferredPrompt){document.getElementById("installBanner").classList.remove("show");return;}
   deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;document.getElementById("installBanner").classList.remove("show");}
 function dismissInstall(){document.getElementById("installBanner").classList.remove("show");localStorage.setItem("mm_pwa_dismiss","1");}
-if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){});});}
+if("serviceWorker" in navigator){window.addEventListener("load",function(){
+  navigator.serviceWorker.register("/sw.js").then(function(reg){
+    reg.update();
+    setInterval(function(){reg.update();},60000);
+    document.addEventListener('visibilitychange',function(){
+      if(document.visibilityState==='visible') reg.update();
+    });
+    reg.addEventListener('updatefound',function(){
+      var nw=reg.installing; if(!nw) return;
+      nw.addEventListener('statechange',function(){
+        if(nw.state==='installed' && navigator.serviceWorker.controller){
+          nw.postMessage({type:'SKIP_WAITING'});
+        }
+      });
+    });
+  }).catch(function(){});
+  var refreshing=false;
+  navigator.serviceWorker.addEventListener('controllerchange',function(){
+    if(refreshing) return; refreshing=true; window.location.reload();
+  });
+});}
 
 /* init */
 async function init(){
