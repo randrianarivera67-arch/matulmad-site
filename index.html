@@ -13,6 +13,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MATUL MADA">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -630,16 +632,27 @@ body:not(.dash) .social-fab{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
       <button class="tab" id="tabReg" onclick="switchTab('register')" data-i18n="tab_register">Inscription</button>
     </div>
     <div class="msg" id="authMsg"></div>
+    <div class="field" id="fldPrenom" style="display:none"><label data-i18n="lbl_prenom">Prénom</label>
+      <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0"/></svg><input id="aPrenom" placeholder="Prénom"></div></div>
     <div class="field" id="fldName" style="display:none"><label data-i18n="lbl_name">Nom</label>
-      <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0"/></svg><input id="aName" placeholder="Nom complet"></div></div>
+      <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0"/></svg><input id="aName" placeholder="Nom de famille"></div></div>
     <div class="field"><label id="lblIdent" data-i18n="lbl_ident">Email ou téléphone</label>
       <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg><input id="aIdent" placeholder="email@exemple.mg / 034…"></div></div>
     <div class="field" id="fldPhone" style="display:none"><label data-i18n="lbl_phone">Téléphone (optionnel)</label>
       <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 5 5L16 13l5 2v3a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/></svg><input id="aPhone" type="tel" placeholder="034 12 345 67"></div></div>
     <div class="field" id="fldCountry" style="display:none"><label data-i18n="lbl_country">Pays</label>
       <div class="inp"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg><select id="aCountry" style="flex:1;background:transparent;border:none;color:var(--ink);font-family:inherit;font-size:15px;outline:none"></select></div></div>
+    <div class="field" id="fldAddress" style="display:none"><label data-i18n="lbl_address">Adresse</label>
+      <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><input id="aAddress" placeholder="Ville, quartier…"></div>
+      <input type="hidden" id="aAddrLat"><input type="hidden" id="aAddrLng"></div>
+    <button type="button" id="aMapBtn" onclick="openMapPicker('reg')" style="display:none;margin:-2px 0 12px;width:100%;justify-content:center;align-items:center;gap:7px;border:1px solid var(--line);border-radius:11px;height:40px;background:var(--panel);font-family:var(--font-d);font-weight:700;font-size:13px;color:var(--blue-1)">
+      <svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+      <span id="aMapBtnTxt" data-i18n="lbl_pickmap">Choisir le point exact (carte)</span>
+    </button>
     <div class="field"><label data-i18n="lbl_pass">Mot de passe</label>
       <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M6 10V7a6 6 0 0 1 12 0v3M5 10h14v10H5z"/></svg><input id="aPass" type="password" placeholder="••••••"></div></div>
+    <div class="field" id="fldPassConfirm" style="display:none"><label data-i18n="lbl_passconfirm">Confirmer le mot de passe</label>
+      <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M6 10V7a6 6 0 0 1 12 0v3M5 10h14v10H5z"/></svg><input id="aPassConfirm" type="password" placeholder="••••••"></div></div>
     <button class="btn btn-primary btn-block" id="authSubmit" onclick="doAuth()"><span id="authBtnTxt" data-i18n="tab_login">Connexion</span></button>
     <div class="modal-foot" id="authSwitch"></div>
   </div>
@@ -648,6 +661,20 @@ body:not(.dash) .social-fab{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
 <!-- Sheet générique (wallet / provider) -->
 <div class="sheet" id="formSheet"><div class="sheet-bd" onclick="closeSheet('formSheet')"></div>
   <div class="sheet-panel"><div class="sheet-head"><h3 id="fsTitle">—</h3><button class="modal-x" style="position:static" onclick="closeSheet('formSheet')"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+
+<!-- Sheet : choix point exact (carte, OpenStreetMap/Leaflet — gratuit, sans clé API) -->
+<div class="sheet" id="mapSheet"><div class="sheet-bd" onclick="closeSheet('mapSheet')"></div>
+  <div class="sheet-panel">
+    <div class="sheet-head"><h3><svg class="ic" viewBox="0 0 24 24" style="width:19px;height:19px"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-i18n="lbl_pickmap_title">Point exact</span></h3><button class="modal-x" style="position:static" onclick="closeSheet('mapSheet')"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+    <div id="pickMap" style="height:280px;border-radius:14px;overflow:hidden;border:1px solid var(--line);margin-bottom:12px"></div>
+    <button type="button" onclick="useMyLocation()" style="width:100%;justify-content:center;display:flex;gap:7px;align-items:center;height:42px;border-radius:11px;border:1px solid var(--line);background:var(--panel);font-family:var(--font-d);font-weight:700;font-size:13px;margin-bottom:10px;color:var(--ink)">
+      <svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+      <span data-i18n="lbl_mylocation">Utiliser ma position actuelle</span>
+    </button>
+    <div id="pickAddrPreview" style="font-size:13px;color:var(--ink-dim);margin-bottom:14px;min-height:18px"></div>
+    <button class="btn btn-primary btn-block" onclick="confirmMapPoint()" data-i18n="lbl_confirm_point">Confirmer ce point</button>
+  </div>
+</div>
     <div class="msg" id="fsMsg"></div><div id="fsBody"></div></div></div>
 
 <!-- Sheet PARAMÈTRES -->
@@ -725,6 +752,7 @@ const I18N={
   s3t:"Confirmez",s3d:"La page de paiement s'ouvre avec votre code.",s4t:"Payez",s4d:"Appelez le code, validation automatique.",
   cta_title:"Prêt à commencer ?",cta_sub:"Ouvrez votre compte en moins d'une minute.",cta_btn:"Ouvrir un compte",
   auth_sub:"Votre espace client",tab_login:"Connexion",tab_register:"Inscription",lbl_name:"Nom",lbl_ident:"Email ou téléphone",lbl_phone:"Téléphone (optionnel)",lbl_pass:"Mot de passe",
+  lbl_prenom:"Prénom",lbl_passconfirm:"Confirmer le mot de passe",lbl_pickmap:"Choisir le point exact (carte)",lbl_pickmap_title:"Point exact",lbl_mylocation:"Utiliser ma position actuelle",lbl_confirm_point:"Confirmer ce point",
   dash_hi:'Bonjour, <span id="dashName">client</span>',dash_sub:"Gérez vos comptes et passez vos ordres.",
   depot:"Dépôt",retrait:"Retrait",lbl_op:"Opérateur",lbl_amount:"Montant (Ar)",lbl_num:"Numéro",lbl_prov:"Fournisseur",lbl_provid:"ID fournisseur",ord_confirm:"Confirmer l'ordre",
   rate_lbl:"Cours du jour · Deriv",rate_dep:"Dépôt (1 USD)",rate_ret:"Retrait (1 USD)",rate_foot:"Appliqué aux ordres Deriv. Mobile money : montants en Ariary.",in_ariary:"EN ARIARY",
@@ -747,6 +775,7 @@ const I18N={
   s3t:"Confirmer",s3d:"Misokatra ny pejy fandoavana misy ny kaody.",s4t:"Mandoa",s4d:"Antsoy ny kaody, validation automatika.",
   cta_title:"Vonona hanomboka?",cta_sub:"Sokafy ny kaontinao latsaky ny iray minitra.",cta_btn:"Hanokatra kaonty",
   auth_sub:"Ny espace client-nao",tab_login:"Hiditra",tab_register:"Hisoratra",lbl_name:"Anarana",lbl_ident:"Email na téléphone",lbl_phone:"Téléphone (tsy voatery)",lbl_pass:"Tenimiafina",
+  lbl_prenom:"Fanampin'anarana",lbl_passconfirm:"Hamarino ny tenimiafina",lbl_pickmap:"Hifidy ny toerana marina (sarintany)",lbl_pickmap_title:"Toerana marina",lbl_mylocation:"Ampiasao ny toerako ankehitriny",lbl_confirm_point:"Hamarino ity toerana ity",
   dash_hi:'Manao ahoana, <span id="dashName">client</span>',dash_sub:"Tantano ny kaontinao ary manaova ordre.",
   depot:"Dépôt",retrait:"Retrait",lbl_op:"Opérateur",lbl_amount:"Montant (Ar)",lbl_num:"Numéro",lbl_prov:"Fournisseur",lbl_provid:"ID fournisseur",ord_confirm:"Confirmer ny ordre",
   rate_lbl:"Tahan'ny andro · Deriv",rate_dep:"Dépôt (1 USD)",rate_ret:"Retrait (1 USD)",rate_foot:"Ampiharina amin'ny ordre Deriv. Mobile money: vola amin'ny Ariary.",in_ariary:"AMIN'NY ARIARY",
@@ -823,8 +852,12 @@ function openAuth(m){authMode=m;switchTab(m);document.getElementById("authModal"
 function closeAuth(){document.getElementById("authModal").classList.remove("open");document.getElementById("authMsg").className="msg";}
 function switchTab(m){authMode=m;
   document.getElementById("tabLogin").classList.toggle("active",m==="login");document.getElementById("tabReg").classList.toggle("active",m==="register");
+  document.getElementById("fldPrenom").style.display=m==="register"?"block":"none";
   document.getElementById("fldName").style.display=m==="register"?"block":"none";document.getElementById("fldPhone").style.display=m==="register"?"block":"none";
   document.getElementById("fldCountry").style.display=m==="register"?"block":"none";
+  document.getElementById("fldAddress").style.display=m==="register"?"block":"none";
+  document.getElementById("aMapBtn").style.display=m==="register"?"flex":"none";
+  document.getElementById("fldPassConfirm").style.display=m==="register"?"block":"none";
   document.getElementById("lblIdent").textContent=m==="register"?"Email":t("lbl_ident");
   document.getElementById("aIdent").placeholder=m==="register"?"email@exemple.mg":"email@exemple.mg / 034…";
   document.getElementById("authBtnTxt").textContent=m==="login"?t("tab_login"):t("tab_register");
@@ -834,13 +867,23 @@ async function doAuth(){
   var btn=document.getElementById("authSubmit");
   var ident=document.getElementById("aIdent").value.trim();var pass=document.getElementById("aPass").value;
   if(!ident||!pass)return authError(lang==="fr"?"Remplissez tous les champs":"Fenoy ny saha rehetra");
+  if(authMode==="register"){
+    var passConfirm=document.getElementById("aPassConfirm").value;
+    if(pass!==passConfirm)return authError(lang==="fr"?"Les mots de passe ne correspondent pas":"Tsy mitovy ny tenimiafina roa");
+  }
   btn.disabled=true;
   try{
     var res;
     if(authMode==="register"){
-      var name=document.getElementById("aName").value.trim();var phone=document.getElementById("aPhone").value.trim();
+      var prenom=document.getElementById("aPrenom").value.trim();var nomF=document.getElementById("aName").value.trim();
+      if(!prenom||!nomF){btn.disabled=false;return authError(lang==="fr"?"Prénom et nom requis":"Mila prénom sy nom");}
+      var name=(prenom+" "+nomF).trim();var phone=document.getElementById("aPhone").value.trim();
       var country=document.getElementById("aCountry").value||"Madagascar";
-      var body={name:name,password:pass,lang:lang,country:country};if(ident.indexOf("@")>=0)body.email=ident;else body.phone=ident;if(phone)body.phone=phone;
+      var address=document.getElementById("aAddress").value.trim();
+      var addrLat=document.getElementById("aAddrLat").value;var addrLng=document.getElementById("aAddrLng").value;
+      var body={name:name,password:pass,confirmPassword:passConfirm,lang:lang,country:country,address:address};
+      if(addrLat)body.addressLat=parseFloat(addrLat);if(addrLng)body.addressLng=parseFloat(addrLng);
+      if(ident.indexOf("@")>=0)body.email=ident;else body.phone=ident;if(phone)body.phone=phone;
       res=await fetch(API+"/api/auth/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
     }else{
       res=await fetch(API+"/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({identifier:ident,password:pass})});
@@ -1105,6 +1148,51 @@ function openNotif(){
 /* sheets */
 function openSheet(id){document.getElementById(id).classList.add("open");}
 function closeSheet(id){document.getElementById(id).classList.remove("open");}
+
+/* ===== Point exact carte (Leaflet + OpenStreetMap — gratuit, sans clé API) ===== */
+var pickLat=null,pickLng=null,pickMapObj=null,pickMarker=null,pickTarget='reg';
+function openMapPicker(target){
+  pickTarget=target||'reg';
+  openSheet('mapSheet');
+  setTimeout(function(){
+    if(!pickMapObj){
+      var startLat=pickLat!=null?pickLat:-18.8792,startLng=pickLng!=null?pickLng:47.5079; // Antananarivo par défaut
+      pickMapObj=L.map('pickMap').setView([startLat,startLng],13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(pickMapObj);
+      pickMarker=L.marker([startLat,startLng],{draggable:true}).addTo(pickMapObj);
+      pickMarker.on('dragend',function(e){var p=e.target.getLatLng();setPickedPoint(p.lat,p.lng);});
+      pickMapObj.on('click',function(e){pickMarker.setLatLng(e.latlng);setPickedPoint(e.latlng.lat,e.latlng.lng);});
+      setPickedPoint(startLat,startLng);
+    }else{pickMapObj.invalidateSize();}
+  },150);
+}
+function setPickedPoint(la,lo){
+  pickLat=la;pickLng=lo;
+  var el=document.getElementById('pickAddrPreview');
+  if(el)el.textContent=(lang==="fr"?"Point : ":"Toerana : ")+la.toFixed(5)+", "+lo.toFixed(5);
+  fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+la+'&lon='+lo)
+    .then(function(r){return r.json();})
+    .then(function(d){if(d&&d.display_name&&el)el.textContent=d.display_name;})
+    .catch(function(){});
+}
+function useMyLocation(){
+  if(!navigator.geolocation)return toast(lang==="fr"?"Géolocalisation indisponible":"Tsy azo ny geolocalisation","err");
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var la=pos.coords.latitude,lo=pos.coords.longitude;
+    if(pickMapObj){pickMapObj.setView([la,lo],15);pickMarker.setLatLng([la,lo]);}
+    setPickedPoint(la,lo);
+  },function(){toast(lang==="fr"?"Position indisponible":"Tsy azo ny toerana","err");});
+}
+function confirmMapPoint(){
+  if(pickLat==null)return closeSheet('mapSheet');
+  if(pickTarget==='reg'){
+    document.getElementById('aAddrLat').value=pickLat;document.getElementById('aAddrLng').value=pickLng;
+    var preview=(document.getElementById('pickAddrPreview').textContent||'').trim();
+    if(preview&&!document.getElementById('aAddress').value.trim())document.getElementById('aAddress').value=preview;
+    var btnTxt=document.getElementById('aMapBtnTxt');if(btnTxt)btnTxt.textContent=(lang==="fr"?"Point choisi ✓":"Voafidy ny toerana ✓");
+  }
+  closeSheet('mapSheet');
+}
 function toast(txt,kind){var el=document.getElementById("toast");el.textContent=txt;el.className="toast "+(kind||"")+" show";setTimeout(function(){el.classList.remove("show");},2600);}
 
 /* PWA */
