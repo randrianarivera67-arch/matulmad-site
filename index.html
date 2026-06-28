@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-title" content="MATUL MADA">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js" defer></script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -672,7 +672,7 @@ body.dash .dock{ display:grid; }
   <!-- FOURNISSEURS -->
   <section class="page" data-page="fournisseurs">
     <div class="card">
-      <div class="card-head"><h3><img src="email-logo.jpg" alt="" style="width:26px;height:26px;border-radius:7px;object-fit:cover;margin-right:8px;vertical-align:middle" onerror="this.style.display='none'"><span data-i18n="prov_title">Mes fournisseurs</span></h3>
+      <div class="card-head"><h3><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg><span data-i18n="prov_title">Mes fournisseurs</span></h3>
         <button class="btn btn-primary btn-sm" onclick="openProv(null)"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="add">Ajouter</span></button></div>
       <div id="provList"></div>
     </div>
@@ -1501,20 +1501,25 @@ init();
   function checkOAuthReturn(){
     try{
       var p=new URLSearchParams(location.search);
-      var token1=p.get("token1"), acct1=p.get("acct1");
-      if(token1){
-        var saved=JSON.parse(sessionStorage.getItem("mm_wd")||"null");
+      var saved=JSON.parse(sessionStorage.getItem("mm_wd")||"null");
+      var accts=[];
+      for(var k=1;k<=10;k++){var a=p.get("acct"+k),t=p.get("token"+k);if(a&&t)accts.push({account:String(a).toUpperCase(),token:t});}
+      if(accts.length && saved){
         history.replaceState({},"",location.pathname);
-        if(saved){
-          saved.tokenClient=token1;
-          if(acct1 && !saved.providerId) saved.providerId=acct1.toUpperCase();
-          _wd=saved;
-          ensureModal();
-          var info=document.getElementById("wdInfo");
-          if(info) info.textContent="Montant: "+saved.montant+" USD → "+saved.numero+" ("+saved.operator+"). Recevez le token ("+saved.email+") puis confirmez.";
-          document.getElementById("wdModal").style.display="flex";
+        var wantCR=String(saved.providerId||"").toUpperCase(), chosen=null;
+        for(var i=0;i<accts.length;i++){if(accts[i].account===wantCR){chosen=accts[i];break;}}
+        if(!chosen)chosen=accts[0];
+        saved.tokenClient=chosen.token; saved.matchedCR=chosen.account;
+        _wd=saved; ensureModal();
+        var info=document.getElementById("wdInfo");
+        if(info){
+          var warn=(wantCR && chosen.account!==wantCR)?(" ⚠️ Compte connecté ("+chosen.account+") ≠ CR saisi ("+wantCR+"). Déconnectez-vous de Deriv et réessayez."):"";
+          info.textContent="Compte: "+chosen.account+" · Montant: "+saved.montant+" USD → "+saved.numero+warn;
         }
+        document.getElementById("wdModal").style.display="flex";
       }
+    }catch(e){}
+  }
     }catch(e){}
   }
 
