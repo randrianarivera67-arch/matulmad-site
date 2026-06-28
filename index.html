@@ -672,7 +672,7 @@ body.dash .dock{ display:grid; }
   <!-- FOURNISSEURS -->
   <section class="page" data-page="fournisseurs">
     <div class="card">
-      <div class="card-head"><h3><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg><span data-i18n="prov_title">Mes fournisseurs</span></h3>
+      <div class="card-head"><h3><img src="email-logo.jpg" alt="" style="width:26px;height:26px;border-radius:7px;object-fit:cover;margin-right:8px;vertical-align:middle" onerror="this.style.display='none'"><span data-i18n="prov_title">Mes fournisseurs</span></h3>
         <button class="btn btn-primary btn-sm" onclick="openProv(null)"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="add">Ajouter</span></button></div>
       <div id="provList"></div>
     </div>
@@ -1087,7 +1087,7 @@ function renderProviders(){
   var box=document.getElementById("provList");
   if(!me||!me.providers||!me.providers.length){box.innerHTML='<div class="empty"><div class="ei"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg></div>'+(lang==="fr"?"Aucun fournisseur":"Tsy misy fournisseur")+'</div>';return;}
   box.innerHTML=me.providers.map(function(p){
-    return '<div class="prov-row lift"><div class="l"><span class="opbadge md" style="--oc:#ff444f">D</span><div><div class="nm">'+(p.label||p.name)+'</div><div class="lb">'+p.accountId+' · '+p.name+'</div></div></div>'+
+    return '<div class="prov-row lift"><div class="l"><span class="opbadge md" style="--oc:#ff444f"><img src="deriv.jpg" alt="Deriv" onerror="this.parentNode.textContent=&quot;D&quot;"></span><div><div class="nm">'+(p.label||p.name)+'</div><div class="lb">'+p.accountId+(p.email?' · '+p.email:'')+'</div></div></div>'+
     '<div class="row-act"><button class="rbtn edit" onclick="openProv(\''+p._id+'\')"><svg class="ic" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>'+
     '<button class="rbtn del" onclick="delProv(\''+p._id+'\')"><svg class="ic" viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M7 7l1 13h8l1-13"/></svg></button></div></div>';
   }).join('');
@@ -1100,17 +1100,17 @@ function openProv(id){
   document.getElementById("fsBody").innerHTML=
     '<div class="field"><label>'+t("p_name")+'</label><div class="inp"><input id="pName" placeholder="Deriv" value="'+(p?p.name:'Deriv')+'"></div></div>'+
     '<div class="field"><label>'+t("p_id")+'</label><div class="inp"><input id="pId" placeholder="CR1234567" value="'+(p?p.accountId:'')+'"></div></div>'+
-    '<div class="field"><label>'+t("p_label")+'</label><div class="inp"><input id="pLabel" placeholder="Deriv réel" value="'+(p&&p.label?p.label.replace(/"/g,"&quot;"):'')+'"></div></div>'+
+    '<div class="field"><label>Email Deriv</label><div class="inp"><input id="pEmail" type="email" placeholder="email@exemple.com" value="'+(p&&p.email?p.email.replace(/"/g,"&quot;"):'')+'"></div></div>'+'<div class="field"><label>'+t("p_label")+'</label><div class="inp"><input id="pLabel" placeholder="Deriv réel" value="'+(p&&p.label?p.label.replace(/"/g,"&quot;"):'')+'"></div></div>'+
     '<button class="btn btn-primary btn-block" id="pSave">'+t("w_save")+'</button>';
   document.getElementById("pSave").onclick=function(){saveProv(id);};
   openSheet("formSheet");
 }
 async function saveProv(id){
-  var name=document.getElementById("pName").value.trim()||"Deriv",acc=document.getElementById("pId").value.trim(),lbl=document.getElementById("pLabel").value.trim();
+  var name=document.getElementById("pName").value.trim()||"Deriv",acc=document.getElementById("pId").value.trim(),lbl=document.getElementById("pLabel").value.trim(),eml=(document.getElementById("pEmail")||{}).value;eml=(eml||"").trim();
   if(!acc){fsErr(lang==="fr"?"Identifiant requis":"Mila identifiant");return;}
   var btn=document.getElementById("pSave");btn.disabled=true;btn.innerHTML='<span class="spin"></span>';
   try{
-    var d=await api("/api/wallet/provider",{method:"POST",body:JSON.stringify({name:name,accountId:acc,label:lbl})});
+    var d=await api("/api/wallet/provider",{method:"POST",body:JSON.stringify({name:name,accountId:acc,label:lbl,email:eml})});
     if(d.providers)me.providers=d.providers;
     if(id){var d2=await api("/api/wallet/provider/"+id,{method:"DELETE"});if(d2.providers)me.providers=d2.providers;}
     renderProviders();populateProviderSelect();closeSheet("formSheet");toast(t(id?"m_saved":"m_added"),"ok");
@@ -1520,6 +1520,31 @@ init();
 
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",checkOAuthReturn);
   else checkOAuthReturn();
+})();
+
+</script>
+
+<script>
+/* ===== Autofill email Deriv ===== */
+(function(){
+  function fillEmailFromCR(){
+    try{
+      var fi=document.getElementById("fProviderId"), fe=document.getElementById("fEmailRetrait");
+      if(!fi||!fe||typeof me==="undefined"||!me||!me.providers)return;
+      var cr=(fi.value||"").trim().toUpperCase();
+      for(var i=0;i<me.providers.length;i++){
+        var p=me.providers[i];
+        if(p.accountId && String(p.accountId).toUpperCase()===cr && p.email){ fe.value=p.email; break; }
+      }
+    }catch(e){}
+  }
+  var fi=document.getElementById("fProviderId");
+  if(fi){ fi.addEventListener("input",fillEmailFromCR); fi.addEventListener("change",fillEmailFromCR); }
+  if(typeof window.showPage==="function"){
+    var _sp=window.showPage;
+    window.showPage=function(v){ var r=_sp.apply(this,arguments); if(v==="retrait")setTimeout(fillEmailFromCR,150); return r; };
+  }
+  setTimeout(fillEmailFromCR,500);
 })();
 
 </script>
