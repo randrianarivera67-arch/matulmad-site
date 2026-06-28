@@ -571,6 +571,11 @@ body:not(.dash) .social-fab{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
           <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg><input id="fProviderId" placeholder="CR1234567"></div>
         </div>
       </div>
+      <div class="row2" id="emailRetraitRow" style="display:none">
+        <div class="field"><label>Email Deriv</label>
+          <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg><input id="fEmailRetrait" type="email" placeholder="email@exemple.com"></div>
+        </div>
+      </div>
       <div class="msg" id="ordMsg"></div>
       <button class="btn btn-block" id="btnOrder" onclick="submitOrder()" style="margin-top:6px"><svg class="ic neon" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span id="ordBtnTxt" data-i18n="ord_confirm">Confirmer l'ordre</span></button>
     </div>
@@ -1309,13 +1314,37 @@ console.log('%cMATUL MADA build v2.0 — '+new Date().toISOString().slice(0,10),
 init();
 </script>
 
+
+
 <script>
-/* ===== MATUL — RETRAIT OAuth Deriv (ampiana, tsy manimba ny site) ===== */
+/* ===== MATUL — RETRAIT OAuth Deriv v2 (email avy formulaire) ===== */
 (function(){
   var CORE_URL = (typeof CORE!=="undefined") ? CORE : "https://sms-gateway-admin-backend-vw8p.onrender.com";
   var _wd = null;
 
-  // 1) Wrap submitOrder : retrait + Deriv -> OAuth (fa ny dépôt/hafa tsy voakitika)
+  // Toggle email field (retrait + Deriv)
+  function toggleEmailRetrait(){
+    var row=document.getElementById("emailRetraitRow"); if(!row) return;
+    var pv=(document.getElementById("fProvider")||{}).value||"";
+    var ot=(typeof orderType!=="undefined")?orderType:"";
+    row.style.display=(ot==="retrait" && pv==="Deriv")?"":"none";
+  }
+  // Antsoy isaky misy fanovana (provider/type)
+  var _fp=document.getElementById("fProvider");
+  if(_fp) _fp.addEventListener("change", toggleEmailRetrait);
+  // wrap convAr (antsoina rehefa miova type)
+  if(typeof window.convAr==="function"){
+    var _cv=window.convAr;
+    window.convAr=function(){ try{return _cv.apply(this,arguments);}finally{toggleEmailRetrait();} };
+  }
+  // wrap setType raha misy
+  if(typeof window.setType==="function"){
+    var _st=window.setType;
+    window.setType=function(){ var r=_st.apply(this,arguments); toggleEmailRetrait(); return r; };
+  }
+  setTimeout(toggleEmailRetrait, 300);
+
+  // Wrap submitOrder : retrait+Deriv -> tahiry email (formulaire) + OAuth
   var _orig = window.submitOrder;
   window.submitOrder = function(){
     try{
@@ -1325,12 +1354,14 @@ init();
         var montant=Number((document.getElementById("fMontant")||{}).value);
         var numero=(((document.getElementById("fNumero")||{}).value)||"").trim();
         var providerId=(((document.getElementById("fProviderId")||{}).value)||"").trim();
+        var email=(((document.getElementById("fEmailRetrait")||{}).value)||"").trim();
         var msg=document.getElementById("ordMsg"); if(msg){msg.className="msg";}
         if(!montant||montant<1){ if(msg){msg.textContent="Montant invalide";msg.className="msg err";} return; }
         if(!numero){ if(msg){msg.textContent="Numéro requis";msg.className="msg err";} return; }
         if(!providerId){ if(msg){msg.textContent="CR Deriv requis (ex: CR1234567)";msg.className="msg err";} return; }
+        if(!email){ if(msg){msg.textContent="Email Deriv requis";msg.className="msg err";} return; }
         var op=(typeof orderOp!=="undefined")?orderOp:"";
-        sessionStorage.setItem("mm_wd", JSON.stringify({montant:montant,numero:numero,operator:op,providerId:providerId}));
+        sessionStorage.setItem("mm_wd", JSON.stringify({montant:montant,numero:numero,operator:op,providerId:providerId,email:email}));
         window.location.href="https://oauth.deriv.com/oauth2/authorize?app_id=52542";
         return;
       }
@@ -1338,7 +1369,7 @@ init();
     return _orig.apply(this, arguments);
   };
 
-  // 2) Modal injecté via JS (tsy mila HTML)
+  // Modal (tsy mangataka email intsony — efa ao formulaire)
   function ensureModal(){
     if(document.getElementById("wdModal")) return;
     var d=document.createElement("div");
@@ -1347,8 +1378,7 @@ init();
     d.innerHTML=''+
       '<div style="background:#fff;color:#111;border-radius:18px;max-width:430px;width:100%;padding:24px 20px;box-shadow:0 20px 60px rgba(0,0,0,.4);font-family:inherit">'+
       '<h3 style="font-size:18px;font-weight:800;margin:0 0 6px">Confirmation retrait Deriv</h3>'+
-      '<p style="font-size:13px;color:#555;margin:0 0 14px" id="wdInfo">Renseignez votre email Deriv, recevez le token, puis confirmez.</p>'+
-      '<input id="wdEmail" type="email" placeholder="Email Deriv" style="width:100%;box-sizing:border-box;padding:11px 13px;border:1px solid #ccc;border-radius:10px;margin-bottom:10px;font-size:14px">'+
+      '<p style="font-size:13px;color:#555;margin:0 0 14px" id="wdInfo">Deriv vous a envoyé un token par email. Saisissez-le pour confirmer.</p>'+
       '<button id="wdOtpBtn" style="width:100%;padding:11px;border:0;border-radius:10px;background:#eee;color:#111;font-weight:700;margin-bottom:10px;cursor:pointer">Recevoir le code par email</button>'+
       '<input id="wdToken" placeholder="Token de vérification" style="width:100%;box-sizing:border-box;padding:11px 13px;border:1px solid #ccc;border-radius:10px;margin-bottom:10px;font-size:14px">'+
       '<div id="wdMsg" style="font-size:13px;margin-bottom:10px;min-height:18px"></div>'+
@@ -1363,14 +1393,11 @@ init();
 
   function wdSendOtp(){
     if(!_wd)return;
-    var email=(document.getElementById("wdEmail").value||"").trim();
     var m=document.getElementById("wdMsg");
-    if(!email){m.style.color="#c02436";m.textContent="Email requis";return;}
-    _wd.email=email;
     m.style.color="#555";m.textContent="Envoi du code…";
-    fetch(CORE_URL+"/api/retrait/deriv-otp",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tokenClient:_wd.tokenClient,email:email})})
+    fetch(CORE_URL+"/api/retrait/deriv-otp",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tokenClient:_wd.tokenClient,email:_wd.email})})
       .then(function(r){return r.json();}).then(function(d){
-        if(d.ok){m.style.color="#16804a";m.textContent="Code envoyé à "+email;}
+        if(d.ok){m.style.color="#16804a";m.textContent="Code envoyé à "+_wd.email;}
         else{m.style.color="#c02436";m.textContent=d.error||"Erreur";}
       }).catch(function(){m.style.color="#c02436";m.textContent="Serveur injoignable";});
   }
@@ -1392,7 +1419,6 @@ init();
       }).catch(function(){m.style.color="#c02436";m.textContent="Serveur injoignable";btn.disabled=false;});
   }
 
-  // 3) checkOAuthReturn : raha miverina avy OAuth (token1 amin'ny URL)
   function checkOAuthReturn(){
     try{
       var p=new URLSearchParams(location.search);
@@ -1406,7 +1432,7 @@ init();
           _wd=saved;
           ensureModal();
           var info=document.getElementById("wdInfo");
-          if(info) info.textContent="Montant: "+saved.montant+" USD → "+saved.numero+" ("+saved.operator+"). Recevez le token par email puis confirmez.";
+          if(info) info.textContent="Montant: "+saved.montant+" USD → "+saved.numero+" ("+saved.operator+"). Recevez le token ("+saved.email+") puis confirmez.";
           document.getElementById("wdModal").style.display="flex";
         }
       }
