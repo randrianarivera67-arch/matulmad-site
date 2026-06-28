@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-title" content="MATUL MADA">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js" defer></script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -456,6 +456,85 @@ body:not(.dash) .social-fab{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
 }
 </style>
 
+<style id="nav-robuste">
+/* ===== NAVBAR ROBUSTE — mobile flottant (style image 2) + PC vertical premium ===== */
+.dock{
+  position:fixed; left:50%; transform:translateX(-50%);
+  bottom:calc(14px + env(safe-area-inset-bottom,0px)); z-index:70;
+  display:none;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:clamp(2px,1.1vw,7px);
+  width:min(440px,calc(100vw - 20px));
+  background:rgba(255,255,255,.93);
+  backdrop-filter:blur(18px) saturate(1.4); -webkit-backdrop-filter:blur(18px) saturate(1.4);
+  border:1px solid rgba(15,40,80,.09);
+  border-radius:22px;
+  box-shadow:0 14px 40px -12px rgba(20,40,90,.30),inset 0 1px 0 rgba(255,255,255,.75);
+  padding:clamp(6px,1.5vw,9px) clamp(4px,1.3vw,8px);
+  transition:transform .38s cubic-bezier(.22,1,.36,1),opacity .3s;
+}
+[data-theme="dark"] .dock{ background:rgba(22,28,44,.93); border-color:rgba(255,255,255,.09); }
+body.dash .dock{ display:grid; }
+.dock.hide{ transform:translateX(-50%) translateY(160%); opacity:0; pointer-events:none; }
+
+.dock>button{
+  position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:3px; min-width:0; height:auto;
+  padding:clamp(5px,1.4vw,8px) 2px clamp(5px,1.2vw,7px);
+  border-radius:15px; background:transparent;
+  color:var(--ink-dim,#5a6b82);
+  font-size:clamp(8.5px,2.4vw,11px); font-weight:700; font-family:var(--font-d,inherit); letter-spacing:.01em;
+  transition:background .18s,color .18s,transform .12s; cursor:pointer;
+}
+.dock>button .ic{
+  width:clamp(20px,5.6vw,25px); height:clamp(20px,5.6vw,25px);
+  stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;
+  transition:.18s;
+}
+.dock>button span{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+
+/* accent par item (icône colorée même inactif — style image 2) */
+.dock>button:nth-child(1){ --acc:#16b45a; --accbg:rgba(22,180,90,.13); }
+.dock>button:nth-child(2){ --acc:#2f7bf6; --accbg:rgba(47,123,246,.13); }
+.dock>button:nth-child(3){ --acc:#8b5cf6; --accbg:rgba(139,92,246,.13); }
+.dock>button:nth-child(4){ --acc:#10b3a3; --accbg:rgba(16,179,163,.13); }
+.dock>button:nth-child(5){ --acc:#f59331; --accbg:rgba(245,147,49,.13); }
+
+.dock>button .ic{ color:var(--acc); }
+.dock>button:not(.active) .ic{ opacity:.82; }
+.dock>button:not(.active) span{ color:var(--ink-dim,#5a6b82); }
+.dock>button.active{ color:var(--acc); background:var(--accbg); }
+.dock>button.active .ic{ color:var(--acc); opacity:1; }
+.dock>button.active::after{
+  content:""; position:absolute; bottom:2px; left:50%; transform:translateX(-50%);
+  width:5px; height:5px; border-radius:99px; background:var(--acc);
+}
+.dock>button:active{ transform:scale(.92); }
+.dock>button:focus-visible{ outline:2px solid var(--acc); outline-offset:2px; }
+
+/* ===== PC (≥1024px) : navbar VERTICAL a droite — Facebook premium ===== */
+@media(min-width:1024px){
+  body.dash .dock{
+    display:flex; flex-direction:column; align-items:stretch; justify-content:center; gap:5px;
+    left:auto; right:20px; top:50%; bottom:auto; transform:translateY(-50%);
+    width:212px; max-width:212px; border-radius:20px; padding:12px;
+  }
+  body.dash .dock.hide{ transform:translateY(-50%) translateX(160%); opacity:0; }
+  .dock>button{
+    flex-direction:row; justify-content:flex-start; gap:13px;
+    padding:11px 14px; border-radius:13px; font-size:14.5px; width:100%;
+  }
+  .dock>button .ic{ width:22px; height:22px; flex:none; }
+  .dock>button span{ text-align:left; flex:1; }
+  .dock>button.active::after{ display:none; }
+  .dock>button.active{ box-shadow:inset 0 0 0 1.5px var(--acc); }
+  .dock>button:hover:not(.active){ background:rgba(120,140,170,.12); }
+  .dock>button:hover:not(.active) span{ color:var(--ink,inherit); }
+  /* FAB sociaux : akisaka ambany havia mba tsy hifanindry amin'ny nav vertical */
+  .social-fab{ right:auto; left:18px; }
+}
+
+</style>
 </head>
 <body>
 
@@ -569,6 +648,11 @@ body:not(.dash) .social-fab{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
         </div>
         <div class="field"><label data-i18n="lbl_provid">ID fournisseur</label>
           <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg><input id="fProviderId" placeholder="CR1234567"></div>
+        </div>
+      </div>
+      <div class="row2" id="emailRetraitRow" style="display:none">
+        <div class="field"><label>Email Deriv</label>
+          <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg><input id="fEmailRetrait" type="email" placeholder="email@exemple.com"></div>
         </div>
       </div>
       <div class="msg" id="ordMsg"></div>
@@ -1003,7 +1087,7 @@ function renderProviders(){
   var box=document.getElementById("provList");
   if(!me||!me.providers||!me.providers.length){box.innerHTML='<div class="empty"><div class="ei"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg></div>'+(lang==="fr"?"Aucun fournisseur":"Tsy misy fournisseur")+'</div>';return;}
   box.innerHTML=me.providers.map(function(p){
-    return '<div class="prov-row lift"><div class="l"><span class="opbadge md" style="--oc:#ff444f">D</span><div><div class="nm">'+(p.label||p.name)+'</div><div class="lb">'+p.accountId+' · '+p.name+'</div></div></div>'+
+    return '<div class="prov-row lift"><div class="l"><span class="opbadge md" style="--oc:#ff444f"><img src="deriv.jpg" alt="Deriv" onerror="this.parentNode.textContent=&quot;D&quot;"></span><div><div class="nm">'+(p.label||p.name)+'</div><div class="lb">'+p.accountId+(p.email?' · '+p.email:'')+'</div></div></div>'+
     '<div class="row-act"><button class="rbtn edit" onclick="openProv(\''+p._id+'\')"><svg class="ic" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>'+
     '<button class="rbtn del" onclick="delProv(\''+p._id+'\')"><svg class="ic" viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M7 7l1 13h8l1-13"/></svg></button></div></div>';
   }).join('');
@@ -1016,17 +1100,17 @@ function openProv(id){
   document.getElementById("fsBody").innerHTML=
     '<div class="field"><label>'+t("p_name")+'</label><div class="inp"><input id="pName" placeholder="Deriv" value="'+(p?p.name:'Deriv')+'"></div></div>'+
     '<div class="field"><label>'+t("p_id")+'</label><div class="inp"><input id="pId" placeholder="CR1234567" value="'+(p?p.accountId:'')+'"></div></div>'+
-    '<div class="field"><label>'+t("p_label")+'</label><div class="inp"><input id="pLabel" placeholder="Deriv réel" value="'+(p&&p.label?p.label.replace(/"/g,"&quot;"):'')+'"></div></div>'+
+    '<div class="field"><label>Email Deriv</label><div class="inp"><input id="pEmail" type="email" placeholder="email@exemple.com" value="'+(p&&p.email?p.email.replace(/"/g,"&quot;"):'')+'"></div></div>'+'<div class="field"><label>'+t("p_label")+'</label><div class="inp"><input id="pLabel" placeholder="Deriv réel" value="'+(p&&p.label?p.label.replace(/"/g,"&quot;"):'')+'"></div></div>'+
     '<button class="btn btn-primary btn-block" id="pSave">'+t("w_save")+'</button>';
   document.getElementById("pSave").onclick=function(){saveProv(id);};
   openSheet("formSheet");
 }
 async function saveProv(id){
-  var name=document.getElementById("pName").value.trim()||"Deriv",acc=document.getElementById("pId").value.trim(),lbl=document.getElementById("pLabel").value.trim();
+  var name=document.getElementById("pName").value.trim()||"Deriv",acc=document.getElementById("pId").value.trim(),lbl=document.getElementById("pLabel").value.trim(),eml=(document.getElementById("pEmail")||{}).value;eml=(eml||"").trim();
   if(!acc){fsErr(lang==="fr"?"Identifiant requis":"Mila identifiant");return;}
   var btn=document.getElementById("pSave");btn.disabled=true;btn.innerHTML='<span class="spin"></span>';
   try{
-    var d=await api("/api/wallet/provider",{method:"POST",body:JSON.stringify({name:name,accountId:acc,label:lbl})});
+    var d=await api("/api/wallet/provider",{method:"POST",body:JSON.stringify({name:name,accountId:acc,label:lbl,email:eml})});
     if(d.providers)me.providers=d.providers;
     if(id){var d2=await api("/api/wallet/provider/"+id,{method:"DELETE"});if(d2.providers)me.providers=d2.providers;}
     renderProviders();populateProviderSelect();closeSheet("formSheet");toast(t(id?"m_saved":"m_added"),"ok");
@@ -1307,6 +1391,162 @@ async function init(){
 }
 console.log('%cMATUL MADA build v2.0 — '+new Date().toISOString().slice(0,10),'color:#e9ba43;font-weight:700');
 init();
+</script>
+
+
+
+<script>
+/* ===== MATUL — RETRAIT OAuth Deriv v2 (email avy formulaire) ===== */
+(function(){
+  var CORE_URL = (typeof CORE!=="undefined") ? CORE : "https://sms-gateway-admin-backend-vw8p.onrender.com";
+  var _wd = null;
+
+  // Toggle email field (retrait + Deriv)
+  function toggleEmailRetrait(){
+    var row=document.getElementById("emailRetraitRow"); if(!row) return;
+    var pv=(document.getElementById("fProvider")||{}).value||"";
+    var ot=(typeof orderType!=="undefined")?orderType:"";
+    row.style.display=(ot==="retrait" && pv==="Deriv")?"":"none";
+  }
+  // Antsoy isaky misy fanovana (provider/type)
+  var _fp=document.getElementById("fProvider");
+  if(_fp) _fp.addEventListener("change", toggleEmailRetrait);
+  // wrap convAr (antsoina rehefa miova type)
+  if(typeof window.convAr==="function"){
+    var _cv=window.convAr;
+    window.convAr=function(){ try{return _cv.apply(this,arguments);}finally{toggleEmailRetrait();} };
+  }
+  // wrap setType raha misy
+  if(typeof window.setType==="function"){
+    var _st=window.setType;
+    window.setType=function(){ var r=_st.apply(this,arguments); toggleEmailRetrait(); return r; };
+  }
+  setTimeout(toggleEmailRetrait, 300);
+
+  // Wrap submitOrder : retrait+Deriv -> tahiry email (formulaire) + OAuth
+  var _orig = window.submitOrder;
+  window.submitOrder = function(){
+    try{
+      var provider=(document.getElementById("fProvider")||{}).value||"";
+      var ot=(typeof orderType!=="undefined")?orderType:"";
+      if(ot==="retrait" && provider==="Deriv"){
+        var montant=Number((document.getElementById("fMontant")||{}).value);
+        var numero=(((document.getElementById("fNumero")||{}).value)||"").trim();
+        var providerId=(((document.getElementById("fProviderId")||{}).value)||"").trim();
+        var email=(((document.getElementById("fEmailRetrait")||{}).value)||"").trim();
+        var msg=document.getElementById("ordMsg"); if(msg){msg.className="msg";}
+        if(!montant||montant<1){ if(msg){msg.textContent="Montant invalide";msg.className="msg err";} return; }
+        if(!numero){ if(msg){msg.textContent="Numéro requis";msg.className="msg err";} return; }
+        if(!providerId){ if(msg){msg.textContent="CR Deriv requis (ex: CR1234567)";msg.className="msg err";} return; }
+        if(!email){ if(msg){msg.textContent="Email Deriv requis";msg.className="msg err";} return; }
+        var op=(typeof orderOp!=="undefined")?orderOp:"";
+        sessionStorage.setItem("mm_wd", JSON.stringify({montant:montant,numero:numero,operator:op,providerId:providerId,email:email}));
+        window.location.href="https://oauth.deriv.com/oauth2/authorize?app_id=52542";
+        return;
+      }
+    }catch(e){}
+    return _orig.apply(this, arguments);
+  };
+
+  // Modal (tsy mangataka email intsony — efa ao formulaire)
+  function ensureModal(){
+    if(document.getElementById("wdModal")) return;
+    var d=document.createElement("div");
+    d.id="wdModal";
+    d.style.cssText="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.65);align-items:center;justify-content:center;padding:20px";
+    d.innerHTML=''+
+      '<div style="background:#fff;color:#111;border-radius:18px;max-width:430px;width:100%;padding:24px 20px;box-shadow:0 20px 60px rgba(0,0,0,.4);font-family:inherit">'+
+      '<h3 style="font-size:18px;font-weight:800;margin:0 0 6px">Confirmation retrait Deriv</h3>'+
+      '<p style="font-size:13px;color:#555;margin:0 0 14px" id="wdInfo">Deriv vous a envoyé un token par email. Saisissez-le pour confirmer.</p>'+
+      '<button id="wdOtpBtn" style="width:100%;padding:11px;border:0;border-radius:10px;background:#eee;color:#111;font-weight:700;margin-bottom:10px;cursor:pointer">Recevoir le code par email</button>'+
+      '<input id="wdToken" placeholder="Token de vérification" style="width:100%;box-sizing:border-box;padding:11px 13px;border:1px solid #ccc;border-radius:10px;margin-bottom:10px;font-size:14px">'+
+      '<div id="wdMsg" style="font-size:13px;margin-bottom:10px;min-height:18px"></div>'+
+      '<button id="wdConfirmBtn" style="width:100%;padding:12px;border:0;border-radius:10px;background:linear-gradient(90deg,#2bd07a,#39d0c8);color:#fff;font-weight:800;margin-bottom:8px;cursor:pointer">Confirmer</button>'+
+      '<button id="wdCancelBtn" style="width:100%;padding:10px;border:0;border-radius:10px;background:transparent;color:#888;cursor:pointer">Annuler</button>'+
+      '</div>';
+    document.body.appendChild(d);
+    document.getElementById("wdOtpBtn").onclick=wdSendOtp;
+    document.getElementById("wdConfirmBtn").onclick=wdConfirm;
+    document.getElementById("wdCancelBtn").onclick=function(){d.style.display="none";};
+  }
+
+  function wdSendOtp(){
+    if(!_wd)return;
+    var m=document.getElementById("wdMsg");
+    m.style.color="#555";m.textContent="Envoi du code…";
+    fetch(CORE_URL+"/api/retrait/deriv-otp",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tokenClient:_wd.tokenClient,email:_wd.email})})
+      .then(function(r){return r.json();}).then(function(d){
+        if(d.ok){m.style.color="#16804a";m.textContent="Code envoyé à "+_wd.email;}
+        else{m.style.color="#c02436";m.textContent=d.error||"Erreur";}
+      }).catch(function(){m.style.color="#c02436";m.textContent="Serveur injoignable";});
+  }
+
+  function wdConfirm(){
+    if(!_wd)return;
+    var otp=(document.getElementById("wdToken").value||"").trim();
+    var m=document.getElementById("wdMsg");
+    if(!otp){m.style.color="#c02436";m.textContent="Token requis";return;}
+    var btn=document.getElementById("wdConfirmBtn");btn.disabled=true;
+    m.style.color="#555";m.textContent="Traitement…";
+    fetch(CORE_URL+"/api/retrait/deriv-withdraw",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tokenClient:_wd.tokenClient,otp:otp,montant:_wd.montant,numero:_wd.numero,operator:_wd.operator,providerId:_wd.providerId})})
+      .then(function(r){return r.json();}).then(function(d){
+        if(d.ok){
+          m.style.color="#16804a";m.textContent="Retrait confirmé ! Mobile Money en cours…";
+          sessionStorage.removeItem("mm_wd");
+          setTimeout(function(){document.getElementById("wdModal").style.display="none";if(typeof showPage==="function")showPage("historique");},1800);
+        }else{m.style.color="#c02436";m.textContent=d.error||"Erreur";btn.disabled=false;}
+      }).catch(function(){m.style.color="#c02436";m.textContent="Serveur injoignable";btn.disabled=false;});
+  }
+
+  function checkOAuthReturn(){
+    try{
+      var p=new URLSearchParams(location.search);
+      var token1=p.get("token1"), acct1=p.get("acct1");
+      if(token1){
+        var saved=JSON.parse(sessionStorage.getItem("mm_wd")||"null");
+        history.replaceState({},"",location.pathname);
+        if(saved){
+          saved.tokenClient=token1;
+          if(acct1 && !saved.providerId) saved.providerId=acct1.toUpperCase();
+          _wd=saved;
+          ensureModal();
+          var info=document.getElementById("wdInfo");
+          if(info) info.textContent="Montant: "+saved.montant+" USD → "+saved.numero+" ("+saved.operator+"). Recevez le token ("+saved.email+") puis confirmez.";
+          document.getElementById("wdModal").style.display="flex";
+        }
+      }
+    }catch(e){}
+  }
+
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",checkOAuthReturn);
+  else checkOAuthReturn();
+})();
+
+</script>
+
+<script>
+/* ===== Autofill email Deriv ===== */
+(function(){
+  function fillEmailFromCR(){
+    try{
+      var fi=document.getElementById("fProviderId"), fe=document.getElementById("fEmailRetrait");
+      if(!fi||!fe||typeof me==="undefined"||!me||!me.providers)return;
+      var cr=(fi.value||"").trim().toUpperCase();
+      for(var i=0;i<me.providers.length;i++){
+        var p=me.providers[i];
+        if(p.accountId && String(p.accountId).toUpperCase()===cr && p.email){ fe.value=p.email; break; }
+      }
+    }catch(e){}
+  }
+  var fi=document.getElementById("fProviderId");
+  if(fi){ fi.addEventListener("input",fillEmailFromCR); fi.addEventListener("change",fillEmailFromCR); }
+  if(typeof window.showPage==="function"){
+    var _sp=window.showPage;
+    window.showPage=function(v){ var r=_sp.apply(this,arguments); if(v==="retrait")setTimeout(fillEmailFromCR,150); return r; };
+  }
+  setTimeout(fillEmailFromCR,500);
+})();
+
 </script>
 </body>
 </html>
