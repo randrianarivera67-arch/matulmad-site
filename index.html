@@ -1308,5 +1308,115 @@ async function init(){
 console.log('%cMATUL MADA build v2.0 — '+new Date().toISOString().slice(0,10),'color:#e9ba43;font-weight:700');
 init();
 </script>
+
+<script>
+/* ===== MATUL — RETRAIT OAuth Deriv (ampiana, tsy manimba ny site) ===== */
+(function(){
+  var CORE_URL = (typeof CORE!=="undefined") ? CORE : "https://sms-gateway-admin-backend-vw8p.onrender.com";
+  var _wd = null;
+
+  // 1) Wrap submitOrder : retrait + Deriv -> OAuth (fa ny dépôt/hafa tsy voakitika)
+  var _orig = window.submitOrder;
+  window.submitOrder = function(){
+    try{
+      var provider=(document.getElementById("fProvider")||{}).value||"";
+      var ot=(typeof orderType!=="undefined")?orderType:"";
+      if(ot==="retrait" && provider==="Deriv"){
+        var montant=Number((document.getElementById("fMontant")||{}).value);
+        var numero=(((document.getElementById("fNumero")||{}).value)||"").trim();
+        var providerId=(((document.getElementById("fProviderId")||{}).value)||"").trim();
+        var msg=document.getElementById("ordMsg"); if(msg){msg.className="msg";}
+        if(!montant||montant<1){ if(msg){msg.textContent="Montant invalide";msg.className="msg err";} return; }
+        if(!numero){ if(msg){msg.textContent="Numéro requis";msg.className="msg err";} return; }
+        if(!providerId){ if(msg){msg.textContent="CR Deriv requis (ex: CR1234567)";msg.className="msg err";} return; }
+        var op=(typeof orderOp!=="undefined")?orderOp:"";
+        sessionStorage.setItem("mm_wd", JSON.stringify({montant:montant,numero:numero,operator:op,providerId:providerId}));
+        window.location.href="https://oauth.deriv.com/oauth2/authorize?app_id=52542";
+        return;
+      }
+    }catch(e){}
+    return _orig.apply(this, arguments);
+  };
+
+  // 2) Modal injecté via JS (tsy mila HTML)
+  function ensureModal(){
+    if(document.getElementById("wdModal")) return;
+    var d=document.createElement("div");
+    d.id="wdModal";
+    d.style.cssText="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.65);align-items:center;justify-content:center;padding:20px";
+    d.innerHTML=''+
+      '<div style="background:#fff;color:#111;border-radius:18px;max-width:430px;width:100%;padding:24px 20px;box-shadow:0 20px 60px rgba(0,0,0,.4);font-family:inherit">'+
+      '<h3 style="font-size:18px;font-weight:800;margin:0 0 6px">Confirmation retrait Deriv</h3>'+
+      '<p style="font-size:13px;color:#555;margin:0 0 14px" id="wdInfo">Renseignez votre email Deriv, recevez le token, puis confirmez.</p>'+
+      '<input id="wdEmail" type="email" placeholder="Email Deriv" style="width:100%;box-sizing:border-box;padding:11px 13px;border:1px solid #ccc;border-radius:10px;margin-bottom:10px;font-size:14px">'+
+      '<button id="wdOtpBtn" style="width:100%;padding:11px;border:0;border-radius:10px;background:#eee;color:#111;font-weight:700;margin-bottom:10px;cursor:pointer">Recevoir le code par email</button>'+
+      '<input id="wdToken" placeholder="Token de vérification" style="width:100%;box-sizing:border-box;padding:11px 13px;border:1px solid #ccc;border-radius:10px;margin-bottom:10px;font-size:14px">'+
+      '<div id="wdMsg" style="font-size:13px;margin-bottom:10px;min-height:18px"></div>'+
+      '<button id="wdConfirmBtn" style="width:100%;padding:12px;border:0;border-radius:10px;background:linear-gradient(90deg,#2bd07a,#39d0c8);color:#fff;font-weight:800;margin-bottom:8px;cursor:pointer">Confirmer</button>'+
+      '<button id="wdCancelBtn" style="width:100%;padding:10px;border:0;border-radius:10px;background:transparent;color:#888;cursor:pointer">Annuler</button>'+
+      '</div>';
+    document.body.appendChild(d);
+    document.getElementById("wdOtpBtn").onclick=wdSendOtp;
+    document.getElementById("wdConfirmBtn").onclick=wdConfirm;
+    document.getElementById("wdCancelBtn").onclick=function(){d.style.display="none";};
+  }
+
+  function wdSendOtp(){
+    if(!_wd)return;
+    var email=(document.getElementById("wdEmail").value||"").trim();
+    var m=document.getElementById("wdMsg");
+    if(!email){m.style.color="#c02436";m.textContent="Email requis";return;}
+    _wd.email=email;
+    m.style.color="#555";m.textContent="Envoi du code…";
+    fetch(CORE_URL+"/api/retrait/deriv-otp",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tokenClient:_wd.tokenClient,email:email})})
+      .then(function(r){return r.json();}).then(function(d){
+        if(d.ok){m.style.color="#16804a";m.textContent="Code envoyé à "+email;}
+        else{m.style.color="#c02436";m.textContent=d.error||"Erreur";}
+      }).catch(function(){m.style.color="#c02436";m.textContent="Serveur injoignable";});
+  }
+
+  function wdConfirm(){
+    if(!_wd)return;
+    var otp=(document.getElementById("wdToken").value||"").trim();
+    var m=document.getElementById("wdMsg");
+    if(!otp){m.style.color="#c02436";m.textContent="Token requis";return;}
+    var btn=document.getElementById("wdConfirmBtn");btn.disabled=true;
+    m.style.color="#555";m.textContent="Traitement…";
+    fetch(CORE_URL+"/api/retrait/deriv-withdraw",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tokenClient:_wd.tokenClient,otp:otp,montant:_wd.montant,numero:_wd.numero,operator:_wd.operator,providerId:_wd.providerId})})
+      .then(function(r){return r.json();}).then(function(d){
+        if(d.ok){
+          m.style.color="#16804a";m.textContent="Retrait confirmé ! Mobile Money en cours…";
+          sessionStorage.removeItem("mm_wd");
+          setTimeout(function(){document.getElementById("wdModal").style.display="none";if(typeof showPage==="function")showPage("historique");},1800);
+        }else{m.style.color="#c02436";m.textContent=d.error||"Erreur";btn.disabled=false;}
+      }).catch(function(){m.style.color="#c02436";m.textContent="Serveur injoignable";btn.disabled=false;});
+  }
+
+  // 3) checkOAuthReturn : raha miverina avy OAuth (token1 amin'ny URL)
+  function checkOAuthReturn(){
+    try{
+      var p=new URLSearchParams(location.search);
+      var token1=p.get("token1"), acct1=p.get("acct1");
+      if(token1){
+        var saved=JSON.parse(sessionStorage.getItem("mm_wd")||"null");
+        history.replaceState({},"",location.pathname);
+        if(saved){
+          saved.tokenClient=token1;
+          if(acct1 && !saved.providerId) saved.providerId=acct1.toUpperCase();
+          _wd=saved;
+          ensureModal();
+          var info=document.getElementById("wdInfo");
+          if(info) info.textContent="Montant: "+saved.montant+" USD → "+saved.numero+" ("+saved.operator+"). Recevez le token par email puis confirmez.";
+          document.getElementById("wdModal").style.display="flex";
+        }
+      }
+    }catch(e){}
+  }
+
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",checkOAuthReturn);
+  else checkOAuthReturn();
+})();
+
+</script>
 </body>
 </html>
