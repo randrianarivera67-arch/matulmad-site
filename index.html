@@ -369,6 +369,8 @@ body.dash .landing-only{display:none !important}
 /* Paramètres — SVG néon */
 .tb-set .ic{color:var(--blue-1);filter:drop-shadow(0 0 5px var(--glow)) drop-shadow(0 0 2px var(--glow))}
 .tb-set:hover{border-color:var(--blue-1);box-shadow:0 0 14px var(--glow)}
+.tb-login .ic{color:#ff2d8a;filter:drop-shadow(0 0 5px rgba(255,45,138,.55)) drop-shadow(0 0 2px rgba(255,45,138,.35))}
+.tb-login:hover{border-color:#ff2d8a;box-shadow:0 0 14px rgba(255,45,138,.45)}
 /* Notification — cloche animée (balancement) */
 .tb-notif .ic{color:var(--gold-2);transform-origin:50% 4px;animation:bellSwing 3s ease-in-out infinite}
 @keyframes bellSwing{0%,50%,100%{transform:rotate(0)}54%{transform:rotate(14deg)}60%{transform:rotate(-12deg)}66%{transform:rotate(9deg)}72%{transform:rotate(-6deg)}78%{transform:rotate(3deg)}84%{transform:rotate(0)}}
@@ -545,7 +547,7 @@ body.dash .dock{ display:grid; }
     <div class="nav-actions">
       <button class="langtog landing-only" onclick="toggleLang()" title="Langue"><span id="langLabel">FR</span></button>
       <button class="iconbtn landing-only" onclick="toggleTheme()" title="Thème" id="themeBtn"></button>
-      <button class="btn btn-ghost btn-sm landing-only" id="navAuthBtn" onclick="openAuth('login')" data-i18n="nav_login">Connexion</button>
+      <button class="tb-btn tb-login landing-only" id="navAuthBtn" onclick="openAuth('login')" title="Connexion"><svg class="ic" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg></button>
       <button class="tb-btn tb-set dash-only" onclick="openSettings()" title="Paramètres"><svg class="ic" viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
       <button class="tb-btn tb-notif dash-only" id="bellBtn" onclick="openNotif()" title="Annonces"><svg class="ic" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="bell-dot hidden" id="bellDot"></span></button>
       <button class="tb-prof dash-only" id="profBtn" onclick="openProfile()" title="Profil"><span class="av-fb" id="profInit">?</span><img id="profImg" alt=""></button>
@@ -1284,6 +1286,19 @@ let deferredPrompt=null;
 window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferredPrompt=e;
   if(localStorage.getItem("mm_pwa_dismiss")!=="1")document.getElementById("installBanner").classList.add("show");});
 window.addEventListener("appinstalled",function(){deferredPrompt=null;document.getElementById("installBanner").classList.remove("show");});
+/* FIX Safari iOS: tsy manohana beforeinstallprompt mihitsy.
+   Toromarika mivantana no atao amin io banner ihany. */
+(function(){
+  var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+  var isStandalone=window.matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+  if(!isIOS||isStandalone)return;
+  if(localStorage.getItem("mm_pwa_dismiss")==="1")return;
+  var b=document.getElementById("installBanner");if(!b)return;
+  var sub=b.querySelector(".ib-t span");
+  if(sub)sub.textContent=(typeof lang!=="undefined"&&lang==="mg")?"Tsindrio Partager, dia Ajouter a l ecran d accueil":"Tapez Partager, puis Ajouter a l ecran d accueil";
+  var yes=b.querySelector(".ib-yes");if(yes)yes.style.display="none";
+  b.classList.add("show");
+})();
 async function installPWA(){if(!deferredPrompt){document.getElementById("installBanner").classList.remove("show");return;}
   deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;document.getElementById("installBanner").classList.remove("show");}
 function dismissInstall(){document.getElementById("installBanner").classList.remove("show");localStorage.setItem("mm_pwa_dismiss","1");}
