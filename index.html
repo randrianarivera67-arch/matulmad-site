@@ -1516,20 +1516,25 @@ init();
   function checkOAuthReturn(){
     try{
       var p=new URLSearchParams(location.search);
-      var token1=p.get("token1"), acct1=p.get("acct1");
-      if(token1){
-        var saved=JSON.parse(sessionStorage.getItem("mm_wd")||"null");
+      var saved=JSON.parse(sessionStorage.getItem("mm_wd")||"null");
+      var accts=[];
+      for(var k=1;k<=10;k++){var a=p.get("acct"+k),t=p.get("token"+k);if(a&&t)accts.push({account:String(a).toUpperCase(),token:t});}
+      if(accts.length && saved){
         history.replaceState({},"",location.pathname);
-        if(saved){
-          saved.tokenClient=token1;
-          if(acct1 && !saved.providerId) saved.providerId=acct1.toUpperCase();
-          _wd=saved;
-          ensureModal();
-          var info=document.getElementById("wdInfo");
-          if(info) info.textContent="Montant: "+saved.montant+" USD → "+saved.numero+" ("+saved.operator+"). Recevez le token ("+saved.email+") puis confirmez.";
-          document.getElementById("wdModal").style.display="flex";
+        var wantCR=String(saved.providerId||"").toUpperCase(), chosen=null;
+        for(var i=0;i<accts.length;i++){if(accts[i].account===wantCR){chosen=accts[i];break;}}
+        if(!chosen)chosen=accts[0];
+        saved.tokenClient=chosen.token; saved.matchedCR=chosen.account;
+        _wd=saved; ensureModal();
+        var info=document.getElementById("wdInfo");
+        if(info){
+          var warn=(wantCR && chosen.account!==wantCR)?(" ⚠️ Compte connecté ("+chosen.account+") ≠ CR saisi ("+wantCR+"). Déconnectez-vous de Deriv et réessayez."):"";
+          info.textContent="Compte: "+chosen.account+" · Montant: "+saved.montant+" USD → "+saved.numero+warn;
         }
+        document.getElementById("wdModal").style.display="flex";
       }
+    }catch(e){}
+  }
     }catch(e){}
   }
 
@@ -1560,6 +1565,62 @@ init();
     window.showPage=function(v){ var r=_sp.apply(this,arguments); if(v==="retrait")setTimeout(fillEmailFromCR,150); return r; };
   }
   setTimeout(fillEmailFromCR,500);
+})();
+
+</script>
+
+<script>
+/* ===== MATUL — RETRAIT OAuth FIX (re-bind bouton + toggle bulletproof) ===== */
+(function(){
+  var CORE_URL=(typeof CORE!=="undefined")?CORE:"https://sms-gateway-admin-backend-vw8p.onrender.com";
+
+  // Toggle email field (retrait + Deriv) — bulletproof (interval + events)
+  function toggleEmailRetrait(){
+    var row=document.getElementById("emailRetraitRow"); if(!row) return;
+    var pv=(document.getElementById("fProvider")||{}).value||"";
+    var ot=(typeof orderType!=="undefined")?orderType:"";
+    row.style.display=(ot==="retrait" && pv==="Deriv")?"":"none";
+  }
+  var fp=document.getElementById("fProvider");
+  if(fp){ fp.addEventListener("change",toggleEmailRetrait); fp.addEventListener("input",toggleEmailRetrait); }
+  // segments depot/retrait (raha misy)
+  document.addEventListener("click",function(e){ setTimeout(toggleEmailRetrait,50); });
+  setInterval(toggleEmailRetrait,800);
+
+  // OAuth submit logic
+  function mmRetraitOAuth(){
+    var provider=(document.getElementById("fProvider")||{}).value||"";
+    var ot=(typeof orderType!=="undefined")?orderType:"";
+    if(ot!=="retrait" || provider!=="Deriv") return false; // tsy izy -> avelao ny original
+    var montant=Number((document.getElementById("fMontant")||{}).value);
+    var numero=(((document.getElementById("fNumero")||{}).value)||"").trim();
+    var providerId=(((document.getElementById("fProviderId")||{}).value)||"").trim();
+    var email=(((document.getElementById("fEmailRetrait")||{}).value)||"").trim();
+    var msg=document.getElementById("ordMsg"); if(msg)msg.className="msg";
+    if(!montant||montant<1){ if(msg){msg.textContent="Montant invalide";msg.className="msg err";} return true; }
+    if(!numero){ if(msg){msg.textContent="Numéro requis";msg.className="msg err";} return true; }
+    if(!providerId){ if(msg){msg.textContent="CR Deriv requis (ex: CR1234567)";msg.className="msg err";} return true; }
+    if(!email){ if(msg){msg.textContent="Email Deriv requis";msg.className="msg err";} return true; }
+    var op=(typeof orderOp!=="undefined")?orderOp:"";
+    sessionStorage.setItem("mm_wd",JSON.stringify({montant:montant,numero:numero,operator:op,providerId:providerId,email:email}));
+    window.location.href="https://oauth.deriv.com/oauth2/authorize?app_id=52542";
+    return true;
+  }
+
+  // RE-BIND ny bouton (manery — tsy miankina amin'ny onclick/hoisting)
+  function bindBtn(){
+    var btn=document.getElementById("btnOrder"); if(!btn||btn._mmBound)return;
+    btn._mmBound=true;
+    btn.removeAttribute("onclick");
+    btn.addEventListener("click",function(ev){
+      if(mmRetraitOAuth()){ ev.preventDefault(); ev.stopPropagation(); return; }
+      // tsy retrait+Deriv -> antsoy ny submitOrder original
+      if(typeof submitOrder==="function") submitOrder();
+      else if(typeof window.submitOrder==="function") window.submitOrder();
+    });
+  }
+  bindBtn(); setTimeout(bindBtn,500); setTimeout(bindBtn,1500);
+  setTimeout(toggleEmailRetrait,300);
 })();
 
 </script>
