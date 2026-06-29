@@ -1,4 +1,4 @@
-const CACHE='matulmada-v4';
+const CACHE='matulmada-v5';
 // FIX: index.html ESORINA amin'ny pre-cache mafy -- HTML page dia tokony
 // ho network-first foana mba tsy hisy "mila fafana vao manavao".
 const SHELL=['/manifest.json','/icon-192.png','/icon-512.png','/apple-touch-icon.png','/yas.png','/orange.png','/airtel.png'];
