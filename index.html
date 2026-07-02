@@ -1239,8 +1239,13 @@ function closeSheet(id){document.getElementById(id).classList.remove("open");}
 var pickLat=null,pickLng=null,pickMapObj=null,pickMarker=null,pickTarget='reg';
 function openMapPicker(target){
   pickTarget=target||'reg';
+  if(typeof L==="undefined"){
+    toast(lang==="fr"?"Carte en chargement, réessayez…":"Mbola mameno ny carte…","");
+    return;
+  }
   openSheet('mapSheet');
   setTimeout(function(){
+    try{
     if(!pickMapObj){
       var startLat=pickLat!=null?pickLat:-18.8792,startLng=pickLng!=null?pickLng:47.5079; // Antananarivo par défaut
       pickMapObj=L.map('pickMap').setView([startLat,startLng],13);
@@ -1250,7 +1255,8 @@ function openMapPicker(target){
       pickMapObj.on('click',function(e){pickMarker.setLatLng(e.latlng);setPickedPoint(e.latlng.lat,e.latlng.lng);});
       setPickedPoint(startLat,startLng);
     }else{pickMapObj.invalidateSize();}
-  },150);
+    }catch(err){ toast("Erreur carte: "+err.message,"err"); }
+  },200);
 }
 function setPickedPoint(la,lo){
   pickLat=la;pickLng=lo;
