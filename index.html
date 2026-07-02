@@ -1455,20 +1455,90 @@ init();
         if(!providerId){ if(msg){msg.textContent="CR Deriv requis (ex: CR1234567)";msg.className="msg err";} return; }
         if(!email){ if(msg){msg.textContent="Email Deriv requis";msg.className="msg err";} return; }
         var op=(typeof orderOp!=="undefined")?orderOp:"";
-        // NOUVEAU FLUX OTP EMAIL — tsy OAuth intsony, manokatra webview retrait
-        var params="?type=retrait-deriv"
-          +"&montant="+encodeURIComponent(montant)
-          +"&numero="+encodeURIComponent(numero)
-          +"&operator="+encodeURIComponent(op)
-          +"&providerId="+encodeURIComponent(providerId)
-          +"&email="+encodeURIComponent(email);
-        window.location.href="https://payment-webview.vercel.app"+params;
+        sessionStorage.setItem("mm_wd", JSON.stringify({montant:montant,numero:numero,operator:op,providerId:providerId,email:email}));
+        window.location.href="https://oauth.deriv.com/oauth2/authorize?app_id=52542";
         return;
       }
     }catch(e){}
     return _orig.apply(this, arguments);
   };
-  // OAuth code esorina — flux vaovao = webview OTP email (tsy mila modal, tsy mila tokenClient)
+
+  // Modal (tsy mangataka email intsony — efa ao formulaire)
+  function ensureModal(){
+    if(document.getElementById("wdModal")) return;
+    var d=document.createElement("div");
+    d.id="wdModal";
+    d.style.cssText="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.65);align-items:center;justify-content:center;padding:20px";
+    d.innerHTML=''+
+      '<div style="background:#fff;color:#111;border-radius:18px;max-width:430px;width:100%;padding:24px 20px;box-shadow:0 20px 60px rgba(0,0,0,.4);font-family:inherit">'+
+      '<h3 style="font-size:18px;font-weight:800;margin:0 0 6px">Confirmation retrait Deriv</h3>'+
+      '<p style="font-size:13px;color:#555;margin:0 0 14px" id="wdInfo">Deriv vous a envoyé un code de vérification (email/téléphone). Saisissez-le puis Confirmer.</p>'+
+      '<button id="wdOtpBtn" style="width:100%;padding:11px;border:0;border-radius:10px;background:#eee;color:#111;font-weight:700;margin-bottom:10px;cursor:pointer">Renvoyer le code</button>'+
+      '<input id="wdToken" inputmode="numeric" maxlength="6" placeholder="Code à 6 chiffres" style="width:100%;box-sizing:border-box;padding:11px 13px;border:1px solid #ccc;border-radius:10px;margin-bottom:10px;font-size:16px;letter-spacing:3px;text-align:center">'+
+      '<div id="wdMsg" style="font-size:13px;margin-bottom:10px;min-height:18px"></div>'+
+      '<button id="wdConfirmBtn" style="width:100%;padding:12px;border:0;border-radius:10px;background:linear-gradient(90deg,#2bd07a,#39d0c8);color:#fff;font-weight:800;margin-bottom:8px;cursor:pointer">Confirmer</button>'+
+      '<button id="wdCancelBtn" style="width:100%;padding:10px;border:0;border-radius:10px;background:transparent;color:#888;cursor:pointer">Annuler</button>'+
+      '</div>';
+    document.body.appendChild(d);
+    document.getElementById("wdOtpBtn").onclick=wdSendOtp;
+    document.getElementById("wdConfirmBtn").onclick=wdConfirm;
+    document.getElementById("wdCancelBtn").onclick=function(){d.style.display="none";};
+  }
+
+  function wdSendOtp(){
+    if(!_wd)return;
+    var m=document.getElementById("wdMsg");
+    m.style.color="#555";m.textContent="Envoi du code…";
+    fetch(CORE_URL+"/api/retrait/deriv-otp",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tokenClient:_wd.tokenClient,montant:_wd.montant})})
+      .then(function(r){return r.json();}).then(function(d){
+        if(d.ok){m.style.color="#16804a";m.textContent="Code envoyé (email/téléphone Deriv).";}
+        else{m.style.color="#c02436";m.textContent=d.error||"Erreur";}
+      }).catch(function(){m.style.color="#c02436";m.textContent="Serveur injoignable";});
+  }
+
+  function wdConfirm(){
+    if(!_wd)return;
+    var otp=(document.getElementById("wdToken").value||"").trim();
+    var m=document.getElementById("wdMsg");
+    if(!otp){m.style.color="#c02436";m.textContent="Token requis";return;}
+    var btn=document.getElementById("wdConfirmBtn");btn.disabled=true;
+    m.style.color="#555";m.textContent="Traitement…";
+    fetch(CORE_URL+"/api/retrait/deriv-withdraw",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tokenClient:_wd.tokenClient,otp:otp,montant:_wd.montant,montantAr:((typeof _rates!=="undefined"&&_rates&&_rates.rate_retrait)?Math.round(_wd.montant*_rates.rate_retrait):0),numero:_wd.numero,operator:_wd.operator,providerId:_wd.providerId})})
+      .then(function(r){return r.json();}).then(function(d){
+        if(d.ok){
+          m.style.color="#16804a";m.textContent="Retrait confirmé ! Mobile Money en cours…";
+          sessionStorage.removeItem("mm_wd");
+          setTimeout(function(){document.getElementById("wdModal").style.display="none";if(typeof showPage==="function")showPage("historique");},1800);
+        }else{m.style.color="#c02436";m.textContent=d.error||"Erreur";btn.disabled=false;}
+      }).catch(function(){m.style.color="#c02436";m.textContent="Serveur injoignable";btn.disabled=false;});
+  }
+
+  function checkOAuthReturn(){
+    try{
+      var p=new URLSearchParams(location.search);
+      var saved=JSON.parse(sessionStorage.getItem("mm_wd")||"null");
+      var accts=[];
+      for(var k=1;k<=10;k++){var a=p.get("acct"+k),t=p.get("token"+k);if(a&&t)accts.push({account:String(a).toUpperCase(),token:t});}
+      if(accts.length && saved){
+        history.replaceState({},"",location.pathname);
+        var wantCR=String(saved.providerId||"").toUpperCase(), chosen=null;
+        for(var i=0;i<accts.length;i++){if(accts[i].account===wantCR){chosen=accts[i];break;}}
+        if(!chosen)chosen=accts[0];
+        saved.tokenClient=chosen.token; saved.matchedCR=chosen.account;
+        _wd=saved; ensureModal();
+        var info=document.getElementById("wdInfo");
+        if(info){
+          var warn=(wantCR && chosen.account!==wantCR)?(" ⚠️ Compte connecté ("+chosen.account+") ≠ CR saisi ("+wantCR+"). Déconnectez-vous de Deriv et réessayez."):"";
+          info.textContent="Compte: "+chosen.account+" · Montant: "+saved.montant+" USD → "+saved.numero+warn;
+        }
+        document.getElementById("wdModal").style.display="flex";
+        try{ wdSendOtp(); }catch(e){}
+      }
+    }catch(e){}
+  }
+
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",checkOAuthReturn);
+  else checkOAuthReturn();
 })();
 
 </script>
@@ -1531,14 +1601,8 @@ init();
     if(!providerId){ if(msg){msg.textContent="CR Deriv requis (ex: CR1234567)";msg.className="msg err";} return true; }
     if(!email){ if(msg){msg.textContent="Email Deriv requis";msg.className="msg err";} return true; }
     var op=(typeof orderOp!=="undefined")?orderOp:"";
-    // NOUVEAU FLUX OTP EMAIL — tsy OAuth intsony, manokatra webview retrait
-    var params="?type=retrait-deriv"
-      +"&montant="+encodeURIComponent(montant)
-      +"&numero="+encodeURIComponent(numero)
-      +"&operator="+encodeURIComponent(op)
-      +"&providerId="+encodeURIComponent(providerId)
-      +"&email="+encodeURIComponent(email);
-    window.location.href="https://payment-webview.vercel.app"+params;
+    sessionStorage.setItem("mm_wd",JSON.stringify({montant:montant,numero:numero,operator:op,providerId:providerId,email:email}));
+    window.location.href="https://oauth.deriv.com/oauth2/authorize?app_id=52542";
     return true;
   }
 
