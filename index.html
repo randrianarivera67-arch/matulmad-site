@@ -1237,6 +1237,15 @@ function closeSheet(id){document.getElementById(id).classList.remove("open");}
 
 /* ===== Point exact carte (Leaflet + OpenStreetMap — gratuit, sans clé API) ===== */
 var pickLat=null,pickLng=null,pickMapObj=null,pickMarker=null,pickTarget='reg';
+// FIX: afindra mapSheet HORS de authModal (nested -> stacking context olana)
+(function(){
+  function moveMapSheet(){
+    var ms=document.getElementById('mapSheet');
+    if(ms && ms.parentElement!==document.body){ document.body.appendChild(ms); }
+  }
+  if(document.readyState!=='loading') moveMapSheet();
+  else document.addEventListener('DOMContentLoaded', moveMapSheet);
+})();
 function openMapPicker(target){
   pickTarget=target||'reg';
   if(typeof L==="undefined"){
