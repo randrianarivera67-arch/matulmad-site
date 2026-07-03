@@ -1,4 +1,4 @@
-const CACHE = 'matulmad-v9';
+const CACHE = 'matulmad-v10';
 const ASSETS = ['/', '/index.html', '/logo.svg', '/icon-192.png', '/icon-512.png', '/manifest.json'];
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -12,7 +12,7 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(req.url);
   if (url.origin !== location.origin) return;
   // Network-first ho an'ny HTML/navigation (mahazo vaovao foana)
-  if (req.mode === 'navigate' || req.destination === 'document' || url.pathname === '/' || url.pathname.endsWith('.html')) {
+  if (req.mode === 'navigate' || req.destination === 'document' || url.pathname === '/' || url.pathname.endsWith('.html') || url.pathname.includes('-bg.jpg') || url.pathname.endsWith('.jpg') || url.pathname.endsWith('.png')) {
     e.respondWith(
       fetch(req).then((res) => { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)).catch(()=>{}); return res; })
         .catch(() => caches.match(req).then((h) => h || caches.match('/index.html')))
