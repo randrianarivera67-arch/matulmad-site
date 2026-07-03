@@ -718,6 +718,16 @@ body.dash .dock{ display:grid; }
       <button class="tab" id="tabReg" onclick="switchTab('register')" data-i18n="tab_register">Inscription</button>
     </div>
     <div class="msg" id="authMsg"></div>
+    <div class="field" id="fldPhoto" style="display:none;text-align:center">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+        <div id="photoPreview" onclick="document.getElementById('aPhotoInput').click()" style="width:88px;height:88px;border-radius:50%;background:var(--panel);border:2px dashed var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative">
+          <svg class="ic" viewBox="0 0 24 24" style="width:34px;height:34px;color:var(--ink-dim)"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0"/></svg>
+        </div>
+        <button type="button" onclick="document.getElementById('aPhotoInput').click()" style="background:none;border:none;color:var(--blue-1);font-family:var(--font-d);font-weight:700;font-size:13px;cursor:pointer" data-i18n="lbl_addphoto">Ajouter une photo</button>
+        <input type="file" id="aPhotoInput" accept="image/*" style="display:none" onchange="onSelectPhoto(event)">
+        <input type="hidden" id="aPhotoData">
+      </div>
+    </div>
     <div class="field" id="fldPrenom" style="display:none"><label data-i18n="lbl_prenom">Prénom</label>
       <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0"/></svg><input id="aPrenom" placeholder="Prénom"></div></div>
     <div class="field" id="fldName" style="display:none"><label data-i18n="lbl_name">Nom</label>
@@ -938,6 +948,7 @@ function openAuth(m){authMode=m;switchTab(m);document.getElementById("authModal"
 function closeAuth(){document.getElementById("authModal").classList.remove("open");document.getElementById("authMsg").className="msg";}
 function switchTab(m){authMode=m;
   document.getElementById("tabLogin").classList.toggle("active",m==="login");document.getElementById("tabReg").classList.toggle("active",m==="register");
+  document.getElementById("fldPhoto").style.display=m==="register"?"block":"none";
   document.getElementById("fldPrenom").style.display=m==="register"?"block":"none";
   document.getElementById("fldName").style.display=m==="register"?"block":"none";document.getElementById("fldPhone").style.display=m==="register"?"block":"none";
   document.getElementById("fldCountry").style.display=m==="register"?"block":"none";
@@ -969,6 +980,14 @@ async function doAuth(){
       var addrLat=document.getElementById("aAddrLat").value;var addrLng=document.getElementById("aAddrLng").value;
       var body={name:name,password:pass,confirmPassword:passConfirm,lang:lang,country:country,address:address};
       if(addrLat)body.addressLat=parseFloat(addrLat);if(addrLng)body.addressLng=parseFloat(addrLng);
+      var photoData=document.getElementById("aPhotoData").value;
+      if(photoData){
+        try{
+          var up=await fetch(API+"/api/photo/upload",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({imageBase64:photoData})});
+          var uj=await up.json();
+          if(up.ok&&uj.fileId)body.photo=uj.fileId;
+        }catch(e){}
+      }
       if(ident.indexOf("@")>=0)body.email=ident;else body.phone=ident;if(phone)body.phone=phone;
       res=await fetch(API+"/api/auth/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
     }else{
@@ -979,6 +998,27 @@ async function doAuth(){
     token=d.token;localStorage.setItem("mm_token",token);me=d.user;closeAuth();enterDash();loadNotifs();
   }catch(e){authError(lang==="fr"?"Serveur injoignable":"Tsy tratra ny serveur");}
   btn.disabled=false;
+}
+function onSelectPhoto(ev){
+  var file=ev.target.files&&ev.target.files[0];if(!file)return;
+  if(!file.type.match(/^image\//)){toast(lang==="fr"?"Image invalide":"Sary diso","err");return;}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var img=new Image();
+    img.onload=function(){
+      var size=400,canvas=document.createElement("canvas");canvas.width=size;canvas.height=size;
+      var ctx=canvas.getContext("2d");
+      // crop carré centré
+      var mn=Math.min(img.width,img.height),sx=(img.width-mn)/2,sy=(img.height-mn)/2;
+      ctx.drawImage(img,sx,sy,mn,mn,0,0,size,size);
+      var dataUrl=canvas.toDataURL("image/jpeg",0.85);
+      document.getElementById("aPhotoData").value=dataUrl;
+      var prev=document.getElementById("photoPreview");
+      prev.innerHTML='<img src="'+dataUrl+'" style="width:100%;height:100%;object-fit:cover">';
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 function logout(){token="";me=null;localStorage.removeItem("mm_token");go("home");}
 async function api(path,opts){
@@ -1334,11 +1374,25 @@ function syncSettings(){
 function avInitOf(u){var s=(u&&(u.name||u.email||u.phone)||'?').trim();return s?s[0].toUpperCase():'?';}
 function updateProfBtn(){
   var ini=document.getElementById('profInit');if(ini)ini.textContent=avInitOf(me);
+  var img=document.getElementById('profImg');
+  if(img){
+    if(me&&me.photo){
+      img.src=API+'/api/photo/'+me.photo;img.style.display='block';
+      if(ini)ini.style.display='none';
+    }else{
+      img.style.display='none';img.removeAttribute('src');
+      if(ini)ini.style.display='';
+    }
+  }
 }
 function openProfile(){
   if(!me)return;
   fillCountrySelects();
   document.getElementById('pfAvInit').textContent=avInitOf(me);
+  (function(){var av=document.querySelector('#profSheet .pf-av');if(av){var im=document.getElementById('pfAvImg');
+    if(me&&me.photo){if(!im){im=document.createElement('img');im.id='pfAvImg';im.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:inherit;position:absolute;inset:0';av.style.position='relative';av.appendChild(im);}im.src=API+'/api/photo/'+me.photo;im.style.display='block';document.getElementById('pfAvInit').style.display='none';}
+    else if(im){im.style.display='none';document.getElementById('pfAvInit').style.display='';}
+  }})();
   document.getElementById('pfName').textContent=me.name||(lang==='fr'?'Client':'Mpanjifa');
   document.getElementById('pfSub').textContent=me.email||me.phone||'';
   document.getElementById('pfNameI').value=me.name||'';
