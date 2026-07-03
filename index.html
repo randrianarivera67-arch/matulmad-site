@@ -456,6 +456,12 @@ body:not(.dash) .social-fab{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
   .dock button .ic{width:21px;height:21px}
   .social-fab a{width:46px;height:46px}
 }
+.add-depot-btn{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:46px;margin-bottom:14px;border:none;border-radius:13px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-family:var(--font-d);font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 6px 18px rgba(34,197,94,.4)}
+.add-depot-btn::after{content:"";position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);animation:shineBtn 2.5s infinite}
+@keyframes shineBtn{0%{left:-100%}55%{left:160%}100%{left:160%}}
+.add-depot-btn:active{transform:scale(.97)}
+.rp-box{cursor:pointer;transition:.15s}.rp-box:active{transform:scale(.96)}
+.social-fab .s-fb{background:linear-gradient(180deg,#4a86f7,#1877f2)}
 </style>
 
 <style id="nav-robuste">
@@ -620,8 +626,8 @@ body.dash .dock{ display:grid; }
     <div class="rate-panel" id="ratePanel">
       <div class="rp-top"><span class="rp-dot"></span><span class="rp-lbl" data-i18n="rate_lbl">Cours du jour · Deriv</span></div>
       <div class="rp-grid">
-        <div class="rp-box dep"><div class="k" data-i18n="rate_dep">Dépôt</div><div class="v" id="rateDep">— Ar</div></div>
-        <div class="rp-box ret"><div class="k" data-i18n="rate_ret">Retrait</div><div class="v" id="rateRet">— Ar</div></div>
+        <div class="rp-box dep" onclick="showPage('depot')"><div class="k" data-i18n="rate_dep">Dépôt</div><div class="v" id="rateDep">— Ar</div></div>
+        <div class="rp-box ret" onclick="showPage('retrait')"><div class="k" data-i18n="rate_ret">Retrait</div><div class="v" id="rateRet">— Ar</div></div>
       </div>
       <div class="rp-foot" data-i18n="rate_foot">Appliqué aux ordres Deriv (1 USD). Mobile money : montants en Ariary.</div>
     </div>
@@ -664,6 +670,7 @@ body.dash .dock{ display:grid; }
 
   <!-- WALLETS -->
   <section class="page" data-page="wallets">
+    <button class="add-depot-btn" onclick="showPage('depot')"><svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="add_depot">Nouveau dépôt</span></button>
     <div class="card">
       <div class="card-head"><h3><svg class="ic" viewBox="0 0 24 24"><path d="M3 7h18v12H3zM3 7l2-3h14l2 3M16 13h2"/></svg><span data-i18n="wal_title">Mes wallets</span></h3>
         <button class="btn btn-gold btn-sm" onclick="openWallet(null)"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="add">Ajouter</span></button></div>
@@ -673,6 +680,7 @@ body.dash .dock{ display:grid; }
 
   <!-- FOURNISSEURS -->
   <section class="page" data-page="fournisseurs">
+    <button class="add-depot-btn" onclick="showPage('depot')"><svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="add_depot">Nouveau dépôt</span></button>
     <div class="card">
       <div class="card-head"><h3><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg><span data-i18n="prov_title">Mes fournisseurs</span></h3>
         <button class="btn btn-primary btn-sm" onclick="openProv(null)"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="add">Ajouter</span></button></div>
@@ -682,6 +690,7 @@ body.dash .dock{ display:grid; }
 
   <!-- HISTORIQUE -->
   <section class="page" data-page="historique">
+    <button class="add-depot-btn" onclick="showPage('depot')"><svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="add_depot">Nouveau dépôt</span></button>
     <div class="card">
       <div class="card-head"><h3><svg class="ic" viewBox="0 0 24 24"><path d="M12 7v5l3 2M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z"/></svg><span data-i18n="hist_title">Historique</span></h3></div>
       <div class="hist-tools">
@@ -800,6 +809,7 @@ body.dash .dock{ display:grid; }
 <div class="social-fab" id="socialFab">
   <a class="s-wa" href="#" onclick="return socialSoon('WhatsApp')" title="WhatsApp" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-1.207zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.148-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.612-.916-2.207-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg></a>
   <a class="s-tg" href="#" onclick="return socialSoon('Telegram')" title="Telegram" aria-label="Telegram"><svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></a>
+  <a class="s-fb" href="#" onclick="return socialSoon('Facebook')" title="Facebook" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
 </div>
 
 <!-- Loading splash -->
@@ -851,7 +861,7 @@ const I18N={
   lbl_prenom:"Prénom",lbl_passconfirm:"Confirmer le mot de passe",lbl_pickmap:"Choisir le point exact (carte)",lbl_pickmap_title:"Point exact",lbl_mylocation:"Utiliser ma position actuelle",lbl_confirm_point:"Confirmer ce point",
   dash_hi:'Bonjour, <span id="dashName">client</span>',dash_sub:"Gérez vos comptes et passez vos ordres.",
   depot:"Dépôt",retrait:"Retrait",lbl_op:"Opérateur",lbl_amount:"Montant (Ar)",lbl_num:"Numéro",lbl_prov:"Fournisseur",lbl_provid:"ID fournisseur",ord_confirm:"Confirmer l'ordre",
-  rate_lbl:"Cours du jour · Deriv",rate_dep:"Dépôt (1 USD)",rate_ret:"Retrait (1 USD)",rate_foot:"Appliqué aux ordres Deriv. Mobile money : montants en Ariary.",in_ariary:"EN ARIARY",
+  rate_lbl:"Cours du jour · Deriv",rate_dep:"Dépôt (1 USD)",rate_ret:"Retrait (1 USD)",rate_foot:"Appliqué aux ordres Deriv. Mobile money : montants en Ariary.",in_ariary:"EN ARIARY",add_depot:"Nouveau dépôt",
   wal_title:"Mes wallets",prov_title:"Mes fournisseurs",hist_title:"Historique",hist_empty:"Aucun ordre pour le moment.",
   nav_wal:"Wallets",nav_prov:"Deriv",nav_hist:"Historique",f_all:"Tous",notif_title:"Annonces",notif_empty:"Aucune annonce pour le moment.",
   set_title:"Paramètres",set_theme:"Apparence",set_lang:"Langue",set_logout_sub:"Quitter votre espace",prof_title:"Mon profil",prof_save:"Enregistrer",lbl_email:"Email",lbl_phone2:"Téléphone",lbl_country:"Pays",lbl_address:"Adresse",
@@ -874,7 +884,7 @@ const I18N={
   lbl_prenom:"Fanampin'anarana",lbl_passconfirm:"Hamarino ny tenimiafina",lbl_pickmap:"Hifidy ny toerana marina (sarintany)",lbl_pickmap_title:"Toerana marina",lbl_mylocation:"Ampiasao ny toerako ankehitriny",lbl_confirm_point:"Hamarino ity toerana ity",
   dash_hi:'Manao ahoana, <span id="dashName">client</span>',dash_sub:"Tantano ny kaontinao ary manaova ordre.",
   depot:"Dépôt",retrait:"Retrait",lbl_op:"Opérateur",lbl_amount:"Montant (Ar)",lbl_num:"Numéro",lbl_prov:"Fournisseur",lbl_provid:"ID fournisseur",ord_confirm:"Confirmer ny ordre",
-  rate_lbl:"Tahan'ny andro · Deriv",rate_dep:"Dépôt (1 USD)",rate_ret:"Retrait (1 USD)",rate_foot:"Ampiharina amin'ny ordre Deriv. Mobile money: vola amin'ny Ariary.",in_ariary:"AMIN'NY ARIARY",
+  rate_lbl:"Tahan'ny andro · Deriv",rate_dep:"Dépôt (1 USD)",rate_ret:"Retrait (1 USD)",rate_foot:"Ampiharina amin'ny ordre Deriv. Mobile money: vola amin'ny Ariary.",in_ariary:"AMIN'NY ARIARY",add_depot:"Depot vaovao",
   wal_title:"Wallets-ko",prov_title:"Fournisseurs-ko",hist_title:"Tantara",hist_empty:"Tsy mbola misy ordre.",
   nav_wal:"Wallets",nav_prov:"Deriv",nav_hist:"Tantara",f_all:"Rehetra",notif_title:"Filazana",notif_empty:"Tsy misy filazana aloha.",
   set_title:"Kirakira",set_theme:"Endrika",set_lang:"Fiteny",set_logout_sub:"Hiala amin'ny espace",prof_title:"Ny mombamomba ahy",prof_save:"Tehirizo",lbl_email:"Email",lbl_phone2:"Téléphone",lbl_country:"Firenena",lbl_address:"Adiresy",
