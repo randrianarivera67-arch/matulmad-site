@@ -849,7 +849,7 @@ body.dash .dock{ display:grid; }
 <div class="toast" id="toast"></div>
 
 <script>
-const API = "https://matulmad-client-api.onrender.com";
+const API = "https://matulmad-client-api-so6n.onrender.com";
 const CORE = "https://sms-gateway-admin-backend-vw8p.onrender.com";
 const PAYMENT = "https://payment-webview.vercel.app";
 
@@ -1617,7 +1617,23 @@ init();
     m.style.color="#555";m.textContent="Envoi du code…";
     fetch(CORE_URL+"/api/retrait/deriv-otp",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tokenClient:_wd.tokenClient,montant:_wd.montant})})
       .then(function(r){return r.json();}).then(function(d){
-        if(d.ok){m.style.color="#16804a";m.textContent="Code envoyé (email/téléphone Deriv).";}
+        if(d.ok){
+          m.style.color="#16804a";m.textContent="Code envoyé (email/téléphone Deriv).";
+          // Rate-limit Deriv : désactiver "Renvoyer" mandra-pahatongan'ny next_request_at
+          var btn=document.getElementById("wdOtpBtn");
+          if(btn && d.next_request_at){
+            var wait=Math.max(0, Math.round(d.next_request_at - Date.now()/1000));
+            if(wait>0){
+              btn.disabled=true; var t0=wait;
+              btn.textContent="Renvoyer ("+t0+"s)";
+              var iv=setInterval(function(){
+                t0--;
+                if(t0<=0){clearInterval(iv);btn.disabled=false;btn.textContent="Renvoyer le code";}
+                else btn.textContent="Renvoyer ("+t0+"s)";
+              },1000);
+            }
+          }
+        }
         else{m.style.color="#c02436";m.textContent=d.error||"Erreur";}
       }).catch(function(){m.style.color="#c02436";m.textContent="Serveur injoignable";});
   }
