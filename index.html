@@ -3,6 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+/* MODE COMPAT: fantarina mialoha ny appareil malemy -> html.lite
+   (esorina ny blur/animations izay mampikorontana ny écran) */
+(function(){
+  try{
+    var lite=false, ls=null;
+    try{ ls=localStorage.getItem("mm_lite"); }catch(e){}
+    if(/[?&]lite=1/.test(location.search)){ lite=true; try{localStorage.setItem("mm_lite","1");}catch(e){} }
+    else if(/[?&]lite=0/.test(location.search)){ lite=false; try{localStorage.setItem("mm_lite","0");}catch(e){} }
+    else if(ls==="1") lite=true;
+    else if(ls==="0") lite=false;
+    else{
+      if(navigator.deviceMemory && navigator.deviceMemory<=2) lite=true;             /* RAM kely */
+      if(navigator.hardwareConcurrency && navigator.hardwareConcurrency<=2) lite=true; /* CPU 1-2 cœurs */
+      var a=(navigator.userAgent||"").match(/Android[\s\/](\d+)/i);
+      if(a && parseInt(a[1],10)<=7) lite=true;                                       /* Android tranainy */
+      var okBF=false;
+      try{ okBF=(window.CSS&&CSS.supports&&(CSS.supports("backdrop-filter","blur(1px)")||CSS.supports("-webkit-backdrop-filter","blur(1px)"))); }catch(e){}
+      if(!okBF) lite=true;                                                            /* tsy zaka ny blur */
+    }
+    if(lite) document.documentElement.classList.add("lite");
+  }catch(e){}
+})();
+</script>
 <title>MATUL MADA — Mobile Money & Deriv</title>
 <meta name="description" content="MATUL MADA — Dépôt et retrait mobile money pour Deriv et plus. Yas, Orange Money, Airtel Money. Sans frais de transfert.">
 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
@@ -481,6 +505,46 @@ header.nav{background-image:url(/topbar-bg.jpg?v=11)!important;background-size:c
 .dock{background-image:url(/dock-bg.jpg?v=11)!important;background-size:cover!important;background-position:center!important}
 .dock button span{color:#1a1030!important;text-shadow:0 1px 3px rgba(255,255,255,.7)!important;font-weight:800!important}
 .dock button .ic-wrap{box-shadow:0 0 0 1.5px rgba(255,255,255,.7),0 3px 8px rgba(0,0,0,.25)!important}
+
+/* ============================================================
+   MODE COMPAT — téléphones faibles / vieux WebView
+   Ny "sary mikorontana toy ny TV noir-blanc" dia avy amin'ny
+   backdrop-filter blur + animations gradient-text amin'ny GPU tranainy.
+   ============================================================ */
+
+/* Fiarovana ankapobeny (tsy manova ny endrika amin'ny tel tsara) */
+img,svg{backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:translateZ(0)}
+img{max-width:100%;image-rendering:auto}
+
+/* Raha TSY zakan'ny navigateur ny backdrop-filter -> fond solide (fa tsy glitch) */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  header.nav{background:var(--bg)!important}
+  .glasscard{background:var(--panel-solid)!important}
+  .modal{background:rgba(6,16,38,.72)!important}
+  .sheet-bd{background:rgba(6,16,38,.72)!important}
+}
+
+/* Mode LITE (classe apetraky ny JS amin'ny appareil malemy, na ?lite=1) */
+html.lite *,html.lite *::before,html.lite *::after{
+  animation:none!important;transition:none!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+}
+html.lite header.nav{background:var(--bg)!important}
+html.lite .glasscard{background:var(--panel-solid)!important}
+html.lite .modal{background:rgba(6,16,38,.72)!important}
+html.lite .sheet-bd{background:rgba(6,16,38,.72)!important}
+html.lite .dock{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+/* gradient-text animé -> loko tsotra (io no tena mampikorontana ny texte) */
+html.lite .brand .m1{background:none!important;-webkit-text-fill-color:var(--gold-1)!important;color:var(--gold-1)!important}
+html.lite .brand .m2{background:none!important;-webkit-text-fill-color:var(--blue-1)!important;color:var(--blue-1)!important}
+html.lite .neon,html.lite .tb-set .ic,html.lite .tb-login .ic,
+html.lite .dock button .ic,html.lite .dock button.active .ic{filter:none!important}
+html.lite .lift:hover{transform:none!important}
+
+/* Manaja ny fandrindrana "réduire les animations" an'ny téléphone */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
 </style>
 
 <style id="nav-robuste">
@@ -656,12 +720,13 @@ body.dash .dock{ display:grid; }
         <button id="segDepot" class="active" onclick="setType('depot')"><svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M12 4v13M18 11l-6 6-6-6"/></svg><span data-i18n="depot">Dépôt</span></button>
         <button id="segRetrait" onclick="setType('retrait')"><svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M12 20V7M6 13l6-6 6 6"/></svg><span data-i18n="retrait">Retrait</span></button>
       </div>
+      <div id="kmBanner" style="display:none;margin:8px 0 2px;padding:9px 12px;border-radius:12px;border:1.5px solid rgba(0,191,165,.45);background:rgba(0,191,165,.08);font-family:var(--font-d);font-weight:700;font-size:12.5px;color:#00BFA5;text-align:center">&#127472;&#127474; Compte Comores &mdash; Telma Comores &middot; Franc comorien (Fc)</div>
       <div class="field"><label data-i18n="lbl_op">Opérateur</label>
         <div class="op-pick" id="opPick"></div>
       </div>
       <div class="row2">
         <div class="field"><label id="lblMontant" data-i18n="lbl_amount">Montant (Ar)</label>
-          <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M6 8h12M6 12h12M9 4l-2 16M17 4l-2 16"/></svg><input id="fMontant" type="number" inputmode="numeric" placeholder="50000" oninput="convAr()"></div>
+          <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M6 8h12M6 12h12M9 4l-2 16M17 4l-2 16"/></svg><input id="fMontant" type="text" inputmode="decimal" placeholder="50000" oninput="convAr()"></div>
           <div id="arBox" style="display:none;margin-top:7px"><div class="amt-cur" style="margin-bottom:4px">&#8776; <span data-i18n="in_ariary">EN ARIARY</span></div><div class="inp" style="opacity:.9"><svg class="ic" viewBox="0 0 24 24"><path d="M6 8h12M6 12h12M9 4l-2 16M17 4l-2 16"/></svg><input id="fMontantAr" type="text" readonly placeholder="0 Ar" style="font-weight:800"></div></div>
           <div id="rateInfo" class="amt-cur" style="color:var(--gold-2);margin-top:6px;display:none"></div>
         </div>
@@ -675,6 +740,11 @@ body.dash .dock{ display:grid; }
         </div>
         <div class="field"><label data-i18n="lbl_provid">ID fournisseur</label>
           <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg><input id="fProviderId" placeholder="CR1234567"></div>
+        </div>
+      </div>
+      <div class="row2" id="bwCodeRow" style="display:none">
+        <div class="field"><label>Code de retrait Betwinner</label>
+          <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M7 11V7a5 5 0 0 1 10 0v4"/><rect x="5" y="11" width="14" height="10" rx="2"/></svg><input id="fBwCode" placeholder="Code (ex: A1B2)"></div>
         </div>
       </div>
       <div class="row2" id="emailRetraitRow" style="display:none">
@@ -764,6 +834,14 @@ body.dash .dock{ display:grid; }
       <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg><input id="aIdent" placeholder="email@exemple.mg / 034…"></div></div>
     <div class="field" id="fldPhone" style="display:none"><label data-i18n="lbl_phone">Téléphone (optionnel)</label>
       <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 5 5L16 13l5 2v3a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/></svg><input id="aPhone" type="tel" placeholder="034 12 345 67"></div></div>
+    <div class="field" id="fldKmAccount" style="display:none"><label>Type de compte</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button type="button" id="acctMg" onclick="pickAcctType(false)" class="active" style="padding:11px 8px;border-radius:12px;border:1.5px solid var(--blue-1);background:var(--field);font-family:var(--font-d);font-weight:700;font-size:13px;color:var(--blue-1);box-shadow:0 0 0 3px var(--glow)">&#127474;&#127468; Madagascar<br><span style="font-size:10px;font-weight:600;opacity:.75">Ariary (Ar)</span></button>
+        <button type="button" id="acctKm" onclick="pickAcctType(true)" style="padding:11px 8px;border-radius:12px;border:1.5px solid var(--field-line);background:var(--field);font-family:var(--font-d);font-weight:700;font-size:13px;color:var(--ink)">&#127472;&#127474; Pour Comores<br><span style="font-size:10px;font-weight:600;opacity:.75">Franc comorien (Fc)</span></button>
+      </div>
+      <input type="hidden" id="aKmAccount" value="0">
+      <div id="kmAcctNote" style="display:none;margin-top:7px;font-size:11.5px;color:var(--blue-1);font-weight:600">Compte Comores : Telma Comores uniquement, montants en Franc comorien (Fc).</div>
+    </div>
     <div class="field" id="fldCountry" style="display:none"><label data-i18n="lbl_country">Pays</label>
       <div class="inp"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg><select id="aCountry" style="flex:1;background:transparent;border:none;color:var(--ink);font-family:inherit;font-size:15px;outline:none"></select></div></div>
     <div class="field" id="fldAddress" style="display:none"><label data-i18n="lbl_address">Adresse</label>
@@ -859,7 +937,14 @@ const OPS = {
   orange: { brand:"Orange", color:"#ff7900", icon:"data:image/png;base64,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" },
   airtel: { brand:"Airtel", color:"#e2001a", icon:"data:image/png;base64,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" }
 };
+OPS.mvola_km = { brand:"Telma Comores", color:"#0a1a52", icon: OPS.mvola.icon };
 const OP_KEYS = ["mvola","orange","airtel"];
+const OP_KEYS_KM = ["mvola_km"];              // Comores: Telma ihany
+var kmMode = false;                            // true = mode Comores (Fc)
+function activeOpKeys(){ return kmMode ? OP_KEYS_KM : OP_KEYS; }
+function devise(){ return kmMode ? "Fc" : "Ar"; }
+// VIRGULE: "1,50" -> 1.5
+function parseM(v){ return Number(String(v==null?"":v).replace(/\s/g,"").replace(",",".")) || 0; }
 function opBadge(op,size){var o=OPS[op]||{brand:op,color:"#888",icon:""};
   return '<span class="opbadge '+(size||'md')+'" style="--oc:'+o.color+'"><img src="'+o.icon+'" alt="'+o.brand+'" onerror="this.style.display=\'none\'"></span>';}
 function opName(op){var o=OPS[op];return o?o.brand:(op||"").toUpperCase();}
@@ -943,7 +1028,19 @@ function hdr(){var h={"Content-Type":"application/json"};if(token)h.Authorizatio
 function renderHeroOps(){var box=document.getElementById("heroOps");if(!box)return;
   box.innerHTML=OP_KEYS.map(function(k){return '<span class="op-chip">'+opBadge(k,'smd')+opName(k)+'</span>';}).join('');}
 function renderOpPick(){var box=document.getElementById("opPick");if(!box)return;
-  box.innerHTML=OP_KEYS.map(function(k){return '<button class="op-opt'+(k===orderOp?' active':'')+'" data-op="'+k+'" onclick="pickOp(\''+k+'\')">'+opBadge(k,'md')+opName(k)+'</button>';}).join('');}
+  var keys=activeOpKeys();
+  if(keys.indexOf(orderOp)<0){orderOp=keys[0];}
+  box.innerHTML=keys.map(function(k){return '<button class="op-opt'+(k===orderOp?' active':'')+'" data-op="'+k+'" onclick="pickOp(\''+k+'\')">'+opBadge(k,'md')+opName(k)+'</button>';}).join('');}
+/* ===== COMORES: bascule Madagascar <-> Comores ===== */
+function setKmMode(on){
+  // kmMode dia avy amin'ny COMPTE (safidy tamin'ny inscription), tsy toggle manuel
+  kmMode=!!on;
+  var b=document.getElementById("kmBanner"); if(b)b.style.display=kmMode?"block":"none";
+  orderOp = kmMode ? "mvola_km" : "mvola";
+  // Comores: Deriv ihany (tsy misy Betwinner)
+  populateProviderSelect();
+  renderOpPick(); autofillOrder(); convAr();
+}
 
 /* navigation */
 function go(v){
@@ -980,6 +1077,7 @@ function switchTab(m){authMode=m;
   document.getElementById("fldPhoto").style.display=m==="register"?"block":"none";
   document.getElementById("fldPrenom").style.display=m==="register"?"block":"none";
   document.getElementById("fldName").style.display=m==="register"?"block":"none";document.getElementById("fldPhone").style.display=m==="register"?"block":"none";
+  document.getElementById("fldKmAccount").style.display=m==="register"?"block":"none";
   document.getElementById("fldCountry").style.display=m==="register"?"block":"none";
   document.getElementById("fldAddress").style.display=m==="register"?"block":"none";
   document.getElementById("aMapBtn").style.display=m==="register"?"flex":"none";
@@ -988,6 +1086,16 @@ function switchTab(m){authMode=m;
   document.getElementById("aIdent").placeholder=m==="register"?"email@exemple.mg":"email@exemple.mg / 034…";
   document.getElementById("authBtnTxt").textContent=m==="login"?t("tab_login"):t("tab_register");
   document.getElementById("authMsg").className="msg";}
+function pickAcctType(km){
+  document.getElementById("aKmAccount").value=km?"1":"0";
+  var mg=document.getElementById("acctMg"),k=document.getElementById("acctKm"),note=document.getElementById("kmAcctNote");
+  function on(b){b.style.borderColor="var(--blue-1)";b.style.color="var(--blue-1)";b.style.boxShadow="0 0 0 3px var(--glow)";}
+  function off(b){b.style.borderColor="var(--field-line)";b.style.color="var(--ink)";b.style.boxShadow="none";}
+  if(km){on(k);off(mg);}else{on(mg);off(k);}
+  if(note)note.style.display=km?"block":"none";
+  var c=document.getElementById("aCountry");
+  if(c){ if(km){ for(var i=0;i<c.options.length;i++){ if(/comor/i.test(c.options[i].value||c.options[i].text)){c.selectedIndex=i;break;} } } }
+}
 function authError(msg){var e=document.getElementById("authMsg");e.textContent=msg;e.className="msg err";}
 async function doAuth(){
   var btn=document.getElementById("authSubmit");
@@ -1007,7 +1115,8 @@ async function doAuth(){
       var country=document.getElementById("aCountry").value||"Madagascar";
       var address=document.getElementById("aAddress").value.trim();
       var addrLat=document.getElementById("aAddrLat").value;var addrLng=document.getElementById("aAddrLng").value;
-      var body={name:name,password:pass,confirmPassword:passConfirm,lang:lang,country:country,address:address};
+      var body={name:name,password:pass,confirmPassword:passConfirm,lang:lang,country:country,address:address,
+        kmAccount:(document.getElementById("aKmAccount")||{}).value==="1"};
       if(addrLat)body.addressLat=parseFloat(addrLat);if(addrLng)body.addressLng=parseFloat(addrLng);
       var photoData=document.getElementById("aPhotoData").value;
       if(photoData){
@@ -1060,12 +1169,20 @@ async function api(path,opts){
 
 /* dashboard */
 function setDashName(){var el=document.getElementById("dashName");if(el&&me)el.textContent=me.name||me.email||me.phone||"client";}
-async function enterDash(){go("dashboard");setDashName();renderOpPick();populateProviderSelect();renderWallets();renderProviders();showPage("depot");loadRates();}
+async function enterDash(){go("dashboard");setDashName();
+  setKmMode(!!(me&&me.kmAccount));   // compte Comores -> mode Fc mandrakariva
+  renderOpPick();populateProviderSelect();renderWallets();renderProviders();showPage("depot");loadRates();}
 function populateProviderSelect(){var sel=document.getElementById("fProvider");if(!sel)return;
   var opts='<option value="">—</option>';var seen={};
-  if(me&&me.providers)for(var i=0;i<me.providers.length;i++){var nm=me.providers[i].name||"Deriv";if(!seen[nm]){seen[nm]=1;opts+='<option>'+nm+'</option>';}}
+  if(me&&me.providers)for(var i=0;i<me.providers.length;i++){var nm=me.providers[i].name||"Deriv";
+    if(kmMode && /betwinner/i.test(nm)) continue;  // Comores: Deriv ihany
+    if(!seen[nm]){seen[nm]=1;opts+='<option>'+nm+'</option>';}}
   if(!seen["Deriv"])opts+='<option>Deriv</option>';
-  sel.innerHTML=opts;}
+  // Betwinner: Madagascar ihany (Comores = Deriv fotsiny)
+  if(!kmMode && !seen["Betwinner"])opts+='<option>Betwinner</option>';
+  sel.innerHTML=opts;
+  if(kmMode && (sel.value||"").toLowerCase()==="betwinner") sel.value="Deriv";}
+function isBetwinner(){var p=document.getElementById("fProvider");return p&&(p.value||"").toLowerCase()==="betwinner";}
 
 /* type / opérateur */
 function setType(ty){orderType=ty;
@@ -1086,19 +1203,27 @@ function paintRatePanel(){
 function isDeriv(){var p=document.getElementById("fProvider");return p&&(p.value||"").toLowerCase()==="deriv";}
 function convAr(){
   var box=document.getElementById("arBox"),info=document.getElementById("rateInfo"),lbl=document.getElementById("lblMontant");
-  var usd=Number(document.getElementById("fMontant").value)||0;
+  var usd=parseM((document.getElementById("fMontant")||{}).value);
+  var dv=devise();  // "Ar" (Madagascar) na "Fc" (Comores)
   if(isDeriv()){
-    var rate=(orderType==="depot")?_rates.rate_depot:_rates.rate_retrait;var ar=Math.round(usd*rate);
+    var rate=kmMode
+      ? ((orderType==="depot")?_rates.rate_depot_km:_rates.rate_retrait_km)
+      : ((orderType==="depot")?_rates.rate_depot:_rates.rate_retrait);
+    rate=Number(rate)||0;
+    var ar=Math.round(usd*rate);
     if(box)box.style.display="block";
-    if(info){info.style.display="block";info.textContent="1 USD = "+Number(rate).toLocaleString('fr-FR')+" Ar ("+(orderType==="depot"?"dépôt":"retrait")+")";}
+    if(info){info.style.display="block";
+      info.textContent = rate
+        ? ("1 USD = "+rate.toLocaleString('fr-FR')+" "+dv+" ("+(orderType==="depot"?"dépôt":"retrait")+")")
+        : ("Cours "+dv+" non configuré — contactez l'admin");}
     if(lbl)lbl.textContent="Montant ($)";
-    var fa=document.getElementById("fMontantAr");if(fa)fa.value=ar.toLocaleString('fr-FR')+" Ar";
+    var fa=document.getElementById("fMontantAr");if(fa)fa.value=ar.toLocaleString('fr-FR')+" "+dv;
   }else{
-    if(box)box.style.display="none";if(info)info.style.display="none";if(lbl)lbl.textContent="Montant (Ar)";
+    if(box)box.style.display="none";if(info)info.style.display="none";if(lbl)lbl.textContent="Montant ("+dv+")";
   }
 }
 async function submitOrder(){
-  var montant=Number(document.getElementById("fMontant").value);
+  var montant=parseM(document.getElementById("fMontant").value);
   var numero=document.getElementById("fNumero").value.trim();
   var provider=document.getElementById("fProvider").value;
   var providerId=document.getElementById("fProviderId").value.trim();
@@ -1131,7 +1256,7 @@ function openWallet(id){
   var w=id?findWallet(id):null;
   document.getElementById("fsTitle").textContent=t(w?"w_edittitle":"w_addtitle");
   document.getElementById("fsMsg").className="msg";
-  var opts=OP_KEYS.map(function(k){return '<option value="'+k+'"'+(w&&w.operator===k?' selected':'')+'>'+opName(k)+'</option>';}).join('');
+  var opts=activeOpKeys().map(function(k){return '<option value="'+k+'"'+(w&&w.operator===k?' selected':'')+'>'+opName(k)+'</option>';}).join('');
   document.getElementById("fsBody").innerHTML=
     '<div class="field"><label>'+t("w_op")+'</label><div class="inp"><select id="wOp">'+opts+'</select></div></div>'+
     '<div class="field"><label>'+t("w_num")+'</label><div class="inp"><input id="wNum" inputmode="numeric" placeholder="034 12 345 67" value="'+(w?w.numero:'')+'"></div></div>'+
@@ -1548,6 +1673,20 @@ init();
     var pv=(document.getElementById("fProvider")||{}).value||"";
     var ot=(typeof orderType!=="undefined")?orderType:"";
     row.style.display=(ot==="retrait" && pv==="Deriv")?"":"none";
+
+    /* ===== BETWINNER ===== */
+    var bwRow=document.getElementById("bwCodeRow");
+    var bwRetrait=(ot==="retrait" && pv==="Betwinner");
+    if(bwRow) bwRow.style.display = bwRetrait ? "" : "none";
+    // Retrait Betwinner: ny montant dia avy amin'ny code (API Payout) -> afenina
+    var fm=document.getElementById("fMontant");
+    var fmField=fm?(fm.closest?fm.closest(".field"):null):null;
+    if(fmField) fmField.style.display = bwRetrait ? "none" : "";
+    var pid=document.getElementById("fProviderId");
+    if(pid && pv==="Betwinner") pid.placeholder="ID Betwinner (chiffres)";
+    else if(pid) pid.placeholder="CR1234567";
+    var ab=document.getElementById("arBox"); if(ab && bwRetrait) ab.style.display="none";
+    var ri=document.getElementById("rateInfo"); if(ri && pv==="Betwinner") ri.style.display="none";
   }
   // Antsoy isaky misy fanovana (provider/type)
   var _fp=document.getElementById("fProvider");
@@ -1570,8 +1709,61 @@ init();
     try{
       var provider=(document.getElementById("fProvider")||{}).value||"";
       var ot=(typeof orderType!=="undefined")?orderType:"";
+
+      /* ============ BETWINNER ============ */
+      if(provider==="Betwinner"){
+        var bMsg=document.getElementById("ordMsg"); if(bMsg){bMsg.className="msg";}
+        var bId=(((document.getElementById("fProviderId")||{}).value)||"").trim();
+        var bNum=(((document.getElementById("fNumero")||{}).value)||"").trim();
+        var bOp=(typeof orderOp!=="undefined")?orderOp:"";
+        if(!/^[0-9]+$/.test(bId)){ if(bMsg){bMsg.textContent="ID Betwinner invalide (chiffres uniquement)";bMsg.className="msg err";} return; }
+        if(!bNum){ if(bMsg){bMsg.textContent="Numéro requis";bMsg.className="msg err";} return; }
+        var bBtn=document.getElementById("btnOrder");
+
+        // --- RETRAIT: ID + code -> ny montant avy amin'ny Betwinner ---
+        if(ot==="retrait"){
+          var bCode=(((document.getElementById("fBwCode")||{}).value)||"").trim();
+          if(!bCode){ if(bMsg){bMsg.textContent="Code de retrait Betwinner requis";bMsg.className="msg err";} return; }
+          if(bBtn) bBtn.disabled=true;
+          fetch(CORE_URL+"/api/retrait/betwinner-withdraw",{
+            method:"POST", headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({userId:bId, code:bCode, numero:bNum, operator:bOp})
+          }).then(function(r){return r.json();}).then(function(d){
+            if(d && d.ok){
+              if(bMsg){bMsg.textContent="Retrait validé ("+Number(d.montantAr).toLocaleString('fr-FR')+" Ar) — envoi en cours…";bMsg.className="msg ok";}
+              try{ _histLoaded=false; }catch(e2){}
+            }else{
+              if(bMsg){bMsg.textContent=(d&&d.error)||"Erreur Betwinner";bMsg.className="msg err";}
+            }
+            if(bBtn) bBtn.disabled=false;
+          }).catch(function(){
+            if(bMsg){bMsg.textContent="Serveur injoignable";bMsg.className="msg err";}
+            if(bBtn) bBtn.disabled=false;
+          });
+          return;
+        }
+
+        // --- DEPOT: validation ID (anaran'ny joueur) dia ordre mahazatra ---
+        var bMont=(typeof parseM==="function")?parseM((document.getElementById("fMontant")||{}).value):Number((document.getElementById("fMontant")||{}).value);
+        if(!bMont || bMont < 500){ if(bMsg){bMsg.textContent="Montant minimum: 500 Ar";bMsg.className="msg err";} return; }
+        if(bBtn) bBtn.disabled=true;
+        fetch(CORE_URL+"/api/retrait/betwinner-user",{
+          method:"POST", headers:{"Content-Type":"application/json"},
+          body: JSON.stringify({userId:bId})
+        }).then(function(r){return r.json();}).then(function(d){
+          if(bBtn) bBtn.disabled=false;
+          if(!d || !d.ok){ if(bMsg){bMsg.textContent=(d&&d.error)||"ID Betwinner introuvable";bMsg.className="msg err";} return; }
+          if(bMsg){bMsg.textContent="Compte: "+(d.name||bId)+" — création de l'ordre…";bMsg.className="msg ok";}
+          _orig.call(window);   // ordre mahazatra (webview paiement)
+        }).catch(function(){
+          if(bBtn) bBtn.disabled=false;
+          if(bMsg){bMsg.textContent="Serveur injoignable";bMsg.className="msg err";}
+        });
+        return;
+      }
+
       if(ot==="retrait" && provider==="Deriv"){
-        var montant=Number((document.getElementById("fMontant")||{}).value);
+        var montant=(typeof parseM==="function")?parseM((document.getElementById("fMontant")||{}).value):Number((document.getElementById("fMontant")||{}).value);
         var numero=(((document.getElementById("fNumero")||{}).value)||"").trim();
         var providerId=(((document.getElementById("fProviderId")||{}).value)||"").trim();
         var email=(((document.getElementById("fEmailRetrait")||{}).value)||"").trim();
