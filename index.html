@@ -800,7 +800,7 @@ body.dash .dock{ display:grid; }
   <button data-go="depot" class="active" onclick="showPage('depot')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M12 4v13M18 11l-6 6-6-6"/><path d="M5 21h14"/></svg></span><span data-i18n="depot">Dépôt</span></button>
   <button data-go="retrait" onclick="showPage('retrait')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M12 20V7M6 13l6-6 6 6"/><path d="M5 3h14"/></svg></span><span data-i18n="retrait">Retrait</span></button>
   <button data-go="wallets" onclick="showPage('wallets')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M3 7h18v12H3zM3 7l2-3h14l2 3M16 13h2"/></svg></span><span data-i18n="nav_wal">Wallets</span></button>
-  <button data-go="fournisseurs" onclick="showPage('fournisseurs')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg></span><span data-i18n="nav_prov">Deriv</span></button>
+  <button data-go="fournisseurs" onclick="showPage('fournisseurs')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg></span><span data-i18n="nav_prov">Fournisseurs</span></button>
   <button data-go="historique" onclick="showPage('historique')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M12 7v5l3 2M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z"/></svg></span><span data-i18n="nav_hist">Historique</span></button>
 </nav>
 </main>
@@ -967,7 +967,7 @@ const I18N={
   depot:"Dépôt",retrait:"Retrait",lbl_op:"Opérateur",lbl_amount:"Montant (Ar)",lbl_num:"Numéro",lbl_prov:"Fournisseur",lbl_provid:"ID fournisseur",ord_confirm:"Confirmer l'ordre",
   rate_lbl:"Cours du jour · Deriv",rate_dep:"Dépôt (1 USD)",rate_ret:"Retrait (1 USD)",rate_foot:"Appliqué aux ordres Deriv. Mobile money : montants en Ariary.",in_ariary:"EN ARIARY",add_depot:"Nouveau dépôt",
   wal_title:"Mes wallets",prov_title:"Mes fournisseurs",hist_title:"Historique",hist_empty:"Aucun ordre pour le moment.",
-  nav_wal:"Wallets",nav_prov:"Deriv",nav_hist:"Historique",f_all:"Tous",notif_title:"Annonces",notif_empty:"Aucune annonce pour le moment.",
+  nav_wal:"Wallets",nav_prov:"Fournisseurs",nav_hist:"Historique",f_all:"Tous",notif_title:"Annonces",notif_empty:"Aucune annonce pour le moment.",
   set_title:"Paramètres",set_theme:"Apparence",set_lang:"Langue",set_logout_sub:"Quitter votre espace",prof_title:"Mon profil",prof_save:"Enregistrer",lbl_email:"Email",lbl_phone2:"Téléphone",lbl_country:"Pays",lbl_address:"Adresse",
   pwa_t:"Installer MATUL MADA",pwa_s:"Accès rapide, plein écran.",
   w_op:"Opérateur",w_num:"Numéro",w_label:"Nom du compte (facultatif)",w_save:"Enregistrer",w_addtitle:"Nouveau wallet",w_edittitle:"Modifier le wallet",
@@ -990,7 +990,7 @@ const I18N={
   depot:"Dépôt",retrait:"Retrait",lbl_op:"Opérateur",lbl_amount:"Montant (Ar)",lbl_num:"Numéro",lbl_prov:"Fournisseur",lbl_provid:"ID fournisseur",ord_confirm:"Confirmer ny ordre",
   rate_lbl:"Tahan'ny andro · Deriv",rate_dep:"Dépôt (1 USD)",rate_ret:"Retrait (1 USD)",rate_foot:"Ampiharina amin'ny ordre Deriv. Mobile money: vola amin'ny Ariary.",in_ariary:"AMIN'NY ARIARY",add_depot:"Depot vaovao",
   wal_title:"Wallets-ko",prov_title:"Fournisseurs-ko",hist_title:"Tantara",hist_empty:"Tsy mbola misy ordre.",
-  nav_wal:"Wallets",nav_prov:"Deriv",nav_hist:"Tantara",f_all:"Rehetra",notif_title:"Filazana",notif_empty:"Tsy misy filazana aloha.",
+  nav_wal:"Wallets",nav_prov:"Mpamatsy",nav_hist:"Tantara",f_all:"Rehetra",notif_title:"Filazana",notif_empty:"Tsy misy filazana aloha.",
   set_title:"Kirakira",set_theme:"Endrika",set_lang:"Fiteny",set_logout_sub:"Hiala amin'ny espace",prof_title:"Ny mombamomba ahy",prof_save:"Tehirizo",lbl_email:"Email",lbl_phone2:"Téléphone",lbl_country:"Firenena",lbl_address:"Adiresy",
   pwa_t:"Apetraho MATUL MADA",pwa_s:"Haingana, manerana ny efijery.",
   w_op:"Opérateur",w_num:"Numéro",w_label:"Anaran'ny kaonty (tsy voatery)",w_save:"Tehirizo",w_addtitle:"Wallet vaovao",w_edittitle:"Hanova wallet",
@@ -1037,7 +1037,7 @@ function setKmMode(on){
   kmMode=!!on;
   var b=document.getElementById("kmBanner"); if(b)b.style.display=kmMode?"block":"none";
   orderOp = kmMode ? "mvola_km" : "mvola";
-  // Comores: Deriv ihany (tsy misy Betwinner)
+  // Providers (Deriv + Betwinner) azo amin'ny compte rehetra
   populateProviderSelect();
   renderOpPick(); autofillOrder(); convAr();
 }
@@ -1175,11 +1175,10 @@ async function enterDash(){go("dashboard");setDashName();
 function populateProviderSelect(){var sel=document.getElementById("fProvider");if(!sel)return;
   var opts='<option value="">—</option>';var seen={};
   if(me&&me.providers)for(var i=0;i<me.providers.length;i++){var nm=me.providers[i].name||"Deriv";
-    if(kmMode && /betwinner/i.test(nm)) continue;  // Comores: Deriv ihany
     if(!seen[nm]){seen[nm]=1;opts+='<option>'+nm+'</option>';}}
   if(!seen["Deriv"])opts+='<option>Deriv</option>';
-  // Betwinner: Madagascar ihany (Comores = Deriv fotsiny)
-  if(!kmMode && !seen["Betwinner"])opts+='<option>Betwinner</option>';
+  // Betwinner: azo amin'ny compte REHETRA (anisan'ny Comores)
+  if(!seen["Betwinner"])opts+='<option>Betwinner</option>';
   sel.innerHTML=opts;
   if(kmMode && (sel.value||"").toLowerCase()==="betwinner") sel.value="Deriv";}
 function isBetwinner(){var p=document.getElementById("fProvider");return p&&(p.value||"").toLowerCase()==="betwinner";}
@@ -1197,8 +1196,17 @@ function pickOp(op){orderOp=op;var b=document.querySelectorAll(".op-opt");for(va
 async function loadRates(){try{_rates=await(await fetch(CORE+"/api/rate")).json();}catch(e){}paintRatePanel();convAr();}
 function paintRatePanel(){
   var dep=document.getElementById("rateDep"),ret=document.getElementById("rateRet");
-  if(dep)dep.textContent=_rates.rate_depot?(Number(_rates.rate_depot).toLocaleString('fr-FR')+" Ar"):"— Ar";
-  if(ret)ret.textContent=_rates.rate_retrait?(Number(_rates.rate_retrait).toLocaleString('fr-FR')+" Ar"):"— Ar";
+  var dv=devise();  // "Ar" (Madagascar) na "Fc" (Comores)
+  // Compte Comores -> cours Fc (rate_depot_km/rate_retrait_km) ; sinon Ar
+  var rDep = kmMode ? _rates.rate_depot_km : _rates.rate_depot;
+  var rRet = kmMode ? _rates.rate_retrait_km : _rates.rate_retrait;
+  if(dep)dep.textContent=rDep?(Number(rDep).toLocaleString('fr-FR')+" "+dv):("— "+dv);
+  if(ret)ret.textContent=rRet?(Number(rRet).toLocaleString('fr-FR')+" "+dv):("— "+dv);
+  // Footer: adapte la devise
+  var foot=document.querySelector(".rp-foot");
+  if(foot)foot.textContent = kmMode
+    ? "Appliqué aux ordres Deriv (1 USD). Comores : montants en Franc comorien (Fc)."
+    : "Appliqué aux ordres Deriv (1 USD). Mobile money : montants en Ariary.";
 }
 function isDeriv(){var p=document.getElementById("fProvider");return p&&(p.value||"").toLowerCase()==="deriv";}
 function convAr(){
