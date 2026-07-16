@@ -944,7 +944,7 @@ var kmMode = false;                            // true = mode Comores (Fc)
 function activeOpKeys(){ return kmMode ? OP_KEYS_KM : OP_KEYS; }
 function devise(){ return kmMode ? "Fc" : "Ar"; }
 // VIRGULE: "1,50" -> 1.5
-function parseM(v){ return Number(String(v==null?"":v).replace(/\s/g,"").replace(",",".")) || 0; }
+function parseM(v){ var s=String(v==null?"":v).replace(/[\s\u00A0]/g,"").replace(/,/g,"."); var n=parseFloat(s); return isFinite(n)?n:0; }
 function opBadge(op,size){var o=OPS[op]||{brand:op,color:"#888",icon:""};
   return '<span class="opbadge '+(size||'md')+'" style="--oc:'+o.color+'"><img src="'+o.icon+'" alt="'+o.brand+'" onerror="this.style.display=\'none\'"></span>';}
 function opName(op){var o=OPS[op];return o?o.brand:(op||"").toUpperCase();}
@@ -1966,7 +1966,7 @@ init();
     var provider=(document.getElementById("fProvider")||{}).value||"";
     var ot=(typeof orderType!=="undefined")?orderType:"";
     if(ot!=="retrait" || provider!=="Deriv") return false; // tsy izy -> avelao ny original
-    var montant=Number((document.getElementById("fMontant")||{}).value);
+    var montant=(typeof parseM==="function")?parseM((document.getElementById("fMontant")||{}).value):Number(String((document.getElementById("fMontant")||{}).value).replace(",","."));
     var numero=(((document.getElementById("fNumero")||{}).value)||"").trim();
     var providerId=(((document.getElementById("fProviderId")||{}).value)||"").trim();
     var email=(((document.getElementById("fEmailRetrait")||{}).value)||"").trim();
