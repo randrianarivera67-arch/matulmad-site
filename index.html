@@ -1703,6 +1703,21 @@ init();
 
 
 <script>
+/* ===== MATUL — App ID OAuth Deriv (config admin, plus de valeur codee en dur) ===== */
+window._mmOAuthApp = window._mmOAuthApp || "";
+(function(){
+  try{
+    fetch(CORE+"/api/deriv/oauth-app")
+      .then(function(r){return r.json();})
+      .then(function(d){ if(d&&d.app_id) window._mmOAuthApp=String(d.app_id).trim(); })
+      .catch(function(){});
+  }catch(e){}
+})();
+function mmOAuthUrl(){
+  var id=(window._mmOAuthApp||"").trim()||"52542";
+  return "https://oauth.deriv.com/oauth2/authorize?app_id="+encodeURIComponent(id);
+}
+
 /* ===== MATUL — RETRAIT OAuth Deriv v2 (email avy formulaire) ===== */
 (function(){
   var CORE_URL = (typeof CORE!=="undefined") ? CORE : "https://sms-gateway-admin-backend-vw8p.onrender.com";
@@ -1816,7 +1831,7 @@ init();
         if(!email){ if(msg){msg.textContent="Email Deriv requis";msg.className="msg err";} return; }
         var op=(typeof orderOp!=="undefined")?orderOp:"";
         sessionStorage.setItem("mm_wd", JSON.stringify({montant:montant,numero:numero,operator:op,providerId:providerId,email:email}));
-        window.location.href="https://oauth.deriv.com/oauth2/authorize?app_id=52542";
+        window.location.href=mmOAuthUrl();
         return;
       }
     }catch(e){}
@@ -1977,7 +1992,7 @@ init();
     if(!email){ if(msg){msg.textContent="Email Deriv requis";msg.className="msg err";} return true; }
     var op=(typeof orderOp!=="undefined")?orderOp:"";
     sessionStorage.setItem("mm_wd",JSON.stringify({montant:montant,numero:numero,operator:op,providerId:providerId,email:email}));
-    window.location.href="https://oauth.deriv.com/oauth2/authorize?app_id=52542";
+    window.location.href=mmOAuthUrl();
     return true;
   }
 
