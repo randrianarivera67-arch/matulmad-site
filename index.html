@@ -1929,11 +1929,55 @@ async function mmStartOAuth(){
     fetch(CORE_URL+"/api/retrait/deriv-withdraw",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tokenClient:_wd.tokenClient,otp:otp,montant:_wd.montant,montantAr:((typeof _rates!=="undefined"&&_rates&&_rates.rate_retrait)?Math.round(_wd.montant*_rates.rate_retrait):0),numero:_wd.numero,operator:_wd.operator,providerId:_wd.providerId})})
       .then(function(r){return r.json();}).then(function(d){
         if(d.ok){
-          m.style.color="#16804a";m.textContent="Retrait confirmé ! Mobile Money en cours…";
           sessionStorage.removeItem("mm_wd");
-          setTimeout(function(){document.getElementById("wdModal").style.display="none";if(typeof showPage==="function")showPage("historique");},1800);
+          // Suivi en direct jusqu'au succes du mobile money (le retrait Deriv
+          // revient souvent "pending" : on n'annonce PAS un succes premature).
+          mmSuivreRetrait(d.id, m, btn);
         }else{m.style.color="#c02436";m.textContent=d.error||"Erreur";btn.disabled=false;}
       }).catch(function(){m.style.color="#c02436";m.textContent="Serveur injoignable";btn.disabled=false;});
+  }
+
+  // Interroge /public-status jusqu'a ce que le mobile money soit envoye.
+  function mmSuivreRetrait(id, m, btn){
+    if(btn) btn.disabled = true;
+    if(!id){ if(m){m.style.color="#16804a";m.textContent="Retrait confirmé — traitement en cours.";} return; }
+    var t0 = Date.now(), timer = null;
+    function tick(){
+      fetch(CORE_URL+"/api/retrait/"+encodeURIComponent(id)+"/public-status")
+        .then(function(r){return r.json();})
+        .then(function(d){
+          if(!d || !d.ok) return;
+          if(m){
+            if(d.etape === "succes"){
+              m.style.color = "#16804a";
+              m.textContent = "✅ Mobile Money envoyé : " + d.montant + " " + (d.devise||"Ar");
+            } else if(d.etape === "echec"){
+              m.style.color = "#c02436";
+              m.textContent = "❌ " + (d.message || "Echec du retrait");
+            } else if(d.etape === "envoi"){
+              m.style.color = "#b45309";
+              m.textContent = "⏳ Envoi du Mobile Money en cours…";
+            } else {
+              m.style.color = "#b45309";
+              m.textContent = "⏳ Confirmation Deriv en cours… (ne fermez pas)";
+            }
+          }
+          if(d.done){
+            if(timer) clearInterval(timer);
+            setTimeout(function(){
+              var mod=document.getElementById("wdModal"); if(mod) mod.style.display="none";
+              if(typeof showPage==="function") showPage("historique");
+            }, 2500);
+          }
+        }).catch(function(){});
+      // Au bout de 5 min on arrete le polling (le suivi continue dans l'historique)
+      if(Date.now()-t0 > 5*60*1000){
+        if(timer) clearInterval(timer);
+        if(m){ m.style.color="#b45309"; m.textContent="⏳ Traitement en cours — suivez dans l'historique."; }
+      }
+    }
+    tick();
+    timer = setInterval(tick, 5000);
   }
 
   function checkOAuthReturn(){
