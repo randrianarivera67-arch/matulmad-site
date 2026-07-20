@@ -1703,19 +1703,51 @@ init();
 
 
 <script>
-/* ===== MATUL — App ID OAuth Deriv (config admin, plus de valeur codee en dur) ===== */
+/* ===== MATUL — OAuth 2.0 + PKCE Deriv (nouveau systeme Deriv, app_id alphanumerique) =====
+   Ancien systeme (oauth.deriv.com/oauth2/authorize?app_id=NNN) abandonne : il ne
+   reconnait pas les nouveaux client_id alphanumeriques et renvoie l'utilisateur
+   sur le dashboard Deriv sans demander l'autorisation. */
 window._mmOAuthApp = window._mmOAuthApp || "";
 (function(){
   try{
-    fetch(CORE+"/api/deriv/oauth-app")
-      .then(function(r){return r.json();})
+    fetch(CORE+"/api/deriv/oauth-app").then(function(r){return r.json();})
       .then(function(d){ if(d&&d.app_id) window._mmOAuthApp=String(d.app_id).trim(); })
       .catch(function(){});
   }catch(e){}
 })();
-function mmOAuthUrl(){
-  var id=(window._mmOAuthApp||"").trim()||"52542";
-  return "https://oauth.deriv.com/oauth2/authorize?app_id="+encodeURIComponent(id);
+function mmRedirectUri(){ return location.origin + "/"; }
+function mmRand(n){
+  var chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~", out="";
+  var a=new Uint8Array(n); (window.crypto||window.msCrypto).getRandomValues(a);
+  for(var i=0;i<n;i++) out+=chars[a[i]%chars.length];
+  return out;
+}
+function mmB64url(buf){
+  var v=new Uint8Array(buf), b="";
+  for(var i=0;i<v.length;i++) b+=String.fromCharCode(v[i]);
+  return btoa(b).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}
+async function mmStartOAuth(){
+  var id=(window._mmOAuthApp||"").trim();
+  if(!id){
+    try{ var r=await fetch(CORE+"/api/deriv/oauth-app"); var d=await r.json(); id=(d&&d.app_id)?String(d.app_id).trim():""; }catch(e){}
+  }
+  if(!id){ alert("Configuration Deriv incomplete (App ID OAuth). Contactez le support."); return; }
+  var verifier=mmRand(64), state=mmRand(24);
+  var challenge;
+  try{
+    var digest=await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
+    challenge=mmB64url(digest);
+  }catch(e){ alert("Navigateur non compatible (HTTPS requis)."); return; }
+  try{ sessionStorage.setItem("mm_pkce", JSON.stringify({v:verifier,s:state})); }catch(e){}
+  window.location.href = "https://auth.deriv.com/oauth2/auth"
+    + "?response_type=code"
+    + "&client_id=" + encodeURIComponent(id)
+    + "&redirect_uri=" + encodeURIComponent(mmRedirectUri())
+    + "&scope=" + encodeURIComponent("payment")
+    + "&state=" + encodeURIComponent(state)
+    + "&code_challenge=" + encodeURIComponent(challenge)
+    + "&code_challenge_method=S256";
 }
 
 /* ===== MATUL — RETRAIT OAuth Deriv v2 (email avy formulaire) ===== */
@@ -1831,7 +1863,7 @@ function mmOAuthUrl(){
         if(!email){ if(msg){msg.textContent="Email Deriv requis";msg.className="msg err";} return; }
         var op=(typeof orderOp!=="undefined")?orderOp:"";
         sessionStorage.setItem("mm_wd", JSON.stringify({montant:montant,numero:numero,operator:op,providerId:providerId,email:email}));
-        window.location.href=mmOAuthUrl();
+        mmStartOAuth(); return false;
         return;
       }
     }catch(e){}
@@ -1908,6 +1940,28 @@ function mmOAuthUrl(){
     try{
       var p=new URLSearchParams(location.search);
       var saved=JSON.parse(sessionStorage.getItem("mm_wd")||"null");
+      // --- Nouveau flux OAuth 2.0 + PKCE : ?code=...&state=... ---
+      var code=p.get("code"), st=p.get("state");
+      if(code && saved){
+        var pk=null; try{ pk=JSON.parse(sessionStorage.getItem("mm_pkce")||"null"); }catch(e){}
+        if(pk && pk.s && st && pk.s!==st){ alert("Session de connexion invalide — reessayez."); return; }
+        history.replaceState({},"",location.pathname);
+        fetch(CORE+"/api/retrait/deriv-oauth-token",{
+          method:"POST", headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({code:code, code_verifier:(pk&&pk.v)||"", redirect_uri:location.origin+"/"})
+        }).then(function(r){return r.json();}).then(function(d){
+          try{ sessionStorage.removeItem("mm_pkce"); }catch(e){}
+          if(!d || !d.token){ alert("Connexion Deriv echouee: "+((d&&d.error)||"token indisponible")); return; }
+          saved.tokenClient=d.token; saved.matchedCR=d.loginid||"";
+          _wd=saved; ensureModal();
+          var info=document.getElementById("wdInfo");
+          if(info) info.textContent="Montant: "+saved.montant+" USD → "+saved.numero;
+          document.getElementById("wdModal").style.display="flex";
+          try{ wdSendOtp(); }catch(e){}
+        }).catch(function(e){ alert("Connexion Deriv echouee: "+(e.message||"")); });
+        return;
+      }
+      // --- Ancien flux (tokenN/acctN), conserve en secours ---
       var accts=[];
       for(var k=1;k<=10;k++){var a=p.get("acct"+k),t=p.get("token"+k);if(a&&t)accts.push({account:String(a).toUpperCase(),token:t});}
       if(accts.length && saved){
@@ -1992,7 +2046,7 @@ function mmOAuthUrl(){
     if(!email){ if(msg){msg.textContent="Email Deriv requis";msg.className="msg err";} return true; }
     var op=(typeof orderOp!=="undefined")?orderOp:"";
     sessionStorage.setItem("mm_wd",JSON.stringify({montant:montant,numero:numero,operator:op,providerId:providerId,email:email}));
-    window.location.href=mmOAuthUrl();
+    mmStartOAuth(); return false;
     return true;
   }
 
