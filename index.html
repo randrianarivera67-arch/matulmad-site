@@ -1821,6 +1821,9 @@ async function mmStartOAuth(){
               var _dvBw=(bOp==="mvola_km")?"Fc":"Ar";
               if(bMsg){bMsg.textContent="Retrait validé ("+Number(d.montantAr).toLocaleString('fr-FR')+" "+_dvBw+") — envoi en cours…";bMsg.className="msg ok";}
               try{ _histLoaded=false; }catch(e2){}
+              // Suivi en direct jusqu'au succes du mobile money (bouton masque)
+              try{ mmSuivreRetrait(d.id, bMsg, bBtn); }catch(e3){ if(bBtn) bBtn.disabled=false; }
+              return;
             }else{
               if(bMsg){bMsg.textContent=(d&&d.error)||"Erreur Betwinner";bMsg.className="msg err";}
             }
@@ -1937,9 +1940,20 @@ async function mmStartOAuth(){
       }).catch(function(){m.style.color="#c02436";m.textContent="Serveur injoignable";btn.disabled=false;});
   }
 
+  // Masque le bouton "Confirmer l'ordre" pendant l'envoi : plus aucun libelle
+  // de confirmation/annulation tant que le mobile money n'est pas parti.
+  function mmVerrouOrdre(actif){
+    var b=document.getElementById("btnOrder");
+    if(b){ b.disabled=!!actif; b.style.display = actif ? "none" : ""; }
+    document.querySelectorAll("[data-mm-annuler]").forEach(function(el){
+      el.style.display = actif ? "none" : "";
+    });
+  }
+
   // Interroge /public-status jusqu'a ce que le mobile money soit envoye.
   function mmSuivreRetrait(id, m, btn){
     if(btn) btn.disabled = true;
+    mmVerrouOrdre(true);
     if(!id){ if(m){m.style.color="#16804a";m.textContent="Retrait confirmé — traitement en cours.";} return; }
     var t0 = Date.now(), timer = null;
     function tick(){
@@ -1964,6 +1978,7 @@ async function mmStartOAuth(){
           }
           if(d.done){
             if(timer) clearInterval(timer);
+            mmVerrouOrdre(false);
             setTimeout(function(){
               var mod=document.getElementById("wdModal"); if(mod) mod.style.display="none";
               if(typeof showPage==="function") showPage("historique");
@@ -1973,6 +1988,7 @@ async function mmStartOAuth(){
       // Au bout de 5 min on arrete le polling (le suivi continue dans l'historique)
       if(Date.now()-t0 > 5*60*1000){
         if(timer) clearInterval(timer);
+        mmVerrouOrdre(false);
         if(m){ m.style.color="#b45309"; m.textContent="⏳ Traitement en cours — suivez dans l'historique."; }
       }
     }
