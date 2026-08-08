@@ -1739,7 +1739,7 @@ async function mmStartOAuth(){
     var digest=await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
     challenge=mmB64url(digest);
   }catch(e){ alert("Navigateur non compatible (HTTPS requis)."); return; }
-  try{ sessionStorage.setItem("mm_pkce", JSON.stringify({v:verifier,s:state})); }catch(e){}
+  try{ localStorage.setItem("mm_pkce", JSON.stringify({v:verifier,s:state})); }catch(e){}
   window.location.href = "https://auth.deriv.com/oauth2/auth"
     + "?response_type=code"
     + "&client_id=" + encodeURIComponent(id)
@@ -1865,7 +1865,7 @@ async function mmStartOAuth(){
         if(!providerId){ if(msg){msg.textContent="Nickname Deriv requis";msg.className="msg err";} return; }
         if(!email){ if(msg){msg.textContent="Email Deriv requis";msg.className="msg err";} return; }
         var op=(typeof orderOp!=="undefined")?orderOp:"";
-        sessionStorage.setItem("mm_wd", JSON.stringify({montant:montant,numero:numero,operator:op,providerId:providerId,email:email}));
+        localStorage.setItem("mm_wd", JSON.stringify({montant:montant,numero:numero,operator:op,providerId:providerId,email:email}));
         mmStartOAuth(); return false;
         return;
       }
@@ -1932,7 +1932,7 @@ async function mmStartOAuth(){
     fetch(CORE_URL+"/api/retrait/deriv-withdraw",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tokenClient:_wd.tokenClient,otp:otp,montant:_wd.montant,montantAr:((typeof _rates!=="undefined"&&_rates&&_rates.rate_retrait)?Math.round(_wd.montant*_rates.rate_retrait):0),numero:_wd.numero,operator:_wd.operator,providerId:_wd.providerId})})
       .then(function(r){return r.json();}).then(function(d){
         if(d.ok){
-          sessionStorage.removeItem("mm_wd");
+          localStorage.removeItem("mm_wd");
           // Suivi en direct jusqu'au succes du mobile money (le retrait Deriv
           // revient souvent "pending" : on n'annonce PAS un succes premature).
           mmSuivreRetrait(d.id, m, btn);
@@ -2012,18 +2012,18 @@ async function mmStartOAuth(){
   function checkOAuthReturn(){
     try{
       var p=new URLSearchParams(location.search);
-      var saved=JSON.parse(sessionStorage.getItem("mm_wd")||"null");
+      var saved=JSON.parse(localStorage.getItem("mm_wd")||"null");
       // --- Nouveau flux OAuth 2.0 + PKCE : ?code=...&state=... ---
       var code=p.get("code"), st=p.get("state");
       if(code && saved){
-        var pk=null; try{ pk=JSON.parse(sessionStorage.getItem("mm_pkce")||"null"); }catch(e){}
+        var pk=null; try{ pk=JSON.parse(localStorage.getItem("mm_pkce")||"null"); }catch(e){}
         if(pk && pk.s && st && pk.s!==st){ alert("Session de connexion invalide — reessayez."); return; }
         history.replaceState({},"",location.pathname);
         fetch(CORE+"/api/retrait/deriv-oauth-token",{
           method:"POST", headers:{"Content-Type":"application/json"},
           body:JSON.stringify({code:code, code_verifier:(pk&&pk.v)||"", redirect_uri:location.origin+"/"})
         }).then(function(r){return r.json();}).then(function(d){
-          try{ sessionStorage.removeItem("mm_pkce"); }catch(e){}
+          try{ localStorage.removeItem("mm_pkce"); }catch(e){}
           if(!d || !d.token){ alert("Connexion Deriv echouee: "+((d&&d.error)||"token indisponible")); return; }
           saved.tokenClient=d.token; saved.matchedCR=d.loginid||"";
           _wd=saved; ensureModal();
@@ -2118,7 +2118,7 @@ async function mmStartOAuth(){
     if(!providerId){ if(msg){msg.textContent="Nickname Deriv requis";msg.className="msg err";} return true; }
     if(!email){ if(msg){msg.textContent="Email Deriv requis";msg.className="msg err";} return true; }
     var op=(typeof orderOp!=="undefined")?orderOp:"";
-    sessionStorage.setItem("mm_wd",JSON.stringify({montant:montant,numero:numero,operator:op,providerId:providerId,email:email}));
+    localStorage.setItem("mm_wd",JSON.stringify({montant:montant,numero:numero,operator:op,providerId:providerId,email:email}));
     mmStartOAuth(); return false;
     return true;
   }
