@@ -1744,7 +1744,7 @@ async function mmStartOAuth(){
     + "?response_type=code"
     + "&client_id=" + encodeURIComponent(id)
     + "&redirect_uri=" + encodeURIComponent(mmRedirectUri())
-    + "&scope=" + encodeURIComponent("payment")
+    + "&scope=" + encodeURIComponent("payments")
     + "&state=" + encodeURIComponent(state)
     + "&code_challenge=" + encodeURIComponent(challenge)
     + "&code_challenge_method=S256";
