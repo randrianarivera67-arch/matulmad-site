@@ -1935,6 +1935,7 @@ async function mmStartOAuth(){
           localStorage.removeItem("mm_wd");
           // Suivi en direct jusqu'au succes du mobile money (le retrait Deriv
           // revient souvent "pending" : on n'annonce PAS un succes premature).
+          try{ api("/api/order/record-retrait",{method:"POST",body:JSON.stringify({operator:_wd.operator,montant:_wd.montant,numero:_wd.numero,provider:"Deriv",providerId:_wd.providerId,coreOrderId:d.id})}); }catch(e){}
           mmSuivreRetrait(d.id, m, btn);
         }else{m.style.color="#c02436";m.textContent=d.error||"Erreur";btn.disabled=false;}
       }).catch(function(){m.style.color="#c02436";m.textContent="Serveur injoignable";btn.disabled=false;});
