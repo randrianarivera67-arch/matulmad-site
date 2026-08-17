@@ -1,2 +1,6 @@
 .vercel
 .env*
+
+*.bak
+*.bak[0-9]
+index.html.bak*
