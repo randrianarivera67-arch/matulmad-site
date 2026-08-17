@@ -1241,21 +1241,7 @@ async function submitOrder(){
   var btn=document.getElementById("btnOrder");btn.disabled=true;
   try{
     var d=await api("/api/order",{method:"POST",body:JSON.stringify({type:orderType,operator:orderOp,montant:montant,numero:numero,provider:provider,providerId:providerId})});
-    /* Deux chemins de paiement :
-       - payUrl : depot Orange par API. On envoie le client directement chez
-         Orange (application Orange Money si elle est installee et declaree par
-         Orange, sinon la page web Orange). Aucun code a composer, aucun jeton
-         visible : payUrl est une url de NOTRE backend qui redirige cote serveur.
-       - webviewUrl : chemin habituel avec le code USSD. C'est aussi le repli
-         automatique quand l'API Orange n'a pas repondu — l'ordre reste payable.
-       On memorise l'ordre en cours pour pouvoir afficher le resultat au retour
-       d'Orange, qui ramene le client sur cette page. */
-    if(d.ok&&d.payUrl){
-      try{ localStorage.setItem("mm_pay_order", String(d.orderId||"")); }catch(e){}
-      msg.textContent=lang==="fr"?"Ordre créé ! Ouverture d'Orange Money…":"Vita ny ordre ! Misokatra ny Orange Money…";msg.className="msg ok";
-      _histLoaded=false;
-      setTimeout(function(){window.location.href=d.payUrl;},700);
-    }else if(d.ok&&d.webviewUrl){
+    if(d.ok&&d.webviewUrl){
       msg.textContent=lang==="fr"?"Ordre créé ! Ouverture du paiement…":"Vita ny ordre ! Misokatra ny fandoavana…";msg.className="msg ok";
       _histLoaded=false;
       setTimeout(function(){window.location.href=d.webviewUrl;},700);
@@ -1949,7 +1935,6 @@ async function mmStartOAuth(){
           localStorage.removeItem("mm_wd");
           // Suivi en direct jusqu'au succes du mobile money (le retrait Deriv
           // revient souvent "pending" : on n'annonce PAS un succes premature).
-          try{ api("/api/order/record-retrait",{method:"POST",body:JSON.stringify({operator:_wd.operator,montant:_wd.montant,numero:_wd.numero,provider:"Deriv",providerId:_wd.providerId,coreOrderId:d.id})}); }catch(e){}
           mmSuivreRetrait(d.id, m, btn);
         }else{m.style.color="#c02436";m.textContent=d.error||"Erreur";btn.disabled=false;}
       }).catch(function(){m.style.color="#c02436";m.textContent="Serveur injoignable";btn.disabled=false;});
@@ -2073,87 +2058,6 @@ async function mmStartOAuth(){
   else checkOAuthReturn();
 })();
 
-</script>
-
-<script>
-/* ============================================================================
- * RETOUR DE PAIEMENT ORANGE MONEY (depot par API)
- * ----------------------------------------------------------------------------
- * Orange ramene le client ici avec ?pay=return (ou ?pay=cancel). Cette page de
- * retour n'est PAS une preuve de paiement : le client peut y arriver sans avoir
- * paye, ou en fermant l'application. On interroge donc le STATUT REEL de
- * l'ordre cote serveur, seule source de verite, jusqu'a ce qu'il soit tranche.
- * ==========================================================================*/
-(function(){
-  function param(n){
-    try{ return new URLSearchParams(location.search).get(n) || ""; }catch(e){ return ""; }
-  }
-  function nettoyerUrl(){
-    try{ history.replaceState(null,"",location.pathname); }catch(e){}
-  }
-  function dire(txt,kind){
-    try{ if(typeof toast==="function") return toast(txt,kind); }catch(e){}
-    alert(txt);
-  }
-
-  async function suivreStatut(orderId, essai){
-    essai = essai || 0;
-    try{
-      var d = await api("/api/order/"+encodeURIComponent(orderId)+"/status");
-      var st = d && d.status;
-      if(st === "success"){
-        try{ localStorage.removeItem("mm_pay_order"); }catch(e){}
-        dire(lang==="fr" ? "Dépôt réussi ! Votre compte est crédité."
-                         : "Vita ny dépôt ! Voampidy ny kaontinao.", "ok");
-        try{ _histLoaded=false; if(typeof loadHist==="function") loadHist(); }catch(e){}
-        return;
-      }
-      if(st === "failed"){
-        try{ localStorage.removeItem("mm_pay_order"); }catch(e){}
-        dire(lang==="fr" ? "Dépôt échoué. Aucun montant n'a été débité côté Orange si vous n'avez pas payé."
-                         : "Tsy vita ny dépôt.", "err");
-        return;
-      }
-      /* pending / processing : le paiement peut etre confirme quelques secondes
-         apres le retour (Orange notifie le serveur de son cote). On interroge
-         pendant ~90 s puis on laisse l'historique prendre le relais, sans
-         jamais annoncer un resultat que le serveur n'a pas confirme. */
-      if(essai < 30){
-        if(essai === 0){
-          dire(lang==="fr" ? "Paiement en cours de vérification…"
-                           : "Eo am-panamarinana ny fandoavana…");
-        }
-        return setTimeout(function(){ suivreStatut(orderId, essai+1); }, 3000);
-      }
-      dire(lang==="fr" ? "Paiement non encore confirmé. Consultez l'historique dans un instant."
-                       : "Mbola tsy voamarina. Jereo ny tantara afaka kelikely.");
-    }catch(e){
-      if(essai < 30) return setTimeout(function(){ suivreStatut(orderId, essai+1); }, 4000);
-    }
-  }
-
-  function auRetour(){
-    var pay = param("pay");
-    if(!pay) return;
-    var orderId = param("order") || "";
-    var local = "";
-    try{ local = localStorage.getItem("mm_pay_order") || ""; }catch(e){}
-    nettoyerUrl();
-    if(pay === "cancel"){
-      try{ localStorage.removeItem("mm_pay_order"); }catch(e){}
-      dire(lang==="fr" ? "Paiement annulé." : "Nofoanana ny fandoavana.", "err");
-      return;
-    }
-    /* L'identifiant renvoye par Orange est celui du CORE ; celui que la vitrine
-       sait interroger est l'ordre CLIENT, memorise avant la redirection. On
-       privilegie donc le local, avec repli sur le parametre d'url. */
-    var id = local || orderId;
-    if(id) suivreStatut(id, 0);
-  }
-
-  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", auRetour);
-  else auRetour();
-})();
 </script>
 
 <script>
