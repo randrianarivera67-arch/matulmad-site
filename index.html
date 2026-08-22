@@ -927,8 +927,14 @@ body.dash .dock{ display:grid; }
 <div class="toast" id="toast"></div>
 
 <script>
-const API = "https://matulmad-client-api-so6n.onrender.com";
-const CORE = "https://sms-gateway-admin-backend-vw8p.onrender.com";
+/* Backend auto-heberge (VPS Contabo, IP fixe 169.58.192.191).
+   - API  : client-api, expose derriere nginx sous /client
+   - CORE : backend principal
+   L'IP fixe est ce qui permet a Betwinner et Orange d'autoriser nos appels ;
+   l'hebergement precedent changeait d'adresse et le serveur s'endormait, ce
+   qui pouvait faire manquer une notification de paiement. */
+const API = "https://169-58-192-191.sslip.io/client";
+const CORE = "https://169-58-192-191.sslip.io";
 const PAYMENT = "https://payment-webview.vercel.app";
 
 /* Opérateurs : icône PNG réelle (téléversée à la racine) + couleur de secours */
