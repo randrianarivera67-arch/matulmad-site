@@ -731,15 +731,15 @@ body.dash .dock{ display:grid; }
           <div id="rateInfo" class="amt-cur" style="color:var(--gold-2);margin-top:6px;display:none"></div>
         </div>
         <div class="field"><label data-i18n="lbl_num">Numéro</label>
-          <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 5 5L16 13l5 2v3a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/></svg><input id="fNumero" type="tel" inputmode="numeric" placeholder="034 12 345 67"></div>
+          <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 5 5L16 13l5 2v3a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/></svg><select id="fNumero"></select></div>
         </div>
       </div>
       <div class="row2">
         <div class="field"><label data-i18n="lbl_prov">Fournisseur</label>
-          <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M3 7h18v12H3zM3 7l3-4h12l3 4M9 12h6"/></svg><select id="fProvider" onchange="convAr()"><option value="">—</option></select></div>
+          <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M3 7h18v12H3zM3 7l3-4h12l3 4M9 12h6"/></svg><select id="fProvider" onchange="onProviderChange()"><option value="">—</option></select></div>
         </div>
         <div class="field"><label data-i18n="lbl_provid">ID fournisseur</label>
-          <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg><input id="fProviderId" placeholder="Nickname Deriv"></div>
+          <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg><select id="fProviderId"></select></div>
         </div>
       </div>
       <div class="row2" id="bwCodeRow" style="display:none">
@@ -1066,11 +1066,83 @@ function showPage(view){
   if(view==="historique")loadHistory();
   window.scrollTo(0,0);
 }
+/* --------------------------------------------------------------------------
+   Le formulaire ne se saisit plus a la main : numero et identifiant viennent
+   des wallets et fournisseurs deja enregistres.
+
+   Motif : un numero tape de travers part vers le mauvais destinataire, et un
+   identifiant de compte errone credite quelqu'un d'autre. Choisir dans ses
+   propres enregistrements supprime ces deux erreurs. Le numero suit en outre
+   l'operateur choisi — un numero Orange ne peut plus se retrouver sur un envoi
+   Telma.
+   -------------------------------------------------------------------------- */
+
+/** Wallets enregistres pour l'operateur en cours. */
+function walletsOperateur(){
+  if(!me||!me.wallets) return [];
+  return me.wallets.filter(function(w){ return w.operator===orderOp; });
+}
+
+/** Comptes enregistres pour le fournisseur choisi (Deriv, Betwinner...). */
+function comptesFournisseur(){
+  if(!me||!me.providers) return [];
+  var nom=(document.getElementById("fProvider")||{}).value||"";
+  if(!nom) return [];
+  return me.providers.filter(function(p){
+    return String(p.name||"Deriv").toLowerCase()===nom.toLowerCase();
+  });
+}
+
+/** Remplit la liste des numeros a partir des wallets de l'operateur. */
+function remplirNumeros(){
+  var sel=document.getElementById("fNumero"); if(!sel) return;
+  var liste=walletsOperateur(), avant=sel.value;
+  if(!liste.length){
+    sel.innerHTML='<option value="">'+(lang==="fr"
+      ? "Aucun wallet "+opName(orderOp)
+      : "Tsy misy wallet "+opName(orderOp))+'</option>';
+    return;
+  }
+  sel.innerHTML=liste.map(function(w){
+    var etiquette=w.numero+(w.label?" · "+w.label:"");
+    return '<option value="'+w.numero+'">'+etiquette+'</option>';
+  }).join("");
+  // On garde le choix precedent s'il reste valable apres un changement
+  // d'operateur ; sinon le premier wallet fait office de valeur par defaut.
+  if(avant&&liste.some(function(w){return w.numero===avant;})) sel.value=avant;
+}
+
+/** Remplit la liste des comptes du fournisseur choisi. */
+function remplirComptes(){
+  var sel=document.getElementById("fProviderId"); if(!sel) return;
+  var liste=comptesFournisseur(), avant=sel.value;
+  if(!liste.length){
+    var nom=(document.getElementById("fProvider")||{}).value||"";
+    sel.innerHTML='<option value="">'+(lang==="fr"
+      ? "Aucun compte "+(nom||"fournisseur")
+      : "Tsy misy compte "+(nom||"fournisseur"))+'</option>';
+    return;
+  }
+  sel.innerHTML=liste.map(function(p){
+    var id=p.accountId||"";
+    var etiquette=id+(p.label?" · "+p.label:"");
+    return '<option value="'+id+'">'+etiquette+'</option>';
+  }).join("");
+  if(avant&&liste.some(function(p){return (p.accountId||"")===avant;})) sel.value=avant;
+}
+
+function onProviderChange(){ remplirComptes(); convAr(); }
+
 function autofillOrder(){
-  if(me&&me.wallets){var w=null;for(var i=0;i<me.wallets.length;i++)if(me.wallets[i].operator===orderOp){w=me.wallets[i];break;}
-    var n=document.getElementById("fNumero");if(w&&n&&!n.value)n.value=w.numero;}
-  if(me&&me.providers&&me.providers.length){var p=me.providers[0];var fp=document.getElementById("fProvider"),fi=document.getElementById("fProviderId");
-    if(fp&&!fp.value)fp.value=p.name||"Deriv";if(fi&&!fi.value)fi.value=p.accountId||"";}
+  // Deriv par defaut : c'est le fournisseur de la quasi-totalite des ordres.
+  var fp=document.getElementById("fProvider");
+  if(fp&&!fp.value){
+    var dispo=[];
+    for(var i=0;i<fp.options.length;i++) dispo.push(fp.options[i].value);
+    fp.value = dispo.indexOf("Deriv")>=0 ? "Deriv" : (dispo[1]||"");
+  }
+  remplirNumeros();
+  remplirComptes();
 }
 function scrollToId(id){document.getElementById(id).scrollIntoView({behavior:"smooth"});}
 
@@ -1177,7 +1249,12 @@ async function api(path,opts){
 function setDashName(){var el=document.getElementById("dashName");if(el&&me)el.textContent=me.name||me.email||me.phone||"client";}
 async function enterDash(){go("dashboard");setDashName();
   setKmMode(!!(me&&me.kmAccount));   // compte Comores -> mode Fc mandrakariva
-  renderOpPick();populateProviderSelect();renderWallets();renderProviders();showPage("depot");loadRates();}
+  renderOpPick();populateProviderSelect();
+  // autofillOrder APRES populateProviderSelect : il choisit Deriv parmi les
+  // options, puis remplit les listes numero et compte a partir des
+  // enregistrements du client.
+  autofillOrder();
+  renderWallets();renderProviders();showPage("depot");loadRates();}
 function populateProviderSelect(){var sel=document.getElementById("fProvider");if(!sel)return;
   var opts='<option value="">—</option>';var seen={};
   if(me&&me.providers)for(var i=0;i<me.providers.length;i++){var nm=me.providers[i].name||"Deriv";
@@ -1243,7 +1320,29 @@ async function submitOrder(){
   var providerId=document.getElementById("fProviderId").value.trim();
   var msg=document.getElementById("ordMsg");msg.className="msg";
   if(!montant||montant<1){msg.textContent=lang==="fr"?"Montant invalide":"Montant diso";msg.className="msg err";return;}
-  if(!numero){msg.textContent=lang==="fr"?"Numéro requis":"Mila numéro";msg.className="msg err";return;}
+
+  /* Numero et compte proviennent desormais d'une liste : s'ils sont vides,
+     c'est que le client n'a rien enregistre. On l'arrete ici avec une consigne
+     precise plutot que de laisser partir un ordre incomplet — un ordre sans
+     destinataire fiable coute plus cher a rattraper qu'a refuser. */
+  if(!numero){
+    msg.innerHTML=(lang==="fr"
+      ? "Aucun wallet "+opName(orderOp)+" enregistre. Ajoutez-le dans <b>Wallet</b>, puis revenez."
+      : "Tsy misy wallet "+opName(orderOp)+" voatahiry. Ampio ao amin'ny <b>Wallet</b>, dia miverina eto.");
+    msg.className="msg err";
+    return;
+  }
+  if(!provider){
+    msg.textContent=lang==="fr"?"Choisissez un fournisseur":"Safidio ny fournisseur";
+    msg.className="msg err";return;
+  }
+  if(!providerId){
+    msg.innerHTML=(lang==="fr"
+      ? "Aucun compte "+provider+" enregistre. Ajoutez-le dans <b>Fournisseurs</b>, puis revenez."
+      : "Tsy misy compte "+provider+" voatahiry. Ampio ao amin'ny <b>Fournisseurs</b>, dia miverina eto.");
+    msg.className="msg err";
+    return;
+  }
   var btn=document.getElementById("btnOrder");btn.disabled=true;
   try{
     var d=await api("/api/order",{method:"POST",body:JSON.stringify({type:orderType,operator:orderOp,montant:montant,numero:numero,provider:provider,providerId:providerId})});
@@ -1301,10 +1400,10 @@ async function saveWallet(id){
     var d=await api("/api/wallet",{method:"POST",body:JSON.stringify({operator:op,numero:num,label:lbl})});
     if(d.wallets)me.wallets=d.wallets;
     if(id){var d2=await api("/api/wallet/"+id,{method:"DELETE"});if(d2.wallets)me.wallets=d2.wallets;}
-    renderWallets();closeSheet("formSheet");toast(t(id?"m_saved":"m_added"),"ok");
+    renderWallets();remplirNumeros();closeSheet("formSheet");toast(t(id?"m_saved":"m_added"),"ok");
   }catch(e){btn.disabled=false;btn.textContent=t("w_save");fsErr(t("m_err"));}
 }
-async function delWallet(id){if(!confirm(t("confirm_del")))return;try{var d=await api("/api/wallet/"+id,{method:"DELETE"});if(d.wallets){me.wallets=d.wallets;renderWallets();toast(t("m_deleted"),"ok");}}catch(e){toast(t("m_err"),"err");}}
+async function delWallet(id){if(!confirm(t("confirm_del")))return;try{var d=await api("/api/wallet/"+id,{method:"DELETE"});if(d.wallets){me.wallets=d.wallets;renderWallets();remplirNumeros();toast(t("m_deleted"),"ok");}}catch(e){toast(t("m_err"),"err");}}
 
 /* providers */
 function renderProviders(){
@@ -1370,10 +1469,10 @@ async function saveProv(id){
     var d=await api("/api/wallet/provider",{method:"POST",body:JSON.stringify({name:name,accountId:acc,label:lbl,email:eml})});
     if(d.providers)me.providers=d.providers;
     if(id){var d2=await api("/api/wallet/provider/"+id,{method:"DELETE"});if(d2.providers)me.providers=d2.providers;}
-    renderProviders();populateProviderSelect();closeSheet("formSheet");toast(t(id?"m_saved":"m_added"),"ok");
+    renderProviders();populateProviderSelect();remplirComptes();closeSheet("formSheet");toast(t(id?"m_saved":"m_added"),"ok");
   }catch(e){btn.disabled=false;btn.textContent=t("w_save");fsErr(t("m_err"));}
 }
-async function delProv(id){if(!confirm(t("confirm_del")))return;try{var d=await api("/api/wallet/provider/"+id,{method:"DELETE"});if(d.providers){me.providers=d.providers;renderProviders();populateProviderSelect();toast(t("m_deleted"),"ok");}}catch(e){toast(t("m_err"),"err");}}
+async function delProv(id){if(!confirm(t("confirm_del")))return;try{var d=await api("/api/wallet/provider/"+id,{method:"DELETE"});if(d.providers){me.providers=d.providers;renderProviders();populateProviderSelect();remplirComptes();toast(t("m_deleted"),"ok");}}catch(e){toast(t("m_err"),"err");}}
 
 function fsErr(m){var e=document.getElementById("fsMsg");e.textContent=m;e.className="msg err";}
 
