@@ -242,6 +242,18 @@ footer{padding:34px 0;border-top:1px solid var(--line);margin-top:36px}
    cartes, et davantage encore dans celle qui est choisie. */
 .op-opt .opbadge{width:44px;height:44px;border-radius:12px;transition:.18s}
 .op-opt.active .opbadge{width:58px;height:58px;border-radius:15px}
+/* Echange de place : la carte choisie vient au centre, celle qui l'occupait
+   prend la position liberee. Uniquement quand il y a EXACTEMENT trois cartes
+   (Madagascar) ; en mode Comores il n'y en a qu'une, un ordre force casserait
+   la mise en page.
+   Rappel grid : order 1 = gauche, 2 = centre, 3 = droite. */
+.op-pick>.op-opt:nth-child(1){order:1}
+.op-pick>.op-opt:nth-child(2){order:2}
+.op-pick>.op-opt:nth-child(3){order:3}
+.op-pick>.op-opt:nth-child(1).active,
+.op-pick>.op-opt:nth-child(3).active{order:2}
+.op-pick>.op-opt:nth-child(1).active~.op-opt:nth-child(2){order:1}
+.op-pick>.op-opt:nth-child(3).active~.op-opt{order:3}
 .op-opt:active{transform:scale(.97)}
 
 /* Listes wallets / providers */
@@ -1278,11 +1290,12 @@ function populateProviderSelect(){var sel=document.getElementById("fProvider");i
     if(!seen[nm]){seen[nm]=1;opts+='<option>'+nm+'</option>';}}
   if(!seen["Deriv"])opts+='<option>Deriv</option>';
   // Betwinner: azo amin'ny compte REHETRA (anisan'ny Comores)
-  if(!seen["Betwinner"])opts+='<option>Betwinner</option>';
-  // 1XBET : meme reseau Cashdesk que Betwinner, caisse distincte.
+  // Betwinner : Madagascar uniquement. Aux Comores la caisse est celle de 1XBET.
+  if(!kmMode && !seen["Betwinner"])opts+='<option>Betwinner</option>';
+  // 1XBET : disponible partout, y compris aux Comores (montants en Fc).
   if(!seen["1XBET"])opts+='<option>1XBET</option>';
   sel.innerHTML=opts;
-  if(kmMode && /betwinner|1xbet/i.test(sel.value||"")) sel.value="Deriv";}
+  if(kmMode && /betwinner/i.test(sel.value||"")) sel.value="Deriv";}
 function isBetwinner(){var p=document.getElementById("fProvider");return p&&(p.value||"").toLowerCase()==="betwinner";}
 
 /* type / opérateur */
