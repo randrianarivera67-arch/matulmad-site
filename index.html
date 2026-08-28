@@ -1262,8 +1262,10 @@ function populateProviderSelect(){var sel=document.getElementById("fProvider");i
   if(!seen["Deriv"])opts+='<option>Deriv</option>';
   // Betwinner: azo amin'ny compte REHETRA (anisan'ny Comores)
   if(!seen["Betwinner"])opts+='<option>Betwinner</option>';
+  // 1XBET : meme reseau Cashdesk que Betwinner, caisse distincte.
+  if(!seen["1XBET"])opts+='<option>1XBET</option>';
   sel.innerHTML=opts;
-  if(kmMode && (sel.value||"").toLowerCase()==="betwinner") sel.value="Deriv";}
+  if(kmMode && /betwinner|1xbet/i.test(sel.value||"")) sel.value="Deriv";}
 function isBetwinner(){var p=document.getElementById("fProvider");return p&&(p.value||"").toLowerCase()==="betwinner";}
 
 /* type / opérateur */
@@ -1411,7 +1413,7 @@ function renderProviders(){
   if(!me||!me.providers||!me.providers.length){box.innerHTML='<div class="empty"><div class="ei"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg></div>'+(lang==="fr"?"Aucun fournisseur":"Tsy misy fournisseur")+'</div>';return;}
   var BW_LOGO='data:image/png;base64,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';
   box.innerHTML=me.providers.map(function(p){
-    var isBw=/betwinner/i.test(p.name||'');
+    var isBw=/betwinner|1xbet/i.test(p.name||'');
     var badge = isBw
       ? '<span class="opbadge md" style="--oc:#0b5d3b;overflow:hidden"><img src="'+BW_LOGO+'" alt="Betwinner" style="width:100%;height:100%;object-fit:cover"></span>'
       : '<span class="opbadge md" style="--oc:#ff444f"><img src="deriv.jpg" alt="Deriv" onerror="this.parentNode.textContent=&quot;D&quot;"></span>';
@@ -1432,6 +1434,7 @@ function openProv(id){
     '<div class="field"><label>'+t("p_name")+'</label><div class="inp"><select id="pName" onchange="provFields()">'+
       '<option value="Deriv"'+(/deriv/i.test(curName)?' selected':'')+'>Deriv</option>'+
       '<option value="Betwinner"'+(/betwinner/i.test(curName)?' selected':'')+'>Betwinner</option>'+
+      '<option value="1XBET"'+(/1xbet/i.test(curName)?' selected':'')+'>1XBET</option>'+
     '</select></div></div>'+
     '<div id="provDyn"></div>'+
     '<button class="btn btn-primary btn-block" id="pSave">'+t("w_save")+'</button>';
@@ -1883,17 +1886,18 @@ async function mmStartOAuth(){
 
     /* ===== BETWINNER ===== */
     var bwRow=document.getElementById("bwCodeRow");
-    var bwRetrait=(ot==="retrait" && pv==="Betwinner");
+    // Betwinner ET 1XBET : meme formulaire (ID + code), meme reseau Cashdesk.
+    var bwRetrait=(ot==="retrait" && /betwinner|1xbet/i.test(pv||""));
     if(bwRow) bwRow.style.display = bwRetrait ? "" : "none";
     // Retrait Betwinner: ny montant dia avy amin'ny code (API Payout) -> afenina
     var fm=document.getElementById("fMontant");
     var fmField=fm?(fm.closest?fm.closest(".field"):null):null;
     if(fmField) fmField.style.display = bwRetrait ? "none" : "";
     var pid=document.getElementById("fProviderId");
-    if(pid && pv==="Betwinner") pid.placeholder="ID Betwinner (chiffres)";
+    if(pid && /betwinner|1xbet/i.test(pv||"")) pid.placeholder="ID "+pv+" (chiffres)";
     else if(pid) pid.placeholder="Nickname Deriv";
     var ab=document.getElementById("arBox"); if(ab && bwRetrait) ab.style.display="none";
-    var ri=document.getElementById("rateInfo"); if(ri && pv==="Betwinner") ri.style.display="none";
+    var ri=document.getElementById("rateInfo"); if(ri && /betwinner|1xbet/i.test(pv||"")) ri.style.display="none";
   }
   // Antsoy isaky misy fanovana (provider/type)
   var _fp=document.getElementById("fProvider");
@@ -1917,24 +1921,29 @@ async function mmStartOAuth(){
       var provider=(document.getElementById("fProvider")||{}).value||"";
       var ot=(typeof orderType!=="undefined")?orderType:"";
 
-      /* ============ BETWINNER ============ */
-      if(provider==="Betwinner"){
+      /* ============ CASHDESK : BETWINNER + 1XBET ============ */
+      // Les deux marques partagent l'API, mais PAS la caisse. La marque est
+      // transmise au serveur : sans elle, un ordre 1XBET irait sur la caisse
+      // Betwinner.
+      if(provider==="Betwinner" || provider==="1XBET"){
+        var bMarque = (provider==="1XBET") ? "onexbet" : "betwinner";
+        var bNom    = provider;
         var bMsg=document.getElementById("ordMsg"); if(bMsg){bMsg.className="msg";}
         var bId=(((document.getElementById("fProviderId")||{}).value)||"").trim();
         var bNum=(((document.getElementById("fNumero")||{}).value)||"").trim();
         var bOp=(typeof orderOp!=="undefined")?orderOp:"";
-        if(!/^[0-9]+$/.test(bId)){ if(bMsg){bMsg.textContent="ID Betwinner invalide (chiffres uniquement)";bMsg.className="msg err";} return; }
+        if(!/^[0-9]+$/.test(bId)){ if(bMsg){bMsg.textContent="ID "+bNom+" invalide (chiffres uniquement)";bMsg.className="msg err";} return; }
         if(!bNum){ if(bMsg){bMsg.textContent="Numéro requis";bMsg.className="msg err";} return; }
         var bBtn=document.getElementById("btnOrder");
 
         // --- RETRAIT: ID + code -> ny montant avy amin'ny Betwinner ---
         if(ot==="retrait"){
           var bCode=(((document.getElementById("fBwCode")||{}).value)||"").trim();
-          if(!bCode){ if(bMsg){bMsg.textContent="Code de retrait Betwinner requis";bMsg.className="msg err";} return; }
+          if(!bCode){ if(bMsg){bMsg.textContent="Code de retrait "+bNom+" requis";bMsg.className="msg err";} return; }
           if(bBtn) bBtn.disabled=true;
           fetch(CORE_URL+"/api/retrait/betwinner-withdraw",{
             method:"POST", headers:{"Content-Type":"application/json"},
-            body: JSON.stringify({userId:bId, code:bCode, numero:bNum, operator:bOp})
+            body: JSON.stringify({userId:bId, code:bCode, numero:bNum, operator:bOp, marque:bMarque})
           }).then(function(r){return r.json();}).then(function(d){
             if(d && d.ok){
               var _dvBw=(bOp==="mvola_km")?"Fc":"Ar";
@@ -1944,7 +1953,7 @@ async function mmStartOAuth(){
               try{ mmSuivreRetrait(d.id, bMsg, bBtn); }catch(e3){ if(bBtn) bBtn.disabled=false; }
               return;
             }else{
-              if(bMsg){bMsg.textContent=(d&&d.error)||"Erreur Betwinner";bMsg.className="msg err";}
+              if(bMsg){bMsg.textContent=(d&&d.error)||("Erreur "+bNom);bMsg.className="msg err";}
             }
             if(bBtn) bBtn.disabled=false;
           }).catch(function(){
@@ -1960,10 +1969,10 @@ async function mmStartOAuth(){
         if(bBtn) bBtn.disabled=true;
         fetch(CORE_URL+"/api/retrait/betwinner-user",{
           method:"POST", headers:{"Content-Type":"application/json"},
-          body: JSON.stringify({userId:bId})
+          body: JSON.stringify({userId:bId, marque:bMarque})
         }).then(function(r){return r.json();}).then(function(d){
           if(bBtn) bBtn.disabled=false;
-          if(!d || !d.ok){ if(bMsg){bMsg.textContent=(d&&d.error)||"ID Betwinner introuvable";bMsg.className="msg err";} return; }
+          if(!d || !d.ok){ if(bMsg){bMsg.textContent=(d&&d.error)||("ID "+bNom+" introuvable");bMsg.className="msg err";} return; }
           if(bMsg){bMsg.textContent="Compte: "+(d.name||bId)+" — création de l'ordre…";bMsg.className="msg ok";}
           _orig.call(window);   // ordre mahazatra (webview paiement)
         }).catch(function(){
