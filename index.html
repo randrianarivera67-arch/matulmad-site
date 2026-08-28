@@ -715,6 +715,13 @@ body.dash .dock{ display:grid; }
       <div class="rp-foot" data-i18n="rate_foot">Appliqué aux ordres Deriv (1 USD). Mobile money : montants en Ariary.</div>
     </div>
 
+    <!-- Betwinner / 1XBET : pas de cours, montants directs. Remplace le panneau
+         de cours Deriv quand l'une de ces deux marques est choisie. -->
+    <div class="rate-panel" id="cashdeskPanel" style="display:none">
+      <div class="rp-top"><span class="rp-dot"></span><span class="rp-lbl" id="cdLbl">Betwinner</span></div>
+      <div class="rp-foot" id="cdFoot" style="margin-top:8px">Montants en Ariary. Entrez votre ID joueur.</div>
+    </div>
+
     <div class="card">
       <div class="seg">
         <button id="segDepot" class="active" onclick="setType('depot')"><svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M12 4v13M18 11l-6 6-6-6"/></svg><span data-i18n="depot">Dépôt</span></button>
@@ -1413,10 +1420,13 @@ function renderProviders(){
   if(!me||!me.providers||!me.providers.length){box.innerHTML='<div class="empty"><div class="ei"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg></div>'+(lang==="fr"?"Aucun fournisseur":"Tsy misy fournisseur")+'</div>';return;}
   var BW_LOGO='data:image/png;base64,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';
   box.innerHTML=me.providers.map(function(p){
+    var isOx=/1xbet/i.test(p.name||'');
     var isBw=/betwinner|1xbet/i.test(p.name||'');
-    var badge = isBw
+    var badge = isOx
+      ? '<span class="opbadge md" style="--oc:#0a4ea3;overflow:hidden"><img src="1xbet.jpg" alt="1XBET" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.textContent=&quot;1X&quot;"></span>'
+      : (isBw
       ? '<span class="opbadge md" style="--oc:#0b5d3b;overflow:hidden"><img src="'+BW_LOGO+'" alt="Betwinner" style="width:100%;height:100%;object-fit:cover"></span>'
-      : '<span class="opbadge md" style="--oc:#ff444f"><img src="deriv.jpg" alt="Deriv" onerror="this.parentNode.textContent=&quot;D&quot;"></span>';
+      : '<span class="opbadge md" style="--oc:#ff444f"><img src="deriv.jpg" alt="Deriv" onerror="this.parentNode.textContent=&quot;D&quot;"></span>');
     var sub = isBw ? ('ID '+p.accountId) : (p.accountId+(p.email?' · '+p.email:''));
     return '<div class="prov-row lift"><div class="l">'+badge+'<div><div class="nm">'+(p.label||p.name)+'</div><div class="lb">'+sub+'</div></div></div>'+
     '<div class="row-act"><button class="rbtn edit" onclick="openProv(\''+p._id+'\')"><svg class="ic" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>'+
@@ -1447,14 +1457,15 @@ function openProv(id){
 function provFields(){
   var p = window.__editProv;
   var name = (document.getElementById("pName")||{}).value || 'Deriv';
-  var isBw = /betwinner/i.test(name);
+  // Betwinner et 1XBET : meme reseau Cashdesk, meme formulaire (ID chiffres).
+  var isBw = /betwinner|1xbet/i.test(name);
   var dyn = document.getElementById("provDyn");
   if(!dyn) return;
   if(isBw){
     // BETWINNER : ID (chiffres) + nom facultatif (pas d'email)
     dyn.innerHTML =
-      '<div class="field"><label>ID Betwinner (chiffres)</label><div class="inp"><input id="pId" inputmode="numeric" placeholder="123456789" value="'+(p&&/betwinner/i.test(p.name||'')?(p.accountId||''):'')+'"></div></div>'+
-      '<div class="field"><label>'+t("p_label")+'</label><div class="inp"><input id="pLabel" placeholder="Betwinner" value="'+(p&&p.label?p.label.replace(/"/g,"&quot;"):'')+'"></div></div>';
+      '<div class="field"><label>ID '+name+' (chiffres)</label><div class="inp"><input id="pId" inputmode="numeric" placeholder="123456789" value="'+(p&&/betwinner|1xbet/i.test(p.name||'')?(p.accountId||''):'')+'"></div></div>'+
+      '<div class="field"><label>'+t("p_label")+'</label><div class="inp"><input id="pLabel" placeholder="'+name+'" value="'+(p&&p.label?p.label.replace(/"/g,"&quot;"):'')+'"></div></div>';
   }else{
     // DERIV : Nickname Deriv (P2P) + Email + nom facultatif
     dyn.innerHTML =
@@ -1466,7 +1477,7 @@ function provFields(){
 async function saveProv(id){
   var name=document.getElementById("pName").value.trim()||"Deriv",acc=document.getElementById("pId").value.trim(),lbl=(document.getElementById("pLabel")||{}).value;lbl=(lbl||"").trim();var eml=(document.getElementById("pEmail")||{}).value;eml=(eml||"").trim();
   if(!acc){fsErr(lang==="fr"?"Identifiant requis":"Mila identifiant");return;}
-  if(/betwinner/i.test(name) && !/^[0-9]+$/.test(acc)){fsErr(lang==="fr"?"ID Betwinner : chiffres uniquement":"ID Betwinner : isa fotsiny");return;}
+  if(/betwinner|1xbet/i.test(name) && !/^[0-9]+$/.test(acc)){fsErr(lang==="fr"?("ID "+name+" : chiffres uniquement"):("ID "+name+" : isa fotsiny"));return;}
   var btn=document.getElementById("pSave");btn.disabled=true;btn.innerHTML='<span class="spin"></span>';
   try{
     var d=await api("/api/wallet/provider",{method:"POST",body:JSON.stringify({name:name,accountId:acc,label:lbl,email:eml})});
@@ -1898,6 +1909,20 @@ async function mmStartOAuth(){
     else if(pid) pid.placeholder="Nickname Deriv";
     var ab=document.getElementById("arBox"); if(ab && bwRetrait) ab.style.display="none";
     var ri=document.getElementById("rateInfo"); if(ri && /betwinner|1xbet/i.test(pv||"")) ri.style.display="none";
+    // Cours Deriv sans objet pour Betwinner/1XBET : on montre a la place le
+    // rappel de la marque et de la devise.
+    var estCd = /betwinner|1xbet/i.test(pv||"");
+    var rp=document.getElementById("ratePanel"), cp=document.getElementById("cashdeskPanel");
+    if(rp) rp.style.display = estCd ? "none" : "";
+    if(cp){
+      cp.style.display = estCd ? "" : "none";
+      if(estCd){
+        var _dev=(typeof orderOp!=="undefined" && orderOp==="mvola_km") ? "Franc comorien (Fc)" : "Ariary";
+        var l=document.getElementById("cdLbl"); if(l) l.textContent=pv;
+        var f=document.getElementById("cdFoot");
+        if(f) f.textContent="Montants en "+_dev+". Entrez votre ID joueur "+pv+".";
+      }
+    }
   }
   // Antsoy isaky misy fanovana (provider/type)
   var _fp=document.getElementById("fProvider");
