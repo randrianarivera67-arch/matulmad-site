@@ -1218,7 +1218,10 @@ async function doAuth(){
     }
     var d=await res.json();
     if(!res.ok){btn.disabled=false;return authError(d.error||"Erreur");}
-    token=d.token;localStorage.setItem("mm_token",token);me=d.user;closeAuth();enterDash();loadNotifs();
+    // updateProfBtn() manquait ici : a la connexion la photo ne s'affichait
+    // qu'apres un rechargement, car seule la reprise par token (plus bas)
+    // l'appelait.
+    token=d.token;localStorage.setItem("mm_token",token);me=d.user;updateProfBtn();closeAuth();enterDash();loadNotifs();
   }catch(e){authError(lang==="fr"?"Serveur injoignable":"Tsy tratra ny serveur");}
   btn.disabled=false;
 }
