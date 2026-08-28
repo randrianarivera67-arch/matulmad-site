@@ -238,11 +238,18 @@ footer{padding:34px 0;border-top:1px solid var(--line);margin-top:36px}
 .op-pick{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .op-opt{padding:12px 8px;border-radius:13px;border:1.5px solid var(--field-line);background:var(--field);text-align:center;font-family:var(--font-d);font-weight:700;font-size:14px;transition:.15s;display:flex;flex-direction:column;align-items:center;gap:8px}
 .op-opt.active{border-color:var(--blue-1);box-shadow:0 0 0 3px var(--glow);color:var(--blue-1);transform:translateY(-1px)}
+/* Le logo de l'operateur est le repere principal : on l'agrandit dans les trois
+   cartes, et davantage encore dans celle qui est choisie. */
+.op-opt .opbadge{width:44px;height:44px;border-radius:12px;transition:.18s}
+.op-opt.active .opbadge{width:58px;height:58px;border-radius:15px}
 .op-opt:active{transform:scale(.97)}
 
 /* Listes wallets / providers */
 .wallet-row,.prov-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 13px;border-radius:13px;background:var(--field);border:1px solid var(--line);margin-bottom:10px}
 .wallet-row .l,.prov-row .l{display:flex;align-items:center;gap:11px;min-width:0}
+/* Le conteneur intermediaire doit pouvoir retrecir, sinon l'ellipsis de .lb
+   ne s'applique jamais et les emails longs debordent de la carte. */
+.wallet-row .l>div,.prov-row .l>div{min-width:0;overflow:hidden}
 .wallet-row .nm,.prov-row .nm{font-family:var(--font-d);font-weight:700;font-size:15px}
 .wallet-row .lb,.prov-row .lb{font-size:12px;color:var(--ink-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row-act{display:flex;gap:7px;flex:none}
