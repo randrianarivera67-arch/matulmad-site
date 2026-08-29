@@ -2017,7 +2017,9 @@ async function mmStartOAuth(){
         if(bBtn) bBtn.disabled=true;
         fetch(CORE_URL+"/api/retrait/betwinner-user",{
           method:"POST", headers:{"Content-Type":"application/json"},
-          body: JSON.stringify({userId:bId, marque:bMarque})
+          // operator indispensable : c'est lui qui distingue la caisse 1XBET
+          // malgache de la caisse 1XBET comorienne.
+          body: JSON.stringify({userId:bId, marque:bMarque, operator:bOp})
         }).then(function(r){return r.json();}).then(function(d){
           if(bBtn) bBtn.disabled=false;
           if(!d || !d.ok){ if(bMsg){bMsg.textContent=(d&&d.error)||("ID "+bNom+" introuvable");bMsg.className="msg err";} return; }
