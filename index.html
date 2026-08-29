@@ -252,8 +252,11 @@ footer{padding:34px 0;border-top:1px solid var(--line);margin-top:36px}
 .op-pick>.op-opt:nth-child(3){order:3}
 .op-pick>.op-opt:nth-child(1).active,
 .op-pick>.op-opt:nth-child(3).active{order:2}
-.op-pick>.op-opt:nth-child(1).active~.op-opt:nth-child(2){order:1}
-.op-pick>.op-opt:nth-child(3).active~.op-opt{order:3}
+/* Le combinateur ~ ne voit que les elements SUIVANTS : quand la 3e carte est
+   choisie, elle ne peut pas deplacer la 2e. :has() sur le conteneur regarde
+   toute la grille et resout les deux sens. */
+.op-pick:has(>.op-opt:nth-child(1).active)>.op-opt:nth-child(2){order:1}
+.op-pick:has(>.op-opt:nth-child(3).active)>.op-opt:nth-child(2){order:3}
 .op-opt:active{transform:scale(.97)}
 
 /* Listes wallets / providers */
