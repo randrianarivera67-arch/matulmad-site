@@ -28,7 +28,7 @@
 })();
 </script>
 <title>MATUL MADA — Mobile Money & Deriv</title>
-<meta name="description" content="MATUL MADA — Dépôt et retrait mobile money pour Deriv et plus. Yas, Orange Money, Airtel Money. Sans frais de transfert.">
+<meta name="description" content="MATUL MADA — Dépôt et retrait mobile money instantanés. Yas, Orange Money, Airtel Money.">
 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.json">
@@ -143,7 +143,14 @@ header.nav{position:sticky;top:0;z-index:50;background:transparent;border-bottom
 .glasscard{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-lg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
 
 .ops{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:26px}
-.op-chip{display:inline-flex;align-items:center;gap:9px;padding:7px 14px 7px 7px;border-radius:50px;border:1px solid var(--line);background:var(--panel);font-family:var(--font-d);font-weight:600;font-size:14px}
+/* Puces operateur de l'accueil : logo agrandi et relief clay, pour qu'elles
+   se lisent comme celles de la page d'ordre. */
+.op-chip{display:inline-flex;align-items:center;gap:11px;padding:9px 18px 9px 9px;border-radius:50px;border:1px solid var(--line);background:var(--panel);font-family:var(--font-d);font-weight:700;font-size:15.5px;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.6),
+             inset 0 -2px 6px rgba(16,50,110,.12),
+             0 8px 18px -8px rgba(16,50,110,.45)}
+.op-chip .opbadge{width:42px!important;height:42px!important;border-radius:13px!important;
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.5),0 5px 12px -4px rgba(8,30,60,.5)}
 
 /* Badge opérateur (icône PNG réelle, fond = couleur de marque en secours) */
 .opbadge{background:var(--oc,#888);border-radius:9px;overflow:hidden;display:grid;place-items:center;flex:none}
@@ -794,20 +801,18 @@ body.dash .dock{ display:grid; }
 <main id="site">
   <div class="wrap">
     <section class="hero">
-      <div class="eyebrow" data-i18n="hero_eyebrow">Passerelle mobile money · Madagascar</div>
-      <h1 data-i18n="hero_title">Alimentez <span class="grad">Deriv</span><br>sans frais de transfert</h1>
+            <h1 data-i18n="hero_title">Dépôt et retrait <span class="grad">instantanés</span></h1>
       <p class="lead" data-i18n="hero_lead">Dépôt et retrait instantanés via Yas, Orange Money et Airtel Money. Créez votre compte, passez un ordre, payez. C'est tout.</p>
       <div class="hero-cta">
         <button class="btn btn-primary" onclick="openAuth('register')"><svg class="ic neon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="hero_cta1">Ouvrir un compte</span></button>
         <button class="btn btn-ghost" onclick="scrollToId('how')"><span data-i18n="hero_cta2">Comment ça marche</span></button>
       </div>
       <div class="hero-player">
-        <video controls autoplay muted loop playsinline preload="metadata"><source src="/hero.mp4" type="video/mp4"></video>
+        <video autoplay muted loop playsinline preload="metadata" disablepictureinpicture controlslist="nodownload noplaybackrate noremoteplayback" oncontextmenu="return false" style="pointer-events:none"><source src="/hero.mp4" type="video/mp4"></video>
       </div>
       <div class="ops" id="heroOps"></div>
       <div class="hero-stats">
-        <div class="stat"><div class="n">0 Ar</div><div class="l" data-i18n="stat1">Frais de transfert</div></div>
-        <div class="stat"><div class="n">~2 min</div><div class="l" data-i18n="stat2">Traitement moyen</div></div>
+                <div class="stat"><div class="n">~2 min</div><div class="l" data-i18n="stat2">Traitement moyen</div></div>
         <div class="stat"><div class="n">24/7</div><div class="l" data-i18n="stat3">Disponible</div></div>
       </div>
     </section>
@@ -815,13 +820,12 @@ body.dash .dock{ display:grid; }
     <section id="features">
       <div class="sec-head">
         <div class="eyebrow" data-i18n="feat_eyebrow">Pourquoi MATUL MADA</div>
-        <h2 data-i18n="feat_title">Une passerelle pensée pour vous</h2>
+        <h2 data-i18n="feat_title">Pensé pour vous</h2>
         <p data-i18n="feat_sub">Rapide, transparent, et fait pour le mobile money malgache.</p>
       </div>
       <div class="grid3">
         <div class="feature"><div class="feat-ic"><svg class="ic neon" viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg></div><h3 data-i18n="f1t">Instantané</h3><p data-i18n="f1d">Validation automatique dès réception du paiement.</p></div>
-        <div class="feature"><div class="feat-ic"><svg class="ic neon" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M8 12l3 3 5-6"/></svg></div><h3 data-i18n="f2t">Zéro frais de transfert</h3><p data-i18n="f2d">Vous envoyez exactement le montant de votre ordre.</p></div>
-        <div class="feature"><div class="feat-ic"><svg class="ic neon" viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg></div><h3 data-i18n="f3t">Sécurisé</h3><p data-i18n="f3d">Chaque transaction est vérifiée avant validation.</p></div>
+                <div class="feature"><div class="feat-ic"><svg class="ic neon" viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg></div><h3 data-i18n="f3t">Sécurisé</h3><p data-i18n="f3d">Chaque transaction est vérifiée avant validation.</p></div>
       </div>
     </section>
 
@@ -1111,11 +1115,11 @@ function opName(op){var o=OPS[op];return o?o.brand:(op||"").toUpperCase();}
 /* i18n */
 const I18N={
  fr:{nav_login:"Connexion",nav_logout:"Déconnexion",install:"Installer",add:"Ajouter",all:"Tout",
-  hero_eyebrow:"Passerelle mobile money · Madagascar",hero_title:'Alimentez <span class="grad">Deriv</span><br>sans frais de transfert',
+  hero_eyebrow:"",hero_title:'Dépôt et retrait <span class="grad">instantanés</span>',
   hero_lead:"Dépôt et retrait instantanés via Yas, Orange Money et Airtel Money. Créez votre compte, passez un ordre, payez. C'est tout.",
-  hero_cta1:"Ouvrir un compte",hero_cta2:"Comment ça marche",stat1:"Frais de transfert",stat2:"Traitement moyen",stat3:"Disponible",
-  feat_eyebrow:"Pourquoi MATUL MADA",feat_title:"Une passerelle pensée pour vous",feat_sub:"Rapide, transparent, et fait pour le mobile money malgache.",
-  f1t:"Instantané",f1d:"Validation automatique dès réception du paiement.",f2t:"Zéro frais de transfert",f2d:"Vous envoyez exactement le montant de votre ordre.",
+  hero_cta1:"Ouvrir un compte",hero_cta2:"Comment ça marche",stat1:"",stat2:"Traitement moyen",stat3:"Disponible",
+  feat_eyebrow:"Pourquoi MATUL MADA",feat_title:"Pensé pour vous",feat_sub:"Rapide, transparent, et fait pour le mobile money malgache.",
+  f1t:"Instantané",f1d:"Validation automatique dès réception du paiement.",
   f3t:"Sécurisé",f3d:"Chaque transaction est vérifiée avant validation.",how_eyebrow:"En 4 étapes",how_title:"Comment ça marche",
   s1t:"Créez un compte",s1d:"Email ou numéro de téléphone, c'est instantané.",s2t:"Passez un ordre",s2d:"Dépôt ou retrait, opérateur, montant et destinataire.",
   s3t:"Confirmez",s3d:"La page de paiement s'ouvre avec votre code.",s4t:"Payez",s4d:"Appelez le code, validation automatique.",
@@ -1134,11 +1138,11 @@ const I18N={
   d_session:"Session",d_ussd:"Code USSD",d_sms:"Modèle SMS opérateur",st_created:"Créée",st_proc:"En traitement",st_done:"Terminée",st_fail:"Échec du traitement",
   m_added:"Ajouté",m_saved:"Enregistré",m_deleted:"Supprimé",m_err:"Erreur",confirm_del:"Supprimer ?"},
  mg:{nav_login:"Hiditra",nav_logout:"Hivoaka",install:"Apetraho",add:"Hanampy",all:"Rehetra",
-  hero_eyebrow:"Vavahady mobile money · Madagasikara",hero_title:'Ampidiro vola ny <span class="grad">Deriv</span><br>tsy misy saran-defa',
+  hero_eyebrow:"",hero_title:'Fampidirana sy fisintonam-bola <span class="grad">avy hatrany</span>',
   hero_lead:"Dépôt sy retrait avy hatrany amin'ny Yas, Orange Money ary Airtel Money. Mamorona kaonty, manao ordre, mandoa. Vita.",
-  hero_cta1:"Hanokatra kaonty",hero_cta2:"Ahoana no fombany",stat1:"Saran-defa",stat2:"Faharetana antonony",stat3:"Misokatra",
-  feat_eyebrow:"Nahoana MATUL MADA",feat_title:"Vavahady natao ho anao",feat_sub:"Haingana, mangarahara, natao ho an'ny mobile money malagasy.",
-  f1t:"Avy hatrany",f1d:"Validation automatika raha vao tonga ny vola.",f2t:"Tsy misy saran-defa",f2d:"Alefanao marina ny vola ao amin'ny ordre.",
+  hero_cta1:"Hanokatra kaonty",hero_cta2:"Ahoana no fombany",stat1:"",stat2:"Faharetana antonony",stat3:"Misokatra",
+  feat_eyebrow:"Nahoana MATUL MADA",feat_title:"Natao ho anao",feat_sub:"Haingana, mangarahara, natao ho an'ny mobile money malagasy.",
+  f1t:"Avy hatrany",f1d:"Validation automatika raha vao tonga ny vola.",
   f3t:"Voaaro",f3d:"Hamarinina alohan'ny valider ny transaction tsirairay.",how_eyebrow:"Dingana 4",how_title:"Ahoana no fombany",
   s1t:"Mamorona kaonty",s1d:"Email na numéro, avy hatrany.",s2t:"Manao ordre",s2d:"Dépôt na retrait, opérateur, montant, mpandray.",
   s3t:"Confirmer",s3d:"Misokatra ny pejy fandoavana misy ny kaody.",s4t:"Mandoa",s4d:"Antsoy ny kaody, validation automatika.",
