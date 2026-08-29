@@ -191,16 +191,17 @@ footer{padding:34px 0;border-top:1px solid var(--line);margin-top:36px}
 .field label{display:block;font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:6px;font-family:var(--font-d);letter-spacing:.03em}
 /* Champs de saisie : creux clay. L'ombre est INTERIEURE, a l'inverse des
    boutons qui sont bombes -- c'est ce qui fait lire "on peut ecrire ici". */
-/* Fond clair pour les champs : sur la carte doree, le gris se confondait. */
-.field .inp{display:flex;align-items:center;gap:10px;background:var(--panel-solid);border:1px solid var(--field-line);border-radius:14px;padding:0 14px;height:50px;
+/* Fond clair pour les champs : sur la carte doree, le gris se confondait.
+   Le selecteur porte sur .inp seul, car dans la carte de l'ordre les champs
+   ne sont pas enveloppes dans un .field. */
+.inp{display:flex;align-items:center;gap:10px;background:var(--panel-solid);border:1px solid var(--field-line);border-radius:14px;padding:0 14px;height:50px;
   box-shadow:inset 0 3px 7px rgba(16,50,110,.13),
              inset 0 -1.5px 0 rgba(255,255,255,.55);
   transition:box-shadow .18s,border-color .15s}
-.field .inp:focus-within{border-color:var(--blue-1);
+.inp:focus-within{border-color:var(--blue-1);
   box-shadow:inset 0 3px 7px rgba(16,50,110,.10),
              inset 0 -1.5px 0 rgba(255,255,255,.6),
              0 0 0 3px var(--glow)}
-.field .inp:focus-within{border-color:var(--blue-1);box-shadow:0 0 0 3px var(--glow)}
 .field .inp .ic{width:18px;height:18px;color:var(--ink-dim);flex:none}
 .field input,.field select{flex:1;background:none;border:none;outline:none;font-family:var(--font-b);font-size:16px;color:var(--ink);height:100%;width:100%}
 .field select{cursor:pointer}
