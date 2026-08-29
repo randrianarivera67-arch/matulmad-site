@@ -471,6 +471,36 @@ body.dash .dock{display:grid}
 .dock button span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-shadow:0 1px 2px rgba(0,0,0,.3)}
 .dock button.active{background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,.12));color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),0 4px 12px rgba(255,255,255,.12)}
 .dock button.active .ic{stroke:#fff;filter:drop-shadow(0 0 6px rgba(255,255,255,.6))}
+
+/* --- Icones "clay" : volume obtenu par empilement d'ombres ---------------
+   Le trait plat des SVG est remplace par un trait epais et arrondi, pose sur
+   une pastille bombee. La lumiere vient du haut : ombre claire en haut a
+   gauche, ombre portee en bas a droite -- c'est ce contraste qui donne le
+   relief, sans aucune image a telecharger. */
+.dock button .ic{
+  stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;
+  filter:drop-shadow(0 1px 0 rgba(255,255,255,.55))
+         drop-shadow(0 -1px 0 rgba(0,0,0,.18))
+         drop-shadow(0 3px 5px rgba(8,30,60,.35));
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1),filter .22s}
+.dock button::before{
+  content:"";position:absolute;top:5px;width:42px;height:42px;border-radius:15px;
+  background:linear-gradient(160deg,rgba(255,255,255,.42),rgba(255,255,255,.06) 45%,rgba(0,0,0,.10));
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),
+             inset 0 -2px 4px rgba(0,0,0,.18),
+             0 5px 12px -4px rgba(8,30,60,.45);
+  opacity:.85;transition:transform .22s cubic-bezier(.34,1.56,.64,1),opacity .22s;
+  pointer-events:none;z-index:-1}
+.dock button.active::before{
+  opacity:1;transform:translateY(-2px) scale(1.06);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.75),
+             inset 0 -3px 6px rgba(0,0,0,.22),
+             0 9px 18px -5px rgba(8,30,60,.55)}
+.dock button.active .ic{transform:translateY(-2px) scale(1.08)}
+.dock button:active .ic{transform:translateY(1px) scale(.94)}
+.dock button:active::before{transform:translateY(1px) scale(.96)}
+@media (prefers-reduced-motion:reduce){
+  .dock button .ic,.dock button::before{transition:none}}
 .dock button:active{transform:scale(.9)}
 .dock button::after{display:none}
 /* Bannière PWA au-dessus du nav flottant */
