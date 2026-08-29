@@ -205,7 +205,10 @@ footer{padding:34px 0;border-top:1px solid var(--line);margin-top:36px}
 /* Dashboard */
 #dashboard{display:none;padding-top:26px;padding-bottom:120px}
 .dash-wrap{max-width:660px;margin:0 auto}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
+.card{background:var(--panel);border:1px solid rgba(120,180,255,.35);border-radius:var(--radius);padding:22px;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.5),
+             inset 0 -3px 9px rgba(16,50,110,.12),
+             0 14px 30px -12px rgba(16,50,110,.4)}
 .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px}
 .card-head h3{font-family:var(--font-d);font-weight:700;font-size:20px;display:flex;align-items:center;gap:10px}
 .card-head h3 .ic{color:var(--blue-1)}
@@ -225,17 +228,37 @@ footer{padding:34px 0;border-top:1px solid var(--line);margin-top:36px}
 .seg button.active#segRetrait{color:var(--rose)}
 
 /* Cours du jour — panneau dédié */
-.rate-panel{position:relative;overflow:hidden;border-radius:var(--radius);padding:15px 18px;margin-bottom:18px;background:linear-gradient(120deg,rgba(19,192,106,.14),rgba(233,186,67,.13) 55%,rgba(255,77,141,.13));border:1px solid rgba(233,186,67,.4)}
+/* Panneau des cours en volume "clay" bleu ciel. Les couleurs viennent des
+   variables du theme : le contraste du texte reste correct en clair comme en
+   sombre, aucun texte ne disparait. */
+.rate-panel{position:relative;overflow:hidden;border-radius:var(--radius);padding:16px 18px;margin-bottom:18px;
+  background:linear-gradient(160deg,rgba(126,196,255,.30),rgba(86,160,240,.18) 55%,rgba(46,120,215,.14));
+  border:1px solid rgba(120,180,255,.45);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.55),
+             inset 0 -3px 8px rgba(16,50,110,.16),
+             0 12px 26px -10px rgba(16,50,110,.45)}
 .rate-panel .rp-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .rate-panel .rp-dot{width:9px;height:9px;border-radius:50%;background:var(--green-2);box-shadow:0 0 0 4px rgba(19,192,106,.18)}
 .rate-panel .rp-lbl{font-family:var(--font-d);font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink)}
 .rate-panel .rp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.rate-panel .rp-box{background:var(--panel-solid);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
-.rate-panel .rp-box .k{font-size:11px;color:var(--ink-dim);font-weight:700;letter-spacing:.05em;text-transform:uppercase}
-.rate-panel .rp-box .v{font-family:var(--font-d);font-weight:700;font-size:17px;margin-top:2px}
+/* Chaque boite devient un bouton bombe et cliquable. */
+.rate-panel .rp-box{background:var(--panel-solid);border:1px solid rgba(120,180,255,.5);border-radius:14px;padding:12px 14px;
+  cursor:pointer;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.75),
+             inset 0 -3px 7px rgba(16,50,110,.14),
+             0 8px 18px -7px rgba(16,50,110,.5);
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s}
+.rate-panel .rp-box:hover{transform:translateY(-2px);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.85),
+             inset 0 -3px 7px rgba(16,50,110,.14),
+             0 13px 24px -8px rgba(16,50,110,.55)}
+.rate-panel .rp-box:active{transform:translateY(1px) scale(.985);
+  box-shadow:inset 0 3px 7px rgba(16,50,110,.28),0 3px 8px -4px rgba(16,50,110,.4)}
+.rate-panel .rp-box .k{font-size:11px;color:var(--ink-2);font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+.rate-panel .rp-box .v{font-family:var(--font-d);font-weight:800;font-size:19px;margin-top:3px}
 .rate-panel .rp-box.dep .v{color:var(--green)}
 .rate-panel .rp-box.ret .v{color:var(--rose)}
-.rate-panel .rp-foot{font-size:11.5px;color:var(--ink-dim);margin-top:8px}
+.rate-panel .rp-foot{font-size:11.5px;color:var(--ink-2);margin-top:10px;line-height:1.5}
 
 /* Sélecteur opérateur */
 .op-pick{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
