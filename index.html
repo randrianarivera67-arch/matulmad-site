@@ -191,7 +191,8 @@ footer{padding:34px 0;border-top:1px solid var(--line);margin-top:36px}
 .field label{display:block;font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:6px;font-family:var(--font-d);letter-spacing:.03em}
 /* Champs de saisie : creux clay. L'ombre est INTERIEURE, a l'inverse des
    boutons qui sont bombes -- c'est ce qui fait lire "on peut ecrire ici". */
-.field .inp{display:flex;align-items:center;gap:10px;background:var(--field);border:1px solid var(--field-line);border-radius:14px;padding:0 14px;height:50px;
+/* Fond clair pour les champs : sur la carte doree, le gris se confondait. */
+.field .inp{display:flex;align-items:center;gap:10px;background:var(--panel-solid);border:1px solid var(--field-line);border-radius:14px;padding:0 14px;height:50px;
   box-shadow:inset 0 3px 7px rgba(16,50,110,.13),
              inset 0 -1.5px 0 rgba(255,255,255,.55);
   transition:box-shadow .18s,border-color .15s}
@@ -307,8 +308,8 @@ footer{padding:34px 0;border-top:1px solid var(--line);margin-top:36px}
              0 14px 26px -9px rgba(16,50,110,.55)}
 /* Le logo de l'operateur est le repere principal : on l'agrandit dans les trois
    cartes, et davantage encore dans celle qui est choisie. */
-.op-opt .opbadge{width:44px;height:44px;border-radius:12px;transition:.18s}
-.op-opt.active .opbadge{width:58px;height:58px;border-radius:15px}
+.op-opt .opbadge{width:34px;height:34px;border-radius:10px;transition:.18s}
+.op-opt.active .opbadge{width:62px;height:62px;border-radius:17px}
 /* Echange de place : la carte choisie vient au centre, celle qui l'occupait
    prend la position liberee. Uniquement quand il y a EXACTEMENT trois cartes
    (Madagascar) ; en mode Comores il n'y en a qu'une, un ordre force casserait
@@ -502,11 +503,11 @@ body.dash .landing-only{display:none !important}
 /* Parametres sorti de la barre du haut : bouton flottant au bord, place
    au-dessus de la barre de navigation pour ne pas la recouvrir. */
 .tb-set-float{position:fixed;left:14px;
-  bottom:calc(74px + env(safe-area-inset-bottom,0px));
+  bottom:calc(112px + env(safe-area-inset-bottom,0px));
   z-index:71;width:46px;height:46px;border-radius:50%;
   background:var(--panel);
   box-shadow:0 8px 22px -6px rgba(10,25,60,.5),0 2px 8px rgba(10,25,60,.22)}
-@media (max-width:520px){.tb-set-float{left:12px;bottom:calc(70px + env(safe-area-inset-bottom,0px))}}
+@media (max-width:520px){.tb-set-float{left:12px;bottom:calc(108px + env(safe-area-inset-bottom,0px))}}
 .tb-login .ic{color:#1FAE6B;filter:drop-shadow(0 0 5px rgba(31,174,107,.55)) drop-shadow(0 0 2px rgba(31,174,107,.35))}
 .tb-login:hover{border-color:#1FAE6B;box-shadow:0 0 14px rgba(31,174,107,.45)}
 /* Notification — cloche animée (balancement) */
