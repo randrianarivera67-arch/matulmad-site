@@ -91,14 +91,17 @@ img{max-width:100%}
 .neon{filter:drop-shadow(0 0 4px var(--glow))}
 
 /* Wordmark */
-.brand{font-family:var(--font-d);font-weight:700;letter-spacing:.02em;display:inline-flex;gap:.18em;align-items:baseline;line-height:1}
+.brand{font-family:var(--font-d);font-weight:700;letter-spacing:.02em;display:inline-flex;gap:0;align-items:baseline;line-height:1}
 .brand .m1{background:linear-gradient(110deg,#b9892f,#fff6d8 25%,#f7e7a8 50%,#fff6d8 75%,#b9892f);background-size:230% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:shineGold 3.4s linear infinite}
 .brand .m2{background:linear-gradient(110deg,#1c6fe0,#dff1ff 25%,#6fc3ff 50%,#dff1ff 75%,#1c6fe0);background-size:230% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:shineBlue 3.4s linear infinite}
 @keyframes shineGold{0%{background-position:0 0}100%{background-position:-230% 0}}
 @keyframes shineBlue{0%{background-position:0 0}100%{background-position:-230% 0}}
 
 /* Header */
-header.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:var(--nav-bg);border-bottom:1px solid var(--line)}
+/* Barre du haut entierement transparente : plus de fond ni de filet. Les
+   boutons portent eux-memes leur relief, ce qui les fait paraitre flottants
+   au-dessus du contenu. */
+header.nav{position:sticky;top:0;z-index:50;background:transparent;border-bottom:0}
 .nav-in{display:flex;align-items:center;justify-content:space-between;height:64px}
 .nav .brand{font-size:26px}
 .logo-mark{width:34px;height:34px;border-radius:10px;flex:none;box-shadow:0 4px 12px rgba(20,50,110,.25)}
@@ -411,10 +414,35 @@ body.dash .dash-only{display:grid !important}
 body.dash .landing-only{display:none !important}
 .tb-btn{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;border:1px solid var(--line);background:var(--panel);position:relative;transition:.16s;flex:none}
 .tb-btn:active{transform:scale(.92)}
+/* Effet flottant : chaque element de la barre porte son propre relief,
+   puisque la barre elle-meme n'a plus de fond. */
+.tb-btn,.tb-prof{box-shadow:0 6px 18px -6px rgba(10,25,60,.45),0 2px 6px rgba(10,25,60,.18);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.brand-lock .logo-mark{border-radius:13px;box-shadow:0 6px 18px -6px rgba(10,25,60,.5),0 2px 6px rgba(10,25,60,.2)}
+/* Contour noir lumineux et anime autour du nom. */
+.brand .m1,.brand .m2{
+  -webkit-text-stroke:.6px rgba(0,0,0,.85);
+  paint-order:stroke fill;
+  filter:drop-shadow(0 0 3px rgba(0,0,0,.55));
+  animation-name:shineGold,brandGlow;animation-duration:3.4s,2.2s;
+  animation-timing-function:linear,ease-in-out;animation-iteration-count:infinite,infinite}
+.brand .m2{animation-name:shineBlue,brandGlow}
+@keyframes brandGlow{
+  0%,100%{filter:drop-shadow(0 0 2px rgba(0,0,0,.45))}
+  50%    {filter:drop-shadow(0 0 7px rgba(0,0,0,.9))}
+}
+@media (prefers-reduced-motion:reduce){.brand .m1,.brand .m2{animation:none}}
 .tb-btn .ic{width:22px;height:22px}
 /* Paramètres — SVG néon */
 .tb-set .ic{color:var(--blue-1);filter:drop-shadow(0 0 5px var(--glow)) drop-shadow(0 0 2px var(--glow))}
 .tb-set:hover{border-color:var(--blue-1);box-shadow:0 0 14px var(--glow)}
+/* Parametres sorti de la barre du haut : bouton flottant au bord, place
+   au-dessus de la barre de navigation pour ne pas la recouvrir. */
+.tb-set-float{position:fixed;right:14px;
+  bottom:calc(96px + env(safe-area-inset-bottom,0px));
+  z-index:71;width:46px;height:46px;border-radius:50%;
+  background:var(--panel);
+  box-shadow:0 8px 22px -6px rgba(10,25,60,.5),0 2px 8px rgba(10,25,60,.22)}
+@media (max-width:520px){.tb-set-float{right:12px;bottom:calc(90px + env(safe-area-inset-bottom,0px))}}
 .tb-login .ic{color:#1FAE6B;filter:drop-shadow(0 0 5px rgba(31,174,107,.55)) drop-shadow(0 0 2px rgba(31,174,107,.35))}
 .tb-login:hover{border-color:#1FAE6B;box-shadow:0 0 14px rgba(31,174,107,.45)}
 /* Notification — cloche animée (balancement) */
@@ -431,10 +459,8 @@ body.dash .landing-only{display:none !important}
 .dock{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:70;
   display:none;grid-template-columns:repeat(5,minmax(56px,1fr));gap:0;align-items:stretch;
   width:auto;max-width:calc(100vw - 22px);
-  background:linear-gradient(180deg,rgba(22,180,90,.30),rgba(16,150,80,.22));
-  backdrop-filter:blur(18px) saturate(1.5);-webkit-backdrop-filter:blur(18px) saturate(1.5);
-  border:1px solid rgba(150,240,190,.45);border-radius:24px;border-top:1px solid rgba(255,255,255,.35);
-  box-shadow:0 16px 44px -12px rgba(8,60,30,.55),inset 0 1px 0 rgba(255,255,255,.3);
+  /* Barre de navigation transparente : seuls les boutons restent visibles. */
+  background:transparent;border:0;border-radius:24px;box-shadow:none;
   height:auto;padding:7px 8px calc(7px);transition:transform .38s cubic-bezier(.22,1,.36,1),opacity .3s}
 body.dash .dock{display:grid}
 .dock.hide{transform:translateX(-50%) translateY(150%);opacity:0;pointer-events:none}
@@ -523,7 +549,7 @@ body:not(.dash) .social-fab{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
 .dock{background-image:url(/dock-bg.jpg?v=11)!important;background-size:cover!important;background-position:center!important}
 .dock button .ic-wrap{box-shadow:0 0 0 1.5px rgba(255,255,255,.45),0 3px 8px rgba(0,0,0,.35)!important}
 .dock button span{text-shadow:0 1px 4px rgba(0,0,0,.7),0 0 2px rgba(0,0,0,.5)}
-header.nav{background-image:url(/topbar-bg.jpg?v=11)!important;background-size:cover!important;background-position:center!important}
+/* L'image de fond de la barre du haut a ete retiree. */
 .dock{background-image:url(/dock-bg.jpg?v=11)!important;background-size:cover!important;background-position:center!important}
 .dock button span{color:#1a1030!important;text-shadow:0 1px 3px rgba(255,255,255,.7)!important;font-weight:800!important}
 .dock button .ic-wrap{box-shadow:0 0 0 1.5px rgba(255,255,255,.7),0 3px 8px rgba(0,0,0,.25)!important}
@@ -540,7 +566,7 @@ img{max-width:100%;image-rendering:auto}
 
 /* Raha TSY zakan'ny navigateur ny backdrop-filter -> fond solide (fa tsy glitch) */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  header.nav{background:var(--bg)!important}
+  header.nav{background:transparent!important}
   .glasscard{background:var(--panel-solid)!important}
   .modal{background:rgba(6,16,38,.72)!important}
   .sheet-bd{background:rgba(6,16,38,.72)!important}
@@ -551,7 +577,7 @@ html.lite *,html.lite *::before,html.lite *::after{
   animation:none!important;transition:none!important;
   backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
 }
-html.lite header.nav{background:var(--bg)!important}
+html.lite header.nav{background:transparent!important}
 html.lite .glasscard{background:var(--panel-solid)!important}
 html.lite .modal{background:rgba(6,16,38,.72)!important}
 html.lite .sheet-bd{background:rgba(6,16,38,.72)!important}
@@ -654,12 +680,12 @@ body.dash .dock{ display:grid; }
 <!-- HEADER -->
 <header class="nav">
   <div class="wrap nav-in">
-    <a class="brand brand-lock" href="#" onclick="go('home');return false" ><img src="/icon-192.png" class="logo-mark" alt="MATUL MADA"><span><span class="m1">MATUL</span> <span class="m2">MADA</span></span></a>
+    <a class="brand brand-lock" href="#" onclick="go('home');return false" ><img src="/icon-192.png" class="logo-mark" alt="MATUL MADA"><span><span class="m1">MATUL</span><span class="m2">MADA</span></span></a>
     <div class="nav-actions">
       <button class="langtog landing-only" onclick="toggleLang()" title="Langue"><span id="langLabel">FR</span></button>
       <button class="iconbtn landing-only" onclick="toggleTheme()" title="Thème" id="themeBtn"></button>
       <button class="tb-btn tb-login landing-only" id="navAuthBtn" onclick="openAuth('login')" title="Connexion"><svg class="ic" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg></button>
-      <button class="tb-btn tb-set dash-only" onclick="openSettings()" title="Paramètres"><svg class="ic" viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+      <button class="tb-btn tb-set dash-only tb-set-float" onclick="openSettings()" title="Paramètres"><svg class="ic" viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
       <button class="tb-btn tb-notif dash-only" id="bellBtn" onclick="openNotif()" title="Annonces"><svg class="ic" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="bell-dot hidden" id="bellDot"></span></button>
       <button class="tb-prof dash-only" id="profBtn" onclick="openProfile()" title="Profil"><span class="av-fb" id="profInit">?</span><img id="profImg" alt=""></button>
     </div>
@@ -838,7 +864,7 @@ body.dash .dock{ display:grid; }
 <div class="modal" id="authModal">
   <div class="modal-card">
     <button class="modal-x" onclick="closeAuth()"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-    <div class="brand brand-lock" style="justify-content:center"><img src="/icon-192.png" class="logo-mark" style="width:40px;height:40px" alt=""><span><span class="m1">MATUL</span> <span class="m2">MADA</span></span></div>
+    <div class="brand brand-lock" style="justify-content:center"><img src="/icon-192.png" class="logo-mark" style="width:40px;height:40px" alt=""><span><span class="m1">MATUL</span><span class="m2">MADA</span></span></div>
     <div class="sub" id="authSub" data-i18n="auth_sub">Votre espace client</div>
     <div class="tabs">
       <button class="tab active" id="tabLogin" onclick="switchTab('login')" data-i18n="tab_login">Connexion</button>
