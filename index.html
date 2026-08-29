@@ -205,6 +205,26 @@ footer{padding:34px 0;border-top:1px solid var(--line);margin-top:36px}
 /* Dashboard */
 #dashboard{display:none;padding-top:26px;padding-bottom:120px}
 .dash-wrap{max-width:660px;margin:0 auto}
+/* Carte de l'ordre : relief clay dore, avec une lueur qui respire. Le fond
+   reste clair pour que le contenu demeure lisible. */
+.card-or{border:1px solid rgba(233,186,67,.55)!important;
+  background:linear-gradient(160deg,rgba(255,246,216,.55),rgba(233,186,67,.14) 55%,rgba(201,150,42,.10))!important;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.75),
+             inset 0 -3px 9px rgba(140,100,20,.18),
+             0 14px 32px -12px rgba(150,110,25,.5),
+             0 0 0 0 rgba(233,186,67,.45)!important;
+  animation:orGlow 3.2s ease-in-out infinite}
+@keyframes orGlow{
+  0%,100%{box-shadow:inset 0 2px 0 rgba(255,255,255,.75),
+                     inset 0 -3px 9px rgba(140,100,20,.18),
+                     0 14px 32px -12px rgba(150,110,25,.5),
+                     0 0 14px -4px rgba(233,186,67,.45)}
+  50%    {box-shadow:inset 0 2px 0 rgba(255,255,255,.9),
+                     inset 0 -3px 9px rgba(140,100,20,.2),
+                     0 16px 36px -12px rgba(150,110,25,.55),
+                     0 0 30px -2px rgba(233,186,67,.85)}
+}
+@media (prefers-reduced-motion:reduce){.card-or{animation:none}}
 .card{background:var(--panel);border:1px solid rgba(120,180,255,.35);border-radius:var(--radius);padding:22px;
   box-shadow:inset 0 2px 0 rgba(255,255,255,.5),
              inset 0 -3px 9px rgba(16,50,110,.12),
@@ -823,7 +843,7 @@ body.dash .dock{ display:grid; }
       <div class="rp-foot" id="cdFoot" style="margin-top:8px">Montants en Ariary. Entrez votre ID joueur.</div>
     </div>
 
-    <div class="card">
+    <div class="card card-or">
       <div class="seg">
         <button id="segDepot" class="active" onclick="setType('depot')"><svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M12 4v13M18 11l-6 6-6-6"/></svg><span data-i18n="depot">Dépôt</span></button>
         <button id="segRetrait" onclick="setType('retrait')"><svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M12 20V7M6 13l6-6 6 6"/></svg><span data-i18n="retrait">Retrait</span></button>
@@ -836,7 +856,7 @@ body.dash .dock{ display:grid; }
         <div class="field"><label id="lblMontant" data-i18n="lbl_amount">Montant (Ar)</label>
           <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M6 8h12M6 12h12M9 4l-2 16M17 4l-2 16"/></svg><input id="fMontant" type="text" inputmode="decimal" placeholder="50000" oninput="convAr()"></div>
           <div id="arBox" style="display:none;margin-top:7px"><div class="amt-cur" style="margin-bottom:4px">&#8776; <span data-i18n="in_ariary">EN ARIARY</span></div><div class="inp" style="opacity:.9"><svg class="ic" viewBox="0 0 24 24"><path d="M6 8h12M6 12h12M9 4l-2 16M17 4l-2 16"/></svg><input id="fMontantAr" type="text" readonly placeholder="0 Ar" style="font-weight:800"></div></div>
-          <div id="rateInfo" class="amt-cur" style="color:var(--gold-2);margin-top:6px;display:none"></div>
+          <div id="rateInfo" class="amt-cur" style="color:var(--blue-1);margin-top:6px;display:none"></div>
         </div>
         <div class="field"><label data-i18n="lbl_num">Numéro</label>
           <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 5 5L16 13l5 2v3a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/></svg><select id="fNumero"></select></div>
