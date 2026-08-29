@@ -116,6 +116,10 @@ header.nav{position:sticky;top:0;z-index:50;background:transparent;border-bottom
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;height:50px;padding:0 24px;border-radius:14px;font-family:var(--font-d);font-weight:700;font-size:16px;letter-spacing:.03em;transition:.16s;white-space:nowrap}
 .btn .ic{width:19px;height:19px}
 .btn-primary{background:linear-gradient(180deg,var(--blue-1),var(--blue-2));color:#fff;box-shadow:0 8px 22px rgba(42,108,242,.4),inset 0 1px 0 rgba(255,255,255,.25)}
+/* Connexion : meme forme que S'inscrire, en vert, pour distinguer d'un coup
+   d'oeil "creer un compte" de "revenir sur le sien". */
+.btn-connexion{background:linear-gradient(180deg,var(--green-2),var(--green));color:#fff;box-shadow:0 8px 22px rgba(19,192,106,.4),inset 0 1px 0 rgba(255,255,255,.25)}
+.btn-connexion .ic{color:#fff}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(42,108,242,.55)}
 .btn-gold{color:#3a2a05;background:linear-gradient(180deg,#ffe9a0,#e9ba43 55%,#c9962a);border:1px solid #f7d971;box-shadow:0 8px 20px rgba(201,150,42,.4)}
 .btn-gold:hover{transform:translateY(-2px)}
@@ -804,7 +808,8 @@ body.dash .dock{ display:grid; }
             <h1 data-i18n="hero_title">Dépôt et retrait <span class="grad">instantanés</span></h1>
       <p class="lead" data-i18n="hero_lead">Dépôt et retrait instantanés via Yas, Orange Money et Airtel Money. Créez votre compte, passez un ordre, payez. C'est tout.</p>
       <div class="hero-cta">
-        <button class="btn btn-primary" onclick="openAuth('register')"><svg class="ic neon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="hero_cta1">Ouvrir un compte</span></button>
+        <button class="btn btn-primary" onclick="openAuth('register')"><svg class="ic neon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg><span data-i18n="hero_cta1">S&#39;inscrire</span></button>
+        <button class="btn btn-connexion" onclick="openAuth('login')"><svg class="ic neon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg><span data-i18n="hero_cta3">Connexion</span></button>
         <button class="btn btn-ghost" onclick="scrollToId('how')"><span data-i18n="hero_cta2">Comment ça marche</span></button>
       </div>
       <div class="hero-player">
@@ -877,7 +882,7 @@ body.dash .dock{ display:grid; }
         <button id="segDepot" class="active" onclick="setType('depot')"><svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M12 4v13M18 11l-6 6-6-6"/></svg><span data-i18n="depot">Dépôt</span></button>
         <button id="segRetrait" onclick="setType('retrait')"><svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M12 20V7M6 13l6-6 6 6"/></svg><span data-i18n="retrait">Retrait</span></button>
       </div>
-      <div id="kmBanner" style="display:none;margin:8px 0 2px;padding:9px 12px;border-radius:12px;border:1.5px solid rgba(0,191,165,.45);background:rgba(0,191,165,.08);font-family:var(--font-d);font-weight:700;font-size:12.5px;color:#00BFA5;text-align:center">&#127472;&#127474; Compte Comores &mdash; Telma Comores &middot; Franc comorien (Fc)</div>
+      <div id="kmBanner" style="display:none;margin:8px 0 2px;padding:9px 12px;border-radius:12px;border:1.5px solid rgba(0,191,165,.45);background:rgba(0,191,165,.08);font-family:var(--font-d);font-weight:700;font-size:12.5px;color:#00BFA5;text-align:center">Compte Comores &mdash; Telma Comores &middot; Franc comorien (Fc)</div>
       <div class="field"><label data-i18n="lbl_op">Opérateur</label>
         <div class="op-pick" id="opPick"></div>
       </div>
@@ -993,8 +998,8 @@ body.dash .dock{ display:grid; }
       <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 5 5L16 13l5 2v3a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/></svg><input id="aPhone" type="tel" placeholder="034 12 345 67"></div></div>
     <div class="field" id="fldKmAccount" style="display:none"><label>Type de compte</label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <button type="button" id="acctMg" onclick="pickAcctType(false)" class="active" style="padding:11px 8px;border-radius:12px;border:1.5px solid var(--blue-1);background:var(--field);font-family:var(--font-d);font-weight:700;font-size:13px;color:var(--blue-1);box-shadow:0 0 0 3px var(--glow)">&#127474;&#127468; Madagascar<br><span style="font-size:10px;font-weight:600;opacity:.75">Ariary (Ar)</span></button>
-        <button type="button" id="acctKm" onclick="pickAcctType(true)" style="padding:11px 8px;border-radius:12px;border:1.5px solid var(--field-line);background:var(--field);font-family:var(--font-d);font-weight:700;font-size:13px;color:var(--ink)">&#127472;&#127474; Pour Comores<br><span style="font-size:10px;font-weight:600;opacity:.75">Franc comorien (Fc)</span></button>
+        <button type="button" id="acctMg" onclick="pickAcctType(false)" class="active" style="padding:14px 8px;border-radius:12px;border:1.5px solid var(--blue-1);background:var(--field);font-family:var(--font-d);font-weight:700;font-size:16px;color:var(--blue-1);box-shadow:0 0 0 3px var(--glow)">Madagascar<br><span style="font-size:12.5px;font-weight:600;opacity:.8">Ariary (Ar)</span></button>
+        <button type="button" id="acctKm" onclick="pickAcctType(true)" style="padding:14px 8px;border-radius:12px;border:1.5px solid var(--field-line);background:var(--field);font-family:var(--font-d);font-weight:700;font-size:16px;color:var(--ink)">Pour Comores<br><span style="font-size:12.5px;font-weight:600;opacity:.8">Franc comorien (Fc)</span></button>
       </div>
       <input type="hidden" id="aKmAccount" value="0">
       <div id="kmAcctNote" style="display:none;margin-top:7px;font-size:11.5px;color:var(--blue-1);font-weight:600">Compte Comores : Telma Comores uniquement, montants en Franc comorien (Fc).</div>
@@ -1117,7 +1122,7 @@ const I18N={
  fr:{nav_login:"Connexion",nav_logout:"Déconnexion",install:"Installer",add:"Ajouter",all:"Tout",
   hero_eyebrow:"",hero_title:'Dépôt et retrait <span class="grad">instantanés</span>',
   hero_lead:"Dépôt et retrait instantanés via Yas, Orange Money et Airtel Money. Créez votre compte, passez un ordre, payez. C'est tout.",
-  hero_cta1:"Ouvrir un compte",hero_cta2:"Comment ça marche",stat1:"",stat2:"Traitement moyen",stat3:"Disponible",
+  hero_cta1:"S&#39;inscrire",hero_cta2:"Comment ça marche",hero_cta3:"Connexion",stat1:"",stat2:"Traitement moyen",stat3:"Disponible",
   feat_eyebrow:"Pourquoi MATUL MADA",feat_title:"Pensé pour vous",feat_sub:"Rapide, transparent, et fait pour le mobile money malgache.",
   f1t:"Instantané",f1d:"Validation automatique dès réception du paiement.",
   f3t:"Sécurisé",f3d:"Chaque transaction est vérifiée avant validation.",how_eyebrow:"En 4 étapes",how_title:"Comment ça marche",
@@ -1140,7 +1145,7 @@ const I18N={
  mg:{nav_login:"Hiditra",nav_logout:"Hivoaka",install:"Apetraho",add:"Hanampy",all:"Rehetra",
   hero_eyebrow:"",hero_title:'Fampidirana sy fisintonam-bola <span class="grad">avy hatrany</span>',
   hero_lead:"Dépôt sy retrait avy hatrany amin'ny Yas, Orange Money ary Airtel Money. Mamorona kaonty, manao ordre, mandoa. Vita.",
-  hero_cta1:"Hanokatra kaonty",hero_cta2:"Ahoana no fombany",stat1:"",stat2:"Faharetana antonony",stat3:"Misokatra",
+  hero_cta1:"Hisoratra anarana",hero_cta2:"Ahoana no fombany",hero_cta3:"Hiditra",stat1:"",stat2:"Faharetana antonony",stat3:"Misokatra",
   feat_eyebrow:"Nahoana MATUL MADA",feat_title:"Natao ho anao",feat_sub:"Haingana, mangarahara, natao ho an'ny mobile money malagasy.",
   f1t:"Avy hatrany",f1d:"Validation automatika raha vao tonga ny vola.",
   f3t:"Voaaro",f3d:"Hamarinina alohan'ny valider ny transaction tsirairay.",how_eyebrow:"Dingana 4",how_title:"Ahoana no fombany",
