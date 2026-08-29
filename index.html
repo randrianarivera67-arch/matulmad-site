@@ -437,12 +437,12 @@ body.dash .landing-only{display:none !important}
 .tb-set:hover{border-color:var(--blue-1);box-shadow:0 0 14px var(--glow)}
 /* Parametres sorti de la barre du haut : bouton flottant au bord, place
    au-dessus de la barre de navigation pour ne pas la recouvrir. */
-.tb-set-float{position:fixed;right:14px;
+.tb-set-float{position:fixed;left:14px;
   bottom:calc(96px + env(safe-area-inset-bottom,0px));
   z-index:71;width:46px;height:46px;border-radius:50%;
   background:var(--panel);
   box-shadow:0 8px 22px -6px rgba(10,25,60,.5),0 2px 8px rgba(10,25,60,.22)}
-@media (max-width:520px){.tb-set-float{right:12px;bottom:calc(90px + env(safe-area-inset-bottom,0px))}}
+@media (max-width:520px){.tb-set-float{left:12px;bottom:calc(90px + env(safe-area-inset-bottom,0px))}}
 .tb-login .ic{color:#1FAE6B;filter:drop-shadow(0 0 5px rgba(31,174,107,.55)) drop-shadow(0 0 2px rgba(31,174,107,.35))}
 .tb-login:hover{border-color:#1FAE6B;box-shadow:0 0 14px rgba(31,174,107,.45)}
 /* Notification — cloche animée (balancement) */
@@ -546,11 +546,11 @@ body:not(.dash) .social-fab{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
 .dock button span{font-size:10.5px;font-weight:700}
 .op-opt{opacity:.45;filter:grayscale(.6)}
 .op-opt.active{opacity:1;filter:none}
-.dock{background-image:url(/dock-bg.jpg?v=11)!important;background-size:cover!important;background-position:center!important}
+/* Fond image de la barre de navigation retire : barre transparente. */
 .dock button .ic-wrap{box-shadow:0 0 0 1.5px rgba(255,255,255,.45),0 3px 8px rgba(0,0,0,.35)!important}
 .dock button span{text-shadow:0 1px 4px rgba(0,0,0,.7),0 0 2px rgba(0,0,0,.5)}
 /* L'image de fond de la barre du haut a ete retiree. */
-.dock{background-image:url(/dock-bg.jpg?v=11)!important;background-size:cover!important;background-position:center!important}
+/* Fond image de la barre de navigation retire : barre transparente. */
 .dock button span{color:#1a1030!important;text-shadow:0 1px 3px rgba(255,255,255,.7)!important;font-weight:800!important}
 .dock button .ic-wrap{box-shadow:0 0 0 1.5px rgba(255,255,255,.7),0 3px 8px rgba(0,0,0,.25)!important}
 
