@@ -1433,6 +1433,8 @@ function populateProviderSelect(){var sel=document.getElementById("fProvider");i
   if(!kmMode && !seen["Betwinner"])opts+='<option>Betwinner</option>';
   // 1XBET : disponible partout, y compris aux Comores (montants en Fc).
   if(!seen["1XBET"])opts+='<option>1XBET</option>';
+  // 1WIN : caisse en dollars, montants convertis au cours du jour comme Deriv.
+  if(!seen["1WIN"])opts+='<option>1WIN</option>';
   sel.innerHTML=opts;
   if(kmMode && /betwinner/i.test(sel.value||"")) sel.value="Deriv";}
 function isBetwinner(){var p=document.getElementById("fProvider");return p&&(p.value||"").toLowerCase()==="betwinner";}
@@ -1607,6 +1609,7 @@ function openProv(id){
       '<option value="Deriv"'+(/deriv/i.test(curName)?' selected':'')+'>Deriv</option>'+
       '<option value="Betwinner"'+(/betwinner/i.test(curName)?' selected':'')+'>Betwinner</option>'+
       '<option value="1XBET"'+(/1xbet/i.test(curName)?' selected':'')+'>1XBET</option>'+
+      '<option value="1WIN"'+(/1win/i.test(curName)?' selected':'')+'>1WIN</option>'+
     '</select></div></div>'+
     '<div id="provDyn"></div>'+
     '<button class="btn btn-primary btn-block" id="pSave">'+t("w_save")+'</button>';
@@ -1620,7 +1623,8 @@ function provFields(){
   var p = window.__editProv;
   var name = (document.getElementById("pName")||{}).value || 'Deriv';
   // Betwinner et 1XBET : meme reseau Cashdesk, meme formulaire (ID chiffres).
-  var isBw = /betwinner|1xbet/i.test(name);
+  // 1WIN demande aussi un simple ID numerique : meme formulaire.
+  var isBw = /betwinner|1xbet|1win/i.test(name);
   var dyn = document.getElementById("provDyn");
   if(!dyn) return;
   if(isBw){
@@ -1639,7 +1643,7 @@ function provFields(){
 async function saveProv(id){
   var name=document.getElementById("pName").value.trim()||"Deriv",acc=document.getElementById("pId").value.trim(),lbl=(document.getElementById("pLabel")||{}).value;lbl=(lbl||"").trim();var eml=(document.getElementById("pEmail")||{}).value;eml=(eml||"").trim();
   if(!acc){fsErr(lang==="fr"?"Identifiant requis":"Mila identifiant");return;}
-  if(/betwinner|1xbet/i.test(name) && !/^[0-9]+$/.test(acc)){fsErr(lang==="fr"?("ID "+name+" : chiffres uniquement"):("ID "+name+" : isa fotsiny"));return;}
+  if(/betwinner|1xbet|1win/i.test(name) && !/^[0-9]+$/.test(acc)){fsErr(lang==="fr"?("ID "+name+" : chiffres uniquement"):("ID "+name+" : isa fotsiny"));return;}
   var btn=document.getElementById("pSave");btn.disabled=true;btn.innerHTML='<span class="spin"></span>';
   try{
     var d=await api("/api/wallet/provider",{method:"POST",body:JSON.stringify({name:name,accountId:acc,label:lbl,email:eml})});
@@ -2060,14 +2064,14 @@ async function mmStartOAuth(){
     /* ===== BETWINNER ===== */
     var bwRow=document.getElementById("bwCodeRow");
     // Betwinner ET 1XBET : meme formulaire (ID + code), meme reseau Cashdesk.
-    var bwRetrait=(ot==="retrait" && /betwinner|1xbet/i.test(pv||""));
+    var bwRetrait=(ot==="retrait" && /betwinner|1xbet|1win/i.test(pv||""));
     if(bwRow) bwRow.style.display = bwRetrait ? "" : "none";
     // Retrait Betwinner: ny montant dia avy amin'ny code (API Payout) -> afenina
     var fm=document.getElementById("fMontant");
     var fmField=fm?(fm.closest?fm.closest(".field"):null):null;
     if(fmField) fmField.style.display = bwRetrait ? "none" : "";
     var pid=document.getElementById("fProviderId");
-    if(pid && /betwinner|1xbet/i.test(pv||"")) pid.placeholder="ID "+pv+" (chiffres)";
+    if(pid && /betwinner|1xbet|1win/i.test(pv||"")) pid.placeholder="ID "+pv+" (chiffres)";
     else if(pid) pid.placeholder="Nickname Deriv";
     var ab=document.getElementById("arBox"); if(ab && bwRetrait) ab.style.display="none";
     var ri=document.getElementById("rateInfo"); if(ri && /betwinner|1xbet/i.test(pv||"")) ri.style.display="none";
@@ -2112,6 +2116,48 @@ async function mmStartOAuth(){
     try{
       var provider=(document.getElementById("fProvider")||{}).value||"";
       var ot=(typeof orderType!=="undefined")?orderType:"";
+
+      /* ============ 1WIN ============
+         Caisse en dollars : le depot suit le circuit normal (conversion au
+         cours du jour), le retrait passe par sa propre route car c'est 1WIN
+         qui fixe le montant a partir du code du joueur. */
+      if(provider==="1WIN"){
+        var wMsg=document.getElementById("ordMsg"); if(wMsg){wMsg.className="msg";}
+        var wId=(((document.getElementById("fProviderId")||{}).value)||"").trim();
+        var wNum=(((document.getElementById("fNumero")||{}).value)||"").trim();
+        var wOp=(typeof orderOp!=="undefined")?orderOp:"";
+        if(!/^[0-9]+$/.test(wId)){ if(wMsg){wMsg.textContent="ID 1WIN invalide (chiffres uniquement)";wMsg.className="msg err";} return; }
+        if(!wNum){ if(wMsg){wMsg.textContent="Numéro requis";wMsg.className="msg err";} return; }
+        var wBtn=document.getElementById("btnOrder");
+
+        if(ot==="retrait"){
+          var wCode=(((document.getElementById("fBwCode")||{}).value)||"").trim();
+          if(!/^[0-9]+$/.test(wCode)){ if(wMsg){wMsg.textContent="Code de retrait 1WIN requis (chiffres)";wMsg.className="msg err";} return; }
+          if(wBtn) wBtn.disabled=true;
+          fetch(CORE_URL+"/api/retrait/onewin-withdraw",{
+            method:"POST", headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({userId:wId, code:wCode, numero:wNum, operator:wOp})
+          }).then(function(r){return r.json();}).then(function(d){
+            if(d && d.ok){
+              var _dvW=(wOp==="mvola_km")?"Fc":"Ar";
+              if(wMsg){wMsg.textContent="Retrait validé ("+Number(d.montantAr).toLocaleString('fr-FR')+" "+_dvW+") — envoi en cours…";wMsg.className="msg ok";}
+              try{ _histLoaded=false; }catch(e2){}
+              try{ mmSuivreRetrait(d.id, wMsg, wBtn); }catch(e3){ if(wBtn) wBtn.disabled=false; }
+              return;
+            }else{
+              if(wMsg){wMsg.textContent=(d&&d.error)||"Erreur 1WIN";wMsg.className="msg err";}
+            }
+            if(wBtn) wBtn.disabled=false;
+          }).catch(function(){
+            if(wMsg){wMsg.textContent="Serveur injoignable";wMsg.className="msg err";}
+            if(wBtn) wBtn.disabled=false;
+          });
+          return;
+        }
+        // Depot : ordre normal, la conversion est faite par le serveur.
+        _orig.call(window);
+        return;
+      }
 
       /* ============ CASHDESK : BETWINNER + 1XBET ============ */
       // Les deux marques partagent l'API, mais PAS la caisse. La marque est
