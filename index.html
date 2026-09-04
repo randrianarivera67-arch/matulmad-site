@@ -1543,6 +1543,8 @@ async function submitOrder(){
 
 /* wallets */
 function renderWallets(){
+  if(!renderWallets._init){ renderWallets._init=1; chargerDemandes().then(function(){ renderWallets(); }); }
+
   var box=document.getElementById("walletList");
   if(!me||!me.wallets||!me.wallets.length){box.innerHTML='<div class="empty"><div class="ei"><svg class="ic" viewBox="0 0 24 24"><path d="M3 7h18v12H3zM3 7l2-3h14l2 3M16 13h2"/></svg></div>'+(lang==="fr"?"Aucun wallet":"Tsy misy wallet")+'</div>';return;}
   box.innerHTML=me.wallets.map(function(w){
@@ -1557,9 +1559,29 @@ function openWallet(id){
   document.getElementById("fsTitle").textContent=t(w?"w_edittitle":"w_addtitle");
   document.getElementById("fsMsg").className="msg";
   var opts=activeOpKeys().map(function(k){return '<option value="'+k+'"'+(w&&w.operator===k?' selected':'')+'>'+opName(k)+'</option>';}).join('');
-  document.getElementById("fsBody").innerHTML=
-    '<div class="field"><label>'+t("w_op")+'</label><div class="inp"><select id="wOp">'+opts+'</select></div></div>'+
-    '<div class="field"><label>'+t("w_num")+'</label><div class="inp"><input id="wNum" inputmode="numeric" placeholder="034 12 345 67" value="'+(w?w.numero:'')+'"></div></div>'+
+  var enAttente = w ? demandeEnCours(w._id) : null;
+  var bloc;
+  if(w){
+    // Modification : operateur fige et ancien numero visible, car il continue
+    // de recevoir l'argent jusqu'a la validation de l'administrateur.
+    bloc =
+      '<div class="field"><label>'+t("w_op")+'</label><div class="inp"><select id="wOp" disabled>'+opts+'</select></div></div>'+
+      '<div class="field"><label>'+(lang==="fr"?"Num\u00e9ro actuel":"Numéro ankehitriny")+'</label><div class="inp"><input id="wOld" value="'+w.numero+'" disabled></div></div>'+
+      (enAttente
+        ? '<div class="msg" style="background:rgba(255,160,0,.12);color:#b45309;padding:10px;border-radius:10px;margin-bottom:10px">'
+          +(lang==="fr"?"Demande en attente de validation : ":"Miandry fankatoavana : ")
+          +(enAttente.type==='suppression'
+              ? (lang==="fr"?"suppression du wallet.":"fanesorana ny wallet.")
+              : ((enAttente.nouveau&&enAttente.nouveau.numero)||''))
+          +'</div>'
+        : '')+
+      '<div class="field"><label>'+(lang==="fr"?"Nouveau num\u00e9ro":"Numéro vaovao")+'</label><div class="inp"><input id="wNum" inputmode="numeric" placeholder="034 12 345 67" value=""'+(enAttente?' disabled':'')+'></div></div>';
+  } else {
+    bloc =
+      '<div class="field"><label>'+t("w_op")+'</label><div class="inp"><select id="wOp">'+opts+'</select></div></div>'+
+      '<div class="field"><label>'+t("w_num")+'</label><div class="inp"><input id="wNum" inputmode="numeric" placeholder="034 12 345 67" value=""></div></div>';
+  }
+  document.getElementById("fsBody").innerHTML= bloc+
     '<div class="field"><label>'+t("w_label")+'</label><div class="inp"><input id="wLabel" placeholder="Yas perso" value="'+(w&&w.label?w.label.replace(/"/g,"&quot;"):'')+'"></div></div>'+
     '<button class="btn btn-gold btn-block" id="wSave">'+t("w_save")+'</button>';
   document.getElementById("wSave").onclick=function(){saveWallet(id);};
@@ -1570,13 +1592,41 @@ async function saveWallet(id){
   if(!num){fsErr(lang==="fr"?"Numéro requis":"Mila numéro");return;}
   var btn=document.getElementById("wSave");btn.disabled=true;btn.innerHTML='<span class="spin"></span>';
   try{
-    var d=await api("/api/wallet",{method:"POST",body:JSON.stringify({operator:op,numero:num,label:lbl})});
-    if(d.wallets)me.wallets=d.wallets;
-    if(id){var d2=await api("/api/wallet/"+id,{method:"DELETE"});if(d2.wallets)me.wallets=d2.wallets;}
-    renderWallets();remplirNumeros();closeSheet("formSheet");toast(t(id?"m_saved":"m_added"),"ok");
+    if(id){
+      var dm=await api("/api/wallet/"+id,{method:"PATCH",body:JSON.stringify({numero:num,label:lbl})});
+      if(dm.error){fsErr(dm.error);btn.disabled=false;btn.textContent=t("w_save");return;}
+      await chargerDemandes();
+      renderWallets();remplirNumeros();closeSheet("formSheet");
+      toast(lang==="fr"?"Demande envoyee — en attente de validation":"Nalefa ny fangatahana — miandry fankatoavana","ok");
+    } else {
+      var d=await api("/api/wallet",{method:"POST",body:JSON.stringify({operator:op,numero:num,label:lbl})});
+      if(d.error){fsErr(d.error);btn.disabled=false;btn.textContent=t("w_save");return;}
+      if(d.wallets)me.wallets=d.wallets;
+      renderWallets();remplirNumeros();closeSheet("formSheet");toast(t("m_added"),"ok");
+    }
   }catch(e){btn.disabled=false;btn.textContent=t("w_save");fsErr(t("m_err"));}
 }
-async function delWallet(id){if(!confirm(t("confirm_del")))return;try{var d=await api("/api/wallet/"+id,{method:"DELETE"});if(d.wallets){me.wallets=d.wallets;renderWallets();remplirNumeros();toast(t("m_deleted"),"ok");}}catch(e){toast(t("m_err"),"err");}}
+/* Demandes en attente : le wallet concerne reste actif jusqu'a la decision. */
+var _demandes=[];
+async function chargerDemandes(){
+  try{var d=await api("/api/wallet/demandes");_demandes=(d&&d.demandes)||[];}catch(e){_demandes=[];}
+}
+function demandeEnCours(wid){
+  for(var i=0;i<_demandes.length;i++) if(String(_demandes[i].walletId)===String(wid)) return _demandes[i];
+  return null;
+}
+async function delWallet(id){
+  if(demandeEnCours(id)){toast(lang==="fr"?"Une demande est deja en attente":"Efa misy fangatahana miandry","err");return;}
+  if(!confirm(lang==="fr"
+      ? "Demander la suppression de ce wallet ?\n\nIl restera actif jusqu'a la validation de l'administrateur."
+      : "Hangataka fanesorana ity wallet ity ?\n\nMbola miasa izy mandra-pankatoavan'ny admin."))return;
+  try{
+    var d=await api("/api/wallet/"+id,{method:"DELETE"});
+    if(d.error){toast(d.error,"err");return;}
+    await chargerDemandes();renderWallets();
+    toast(lang==="fr"?"Demande envoyee":"Nalefa ny fangatahana","ok");
+  }catch(e){toast(t("m_err"),"err");}
+}
 
 /* providers */
 function renderProviders(){
