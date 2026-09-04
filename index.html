@@ -1820,15 +1820,35 @@ let _notifs=[];
 async function loadNotifs(){
   var urls=[CORE+"/api/announcements",API+"/api/notifications"];
   for(var i=0;i<urls.length;i++){
-    try{var r=await fetch(urls[i],{headers:hdr()});if(!r.ok)continue;var d=await r.json();_notifs=(d&&(d.data||d.announcements))||[];break;}catch(e){}
+    try{var r=await fetch(urls[i],{headers:hdr()});if(!r.ok)continue;var d=await r.json();_notifs=((d&&(d.data||d.announcements))||[]).filter(function(a){var mq=(me&&me.annoncesMasquees)||[];return mq.indexOf(String(a._id||a.id))<0;});break;}catch(e){}
   }
-  var dot=document.getElementById("bellDot");if(dot)dot.classList.toggle("hidden",!_notifs.length);
+  var lu=(me&&me.annoncesLues)||[];
+  var nonLues=_notifs.filter(function(a){return lu.indexOf(String(a._id||a.id))<0;}).length;
+  var dot=document.getElementById("bellDot");if(dot)dot.classList.toggle("hidden",!nonLues);
+}
+async function marquerAnnoncesLues(){
+  var ids=_notifs.map(function(a){return String(a._id||a.id);});
+  if(!ids.length) return;
+  try{
+    var d=await api("/api/auth/annonces/lues",{method:"POST",body:JSON.stringify({ids:ids})});
+    if(d&&d.lues&&me) me.annoncesLues=d.lues;
+    var dot=document.getElementById("bellDot"); if(dot) dot.classList.add("hidden");
+  }catch(e){}
+}
+async function masquerAnnonce(id){
+  try{
+    var d=await api("/api/auth/annonces/masquer",{method:"POST",body:JSON.stringify({id:String(id)})});
+    if(d&&d.masquees&&me) me.annoncesMasquees=d.masquees;
+    _notifs=_notifs.filter(function(a){return String(a._id||a.id)!==String(id);});
+    openNotif();
+  }catch(e){ toast(t("m_err"),"err"); }
 }
 function openNotif(){
+  marquerAnnoncesLues();
   var box=document.getElementById("notifList");
   if(!_notifs.length){box.innerHTML='<div class="empty"><div class="ei"><svg class="ic" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>'+t("notif_empty")+'</div>';}
   else{box.innerHTML=_notifs.map(function(n){var when=n.createdAt?new Date(n.createdAt).toLocaleString('fr-FR'):"";
-    return '<div class="notif-item"><div class="ni"><svg class="ic" viewBox="0 0 24 24" style="width:19px;height:19px"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div><div class="nm"><b>'+(n.title||"Annonce")+'</b><p>'+(n.body||n.message||"")+'</p>'+(when?'<time>'+when+'</time>':'')+'</div></div>';}).join('');}
+    return '<div class="notif-item"><div class="ni"><svg class="ic" viewBox="0 0 24 24" style="width:19px;height:19px"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div><div class="nm"><b>'+(n.title||"Annonce")+'</b><p>'+(n.body||n.message||"")+'</p>'+(when?'<time>'+when+'</time>':'')+'</div>'+'<button onclick="masquerAnnonce(\''+String(n._id||n.id)+'\')" title="Supprimer" style="background:none;border:0;cursor:pointer;padding:6px;color:#94a3b8;align-self:flex-start">'+'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M4 7h16M9 7V5h6v2M7 7l1 13h8l1-13"/></svg></button>'+'</div>';}).join('');}
   openSheet("notifSheet");
 }
 
