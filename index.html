@@ -1045,10 +1045,17 @@ body.dash .dock{ display:grid; }
     <div class="msg" id="fsMsg"></div><div id="fsBody"></div></div></div>
 
 <!-- Sheet PARAMÈTRES -->
+<div class="sheet" id="secuSheet"><div class="sheet-bd" onclick="closeSheet('secuSheet')"></div>
+  <div class="sheet-panel"><div class="sheet-head"><h3><svg class="ic" viewBox="0 0 24 24" style="width:19px;height:19px"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg><span>S&eacute;curit&eacute;</span></h3><button class="modal-x" style="position:static" onclick="closeSheet('secuSheet')"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+    <div id="secuBody" style="padding:4px 2px 14px"></div>
+  </div>
+</div>
+
 <div class="sheet" id="setSheet"><div class="sheet-bd" onclick="closeSheet('setSheet')"></div>
   <div class="sheet-panel"><div class="sheet-head"><h3><svg class="ic" viewBox="0 0 24 24" style="width:19px;height:19px"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span data-i18n="set_title">Paramètres</span></h3><button class="modal-x" style="position:static" onclick="closeSheet('setSheet')"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
     <button class="set-row" onclick="toggleTheme()"><span class="sr-ic"><svg class="ic" id="setThemeIc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span><span class="sr-t"><b data-i18n="set_theme">Apparence</b><span id="setThemeTxt">Clair</span></span></button>
     <button class="set-row" onclick="toggleLang()"><span class="sr-ic"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg></span><span class="sr-t"><b data-i18n="set_lang">Langue</b><span>Français · Malagasy</span></span><span class="sr-v" id="setLangV">FR</span></button>
+    <button class="set-row" onclick="ouvrirSecurite()"><span class="sr-ic"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg></span><span class="sr-t"><b>Sécurité</b><span>Désactiver ou supprimer le compte</span></span></button>
     <button class="set-row danger" onclick="closeSheet('setSheet');logout()"><span class="sr-ic"><svg class="ic" viewBox="0 0 24 24"><path d="M16 17l5-5-5-5M21 12H9M12 19H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h7"/></svg></span><span class="sr-t"><b data-i18n="nav_logout">Déconnexion</b><span data-i18n="set_logout_sub">Quitter votre espace</span></span></button>
   </div></div>
 
@@ -1417,6 +1424,7 @@ async function api(path,opts){
 function setDashName(){var el=document.getElementById("dashName");if(el&&me)el.textContent=me.name||me.email||me.phone||"client";}
 async function enterDash(){go("dashboard");setDashName();
   setKmMode(!!(me&&me.kmAccount));   // compte Comores -> mode Fc mandrakariva
+  majBandeauSecurite();
   renderOpPick();populateProviderSelect();
   // autofillOrder APRES populateProviderSelect : il choisit Deriv parmi les
   // options, puis remplit les listes numero et compte a partir des
@@ -2675,6 +2683,82 @@ async function mmStartOAuth(){
   bindBtn(); setTimeout(bindBtn,500); setTimeout(bindBtn,1500);
   setTimeout(toggleEmailRetrait,300);
 })();
+
+/* ── Securite du compte ──────────────────────────────────────────────
+   Desactiver = pause, le client garde l'acces pour revenir.
+   Supprimer  = compte a rebours de 60 jours, annulable par reactivation.
+   Un motif est demande dans les deux cas et transmis a l'administration. */
+function joursRestants(){
+  if(!me||!me.suppressionDemandeeLe) return null;
+  var fin=new Date(new Date(me.suppressionDemandeeLe).getTime()+60*86400000);
+  return Math.max(0, Math.ceil((fin-Date.now())/86400000));
+}
+function ouvrirSecurite(){
+  closeSheet('setSheet');
+  var box=document.getElementById('secuBody');
+  var jr=joursRestants();
+  var h='';
+  if(me&&me.desactiveParClient){
+    h+='<div style="background:rgba(255,160,0,.12);color:#b45309;padding:12px;border-radius:12px;margin-bottom:14px;font-size:13px">'
+      +(jr!==null
+         ? 'Votre compte sera supprim\u00e9 automatiquement dans <b>'+jr+' jour(s)</b>. R\u00e9activez-le pour annuler.'
+         : 'Votre compte est actuellement d\u00e9sactiv\u00e9.')
+      +'</div>'
+      +'<button class="btn btn-primary btn-block" onclick="reactiverCompte()">R\u00e9activer mon compte</button>';
+    box.innerHTML=h; openSheet('secuSheet'); return;
+  }
+  h+='<div style="font-size:13px;color:var(--muted,#64748b);margin-bottom:14px">'
+   +'D\u00e9sactiver met votre compte en pause : vous pourrez le r\u00e9activer \u00e0 tout moment. '
+   +'Supprimer lance un d\u00e9lai de 60 jours, pendant lequel un retour reste possible.</div>'
+   +'<div class="field"><label>Pourquoi souhaitez-vous partir ?</label>'
+   +'<div class="inp"><input id="secuMotif" placeholder="Votre r\u00e9ponse (obligatoire)"></div></div>'
+   +'<div id="secuMsg" class="msg"></div>'
+   +'<button class="btn btn-block" style="margin-bottom:10px" onclick="actionSecurite(\'desactiver\')">D\u00e9sactiver mon compte</button>'
+   +'<button class="btn btn-block" style="background:#dc2626;color:#fff" onclick="actionSecurite(\'supprimer\')">Supprimer mon compte</button>';
+  box.innerHTML=h; openSheet('secuSheet');
+}
+async function actionSecurite(quoi){
+  var m=(document.getElementById('secuMotif').value||'').trim();
+  var msg=document.getElementById('secuMsg');
+  if(m.length<5){ msg.className='msg err'; msg.textContent='Merci d\'indiquer la raison.'; return; }
+  var txt = quoi==='supprimer'
+    ? 'Supprimer votre compte ?\n\nIl sera effac\u00e9 automatiquement dans 60 jours. Vous pouvez revenir avant cette date.'
+    : 'D\u00e9sactiver votre compte ?\n\nVous pourrez le r\u00e9activer quand vous voulez.';
+  if(!confirm(txt)) return;
+  try{
+    var d=await api('/api/auth/securite/'+quoi,{method:'POST',body:JSON.stringify({motif:m})});
+    if(d.error){ msg.className='msg err'; msg.textContent=d.error; return; }
+    if(d.user) me=d.user;
+    closeSheet('secuSheet');
+    toast(quoi==='supprimer'
+      ? 'Compte supprim\u00e9 dans 60 jours — vous pouvez encore revenir'
+      : 'Compte d\u00e9sactiv\u00e9','ok');
+    majBandeauSecurite();
+  }catch(e){ msg.className='msg err'; msg.textContent='Serveur injoignable'; }
+}
+async function reactiverCompte(){
+  try{
+    var d=await api('/api/auth/securite/reactiver',{method:'POST'});
+    if(d.error){ toast(d.error,'err'); return; }
+    if(d.user) me=d.user;
+    closeSheet('secuSheet'); toast('Compte r\u00e9activ\u00e9','ok'); majBandeauSecurite();
+  }catch(e){ toast('Serveur injoignable','err'); }
+}
+function majBandeauSecurite(){
+  var id='bandeauSecu', el=document.getElementById(id);
+  if(!me||!me.desactiveParClient){ if(el) el.remove(); return; }
+  if(!el){
+    el=document.createElement('div'); el.id=id;
+    el.style.cssText='position:fixed;left:0;right:0;top:0;z-index:2000;padding:9px 12px;'
+      +'background:#b45309;color:#fff;font-size:12.5px;font-weight:700;text-align:center;cursor:pointer';
+    el.onclick=ouvrirSecurite;
+    document.body.appendChild(el);
+  }
+  var jr=joursRestants();
+  el.textContent = jr!==null
+    ? 'Compte d\u00e9sactiv\u00e9 — suppression dans '+jr+' jour(s). Toucher pour r\u00e9activer.'
+    : 'Compte d\u00e9sactiv\u00e9 — toucher pour r\u00e9activer.';
+}
 
 </script>
 </body>
