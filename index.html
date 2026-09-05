@@ -263,6 +263,20 @@ footer{padding:34px 0;border-top:1px solid var(--line);margin-top:36px}
 .page{display:none}
 .page.active{display:block;animation:pageIn .26s ease}
 @keyframes pageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* Carte d'accueil : degrade doux + illustration, comme le reste du site. */
+.hello-card{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:20px 22px;margin-bottom:20px;border-radius:22px;overflow:hidden;
+  background:linear-gradient(120deg,var(--gold-soft),var(--panel-solid) 55%,var(--blue-soft));
+  border:1px solid var(--line);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.7),
+             inset 0 -3px 10px rgba(26,39,68,.08),
+             0 14px 32px -14px rgba(26,39,68,.35)}
+.hello-txt{min-width:0;flex:1}
+.hello-txt .dash-sub{margin-bottom:0}
+.hello-art{width:150px;height:112px;flex:none}
+@media (max-width:520px){ .hello-art{width:112px;height:84px} }
+@media (max-width:380px){ .hello-art{display:none} }
+
 .welcome{font-family:var(--font-d);font-weight:700;font-size:clamp(24px,5vw,34px);margin-bottom:4px}
 .welcome span{background:linear-gradient(110deg,var(--gold-2),var(--gold-1));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .dash-sub{color:var(--ink-dim);margin-bottom:20px}
@@ -910,8 +924,26 @@ body.dash .dock{ display:grid; }
 
 <!-- DASHBOARD -->
 <main id="dashboard"><div class="wrap dash-wrap">
-  <div class="welcome" data-i18n="dash_hi">Bonjour, <span id="dashName">client</span></div>
-  <div class="dash-sub" id="pageSub" data-i18n="dash_sub">Gérez vos comptes et passez vos ordres.</div>
+  <div class="hello-card">
+    <div class="hello-txt">
+      <div class="welcome" data-i18n="dash_hi">Bonjour, <span id="dashName">client</span></div>
+      <div class="dash-sub" id="pageSub" data-i18n="dash_sub">Gérez vos comptes et passez vos ordres.</div>
+    </div>
+    <!-- Illustration dessinee en SVG plutot qu'en image : nette a toute taille,
+         suit les couleurs du theme et ne coute aucun telechargement. -->
+    <svg class="hello-art" viewBox="0 0 200 150" aria-hidden="true">
+      <ellipse cx="118" cy="128" rx="72" ry="10" fill="rgba(26,39,68,.10)"/>
+      <circle cx="42" cy="34" r="13" fill="none" stroke="var(--gold-1)" stroke-width="2.5" opacity=".55"/>
+      <text x="42" y="39" text-anchor="middle" font-size="11" font-weight="700" fill="var(--gold-1)" opacity=".75">Ar</text>
+      <circle cx="176" cy="58" r="11" fill="none" stroke="var(--gold-1)" stroke-width="2.5" opacity=".45"/>
+      <text x="176" y="62" text-anchor="middle" font-size="9" font-weight="700" fill="var(--gold-1)" opacity=".65">Ar</text>
+      <rect x="78" y="40" width="86" height="54" rx="9" fill="var(--gold-1)" opacity=".85"/>
+      <rect x="62" y="52" width="104" height="66" rx="12" fill="var(--navy-1)"/>
+      <rect x="62" y="52" width="104" height="18" rx="12" fill="rgba(255,255,255,.10)"/>
+      <rect x="120" y="76" width="52" height="20" rx="10" fill="var(--gold-1)"/>
+      <circle cx="146" cy="86" r="5" fill="#fff"/>
+    </svg>
+  </div>
 
   <!-- ORDER (dépôt / retrait) -->
   <section class="page active" data-page="order">
