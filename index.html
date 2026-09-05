@@ -285,6 +285,53 @@ footer{padding:34px 0;border-top:1px solid var(--line);margin-top:36px}
   box-shadow:inset 0 2px 0 rgba(255,255,255,.55),
              inset 0 -3px 8px rgba(16,50,110,.16),
              0 12px 26px -10px rgba(16,50,110,.45)}
+/* ===== En-tete : cercle fournisseur + deux boutons =====================
+   Le cercle porte le logo et le nom du fournisseur choisi. Les montants ne
+   s'affichent que pour Deriv et 1WIN, seuls a fonctionner avec un cours ;
+   pour Betwinner et 1XBET les boutons restent, sans chiffre. */
+.hero-rate{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;margin-bottom:18px}
+.hero-rate .rp-foot{grid-column:1/-1;font-size:11.5px;color:var(--ink-dim);line-height:1.5;margin-top:2px}
+
+.hr-circle{width:132px;height:132px;border-radius:50%;flex:none;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+  background:linear-gradient(160deg,var(--navy-3),var(--navy-1) 55%,var(--navy-2));
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.18),
+             inset 0 -4px 12px rgba(0,0,0,.35),
+             0 14px 30px -10px rgba(15,27,51,.55)}
+.hr-logo{width:52px;height:52px;border-radius:15px;object-fit:cover;
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.4),0 6px 14px -4px rgba(0,0,0,.5)}
+.hr-name{font-family:var(--font-d);font-weight:800;font-size:14px;color:#fff;
+  letter-spacing:.02em;text-align:center;padding:0 8px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:112px}
+
+.hr-btns{display:flex;flex-direction:column;gap:10px;min-width:0}
+.hr-btn{display:flex;align-items:center;gap:12px;width:100%;padding:14px 14px;
+  border:0;border-radius:18px;cursor:pointer;text-align:left;color:#fff;
+  font-family:var(--font-d);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.22),
+             inset 0 -3px 9px rgba(0,0,0,.28),
+             0 12px 24px -10px rgba(15,27,51,.55);
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s}
+.hr-btn.dep{background:linear-gradient(150deg,var(--navy-3),var(--navy-1) 60%,var(--navy-2))}
+.hr-btn.ret{background:linear-gradient(150deg,#f2536f,var(--gold-1) 55%,var(--gold-2))}
+.hr-btn:hover{transform:translateY(-2px)}
+.hr-btn:active{transform:translateY(1px) scale(.985);
+  box-shadow:inset 0 3px 8px rgba(0,0,0,.32),0 4px 10px -5px rgba(15,27,51,.5)}
+.hr-ic{width:42px;height:42px;border-radius:14px;flex:none;display:grid;place-items:center;
+  background:rgba(255,255,255,.16);
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.35),inset 0 -2px 5px rgba(0,0,0,.2)}
+.hr-ic svg{width:21px;height:21px;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.hr-txt{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.hr-txt .k{font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.85}
+.hr-txt .v{font-size:19px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hr-go{font-size:22px;opacity:.6;flex:none;line-height:1}
+
+@media (max-width:420px){
+  .hero-rate{grid-template-columns:1fr;justify-items:center}
+  .hr-circle{width:118px;height:118px}
+  .hr-btns{width:100%}
+}
+
 .rate-panel .rp-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .rate-panel .rp-logo{width:26px;height:26px;border-radius:8px;object-fit:cover;flex:none;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 4px 10px -3px rgba(8,30,60,.5)}
@@ -868,20 +915,46 @@ body.dash .dock{ display:grid; }
 
   <!-- ORDER (dépôt / retrait) -->
   <section class="page active" data-page="order">
-    <div class="rate-panel" id="ratePanel">
-      <div class="rp-top"><span class="rp-dot"></span><img class="rp-logo" src="deriv.jpg" alt="Deriv"><span class="rp-lbl" data-i18n="rate_lbl">Cours du jour · Deriv</span></div>
-      <div class="rp-grid">
-        <div class="rp-box dep" onclick="showPage('depot')"><div class="k" data-i18n="rate_dep">Dépôt</div><div class="v" id="rateDep">— Ar</div></div>
-        <div class="rp-box ret" onclick="showPage('retrait')"><div class="k" data-i18n="rate_ret">Retrait</div><div class="v" id="rateRet">— Ar</div></div>
+    <div class="hero-rate" id="ratePanel">
+      <div class="hr-circle">
+        <img src="deriv.jpg" alt="Deriv" class="hr-logo">
+        <div class="hr-name">Deriv</div>
+      </div>
+      <div class="hr-btns">
+        <button class="hr-btn dep" onclick="showPage('depot')">
+          <span class="hr-ic"><svg viewBox="0 0 24 24"><path d="M12 4v13M18 11l-6 6-6-6"/></svg></span>
+          <span class="hr-txt"><span class="k" data-i18n="rate_dep">Dépôt</span><span class="v" id="rateDep">— Ar</span></span>
+          <span class="hr-go">›</span>
+        </button>
+        <button class="hr-btn ret" onclick="showPage('retrait')">
+          <span class="hr-ic"><svg viewBox="0 0 24 24"><path d="M12 20V7M6 13l6-6 6 6"/></svg></span>
+          <span class="hr-txt"><span class="k" data-i18n="rate_ret">Retrait</span><span class="v" id="rateRet">— Ar</span></span>
+          <span class="hr-go">›</span>
+        </button>
       </div>
       <div class="rp-foot" data-i18n="rate_foot">Appliqué aux ordres Deriv (1 USD). Mobile money : montants en Ariary.</div>
     </div>
 
     <!-- Betwinner / 1XBET : pas de cours, montants directs. Remplace le panneau
          de cours Deriv quand l'une de ces deux marques est choisie. -->
-    <div class="rate-panel" id="cashdeskPanel" style="display:none">
-      <div class="rp-top"><span class="rp-dot"></span><img class="rp-logo" id="cdLogo" src="1xbet.jpg" alt=""><span class="rp-lbl" id="cdLbl">Betwinner</span></div>
-      <div class="rp-foot" id="cdFoot" style="margin-top:8px">Montants en Ariary. Passer un ordre et confirmer.</div>
+    <div class="hero-rate" id="cashdeskPanel" style="display:none">
+      <div class="hr-circle">
+        <img src="1xbet.jpg" alt="" class="hr-logo" id="cdLogo">
+        <div class="hr-name" id="cdLbl">Betwinner</div>
+      </div>
+      <div class="hr-btns">
+        <button class="hr-btn dep" onclick="showPage('depot')">
+          <span class="hr-ic"><svg viewBox="0 0 24 24"><path d="M12 4v13M18 11l-6 6-6-6"/></svg></span>
+          <span class="hr-txt"><span class="k" data-i18n="rate_dep">Dépôt</span></span>
+          <span class="hr-go">›</span>
+        </button>
+        <button class="hr-btn ret" onclick="showPage('retrait')">
+          <span class="hr-ic"><svg viewBox="0 0 24 24"><path d="M12 20V7M6 13l6-6 6 6"/></svg></span>
+          <span class="hr-txt"><span class="k" data-i18n="rate_ret">Retrait</span></span>
+          <span class="hr-go">›</span>
+        </button>
+      </div>
+      <div class="rp-foot" id="cdFoot" style="margin-top:10px">Montants en Ariary. Passer un ordre et confirmer.</div>
     </div>
 
     <div class="card card-or">
