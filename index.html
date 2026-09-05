@@ -119,10 +119,14 @@ header.nav{position:sticky;top:0;z-index:50;background:transparent;border-bottom
 /* Boutons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;height:50px;padding:0 24px;border-radius:14px;font-family:var(--font-d);font-weight:700;font-size:16px;letter-spacing:.03em;transition:.16s;white-space:nowrap}
 .btn .ic{width:19px;height:19px}
-.btn-primary{background:linear-gradient(180deg,var(--blue-1),var(--blue-2));color:#fff;box-shadow:0 8px 22px rgba(42,108,242,.4),inset 0 1px 0 rgba(255,255,255,.25)}
+.btn-primary{background:linear-gradient(150deg,var(--navy-3),var(--navy-1) 60%,var(--navy-2));color:#fff;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.22),inset 0 -3px 9px rgba(0,0,0,.28),
+             0 12px 24px -10px rgba(15,27,51,.6)}
 /* Connexion : meme forme que S'inscrire, en vert, pour distinguer d'un coup
    d'oeil "creer un compte" de "revenir sur le sien". */
-.btn-connexion{background:linear-gradient(180deg,var(--green-2),var(--green));color:#fff;box-shadow:0 8px 22px rgba(19,192,106,.4),inset 0 1px 0 rgba(255,255,255,.25)}
+.btn-connexion{background:linear-gradient(150deg,var(--green-2),var(--green));color:#fff;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.28),inset 0 -3px 9px rgba(0,0,0,.2),
+             0 12px 24px -10px rgba(19,192,106,.6)}
 .btn-connexion .ic{color:#fff}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(42,108,242,.55)}
 .cta-banner{display:block;width:100%;max-width:560px;margin:0 auto 18px;border-radius:18px;
@@ -235,24 +239,22 @@ footer{padding:34px 0;border-top:1px solid var(--line);margin-top:36px}
 .dash-wrap{max-width:660px;margin:0 auto}
 /* Carte de l'ordre : relief clay dore, avec une lueur qui respire. Le fond
    reste clair pour que le contenu demeure lisible. */
-.card-or{border:1px solid rgba(233,186,67,.55)!important;
-  background:linear-gradient(160deg,rgba(255,246,216,.55),rgba(233,186,67,.14) 55%,rgba(201,150,42,.10))!important;
+/* La carte de l'ordre prend la couleur de l'operation en cours : rose pour un
+   depot, bleu nuit pour un retrait. Le client voit d'un coup d'oeil ce qu'il
+   est en train de faire, sans relire le titre. */
+.card-or{border:1px solid rgba(230,52,85,.35)!important;
+  background:linear-gradient(160deg,var(--gold-soft),var(--panel-solid) 58%,rgba(230,52,85,.07))!important;
   box-shadow:inset 0 2px 0 rgba(255,255,255,.75),
-             inset 0 -3px 9px rgba(140,100,20,.18),
-             0 14px 32px -12px rgba(150,110,25,.5),
-             0 0 0 0 rgba(233,186,67,.45)!important;
-  animation:orGlow 3.2s ease-in-out infinite}
-@keyframes orGlow{
-  0%,100%{box-shadow:inset 0 2px 0 rgba(255,255,255,.75),
-                     inset 0 -3px 9px rgba(140,100,20,.18),
-                     0 14px 32px -12px rgba(150,110,25,.5),
-                     0 0 14px -4px rgba(233,186,67,.45)}
-  50%    {box-shadow:inset 0 2px 0 rgba(255,255,255,.9),
-                     inset 0 -3px 9px rgba(140,100,20,.2),
-                     0 16px 36px -12px rgba(150,110,25,.55),
-                     0 0 30px -2px rgba(233,186,67,.85)}
-}
-@media (prefers-reduced-motion:reduce){.card-or{animation:none}}
+             inset 0 -3px 9px rgba(120,30,50,.10),
+             0 14px 32px -12px rgba(230,52,85,.35),
+             0 0 16px -6px rgba(230,52,85,.35)!important;
+  transition:background .35s ease,border-color .35s ease,box-shadow .35s ease}
+.card-or.mode-retrait{border-color:rgba(26,39,68,.35)!important;
+  background:linear-gradient(160deg,var(--blue-soft),var(--panel-solid) 58%,rgba(26,39,68,.07))!important;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.75),
+             inset 0 -3px 9px rgba(26,39,68,.12),
+             0 14px 32px -12px rgba(26,39,68,.40),
+             0 0 16px -6px rgba(26,39,68,.35)!important}
 .card{background:var(--panel);border:1px solid rgba(120,180,255,.35);border-radius:var(--radius);padding:22px;
   box-shadow:inset 0 2px 0 rgba(255,255,255,.5),
              inset 0 -3px 9px rgba(16,50,110,.12),
@@ -745,7 +747,12 @@ body:not(.dash) .social-fab{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
   .dock button .ic{width:21px;height:21px}
   .social-fab a{width:46px;height:46px}
 }
-.add-depot-btn{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:46px;margin-bottom:14px;border:none;border-radius:13px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-family:var(--font-d);font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 6px 18px rgba(34,197,94,.4)}
+.add-depot-btn{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:9px;width:100%;height:52px;margin-bottom:14px;border:none;border-radius:26px;background:linear-gradient(150deg,#f2536f,var(--gold-1) 55%,var(--gold-2));color:#fff;font-family:var(--font-d);font-weight:800;font-size:15px;cursor:pointer;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.30),
+             inset 0 -3px 9px rgba(0,0,0,.22),
+             0 12px 26px -10px rgba(230,52,85,.6);
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s}
+.add-depot-btn:hover{transform:translateY(-2px)}
 .add-depot-btn::after{content:"";position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);animation:shineBtn 2.5s infinite}
 @keyframes shineBtn{0%{left:-100%}55%{left:160%}100%{left:160%}}
 .add-depot-btn:active{transform:scale(.97)}
@@ -1620,7 +1627,9 @@ function isBetwinner(){var p=document.getElementById("fProvider");return p&&(p.v
 function setType(ty){orderType=ty;
   var sd=document.getElementById("segDepot"),sr=document.getElementById("segRetrait");
   if(sd)sd.classList.toggle("active",ty==="depot");if(sr)sr.classList.toggle("active",ty==="retrait");
-  var bt=document.getElementById("btnOrder");if(bt){bt.classList.remove("btn-green","btn-rose","btn-primary");bt.classList.add(ty==="depot"?"btn-green":"btn-rose");}
+  var bt=document.getElementById("btnOrder");if(bt){bt.classList.remove("btn-green","btn-rose","btn-primary");bt.classList.add(ty==="depot"?"btn-rose":"btn-primary");}
+  // Teinte de la carte : rose au depot, bleu nuit au retrait.
+  var co=document.querySelector(".card-or");if(co)co.classList.toggle("mode-retrait",ty==="retrait");
   var dk=document.querySelectorAll("#dock button");for(var i=0;i<dk.length;i++)dk[i].classList.toggle("active",dk[i].dataset.go===ty);
   convAr();}
 function pickOp(op){orderOp=op;var b=document.querySelectorAll(".op-opt");for(var i=0;i<b.length;i++)b[i].classList.toggle("active",b[i].dataset.op===op);autofillOrder();convAr();}
