@@ -66,6 +66,12 @@ html[data-theme="light"]{
   --dock-bg:#ffffff; --dock-line:#e8ebf4; --dock-ink:#1a2744;
 }
 html[data-theme="dark"]{
+  /* En sombre, le bleu nuit de l'identite se confond avec le fond : les
+     boutons deviendraient invisibles. On les eclaircit ici — l'identite reste
+     la meme, seule la luminosite change pour rester lisible. */
+  --navy-1:#3b5488; --navy-2:#2b3f6b; --navy-3:#4d6aa5;
+  --blue-1:#4d6aa5; --blue-2:#3b5488; --blue-soft:#26355a;
+  --gold-soft:#3a2230;
   --bg:#0f1b33; --bg-2:#0a1425;
   --panel:rgba(32,48,80,.72); --panel-solid:#1a2744;
   --nav-bg:rgba(15,27,51,.85);
@@ -249,6 +255,12 @@ footer{padding:34px 0;border-top:1px solid var(--line);margin-top:36px}
              0 14px 32px -12px rgba(230,52,85,.35),
              0 0 16px -6px rgba(230,52,85,.35)!important;
   transition:background .35s ease,border-color .35s ease,box-shadow .35s ease}
+/* Champs de la carte de l'ordre : fond legerement dore pour se detacher du
+   panneau sans perdre le contraste du texte. En sombre, la variable prend une
+   valeur foncee et la regle reste lisible. */
+.card-or .inp{background:linear-gradient(160deg,#fffdf4,var(--gold-soft) 120%)}
+html[data-theme="dark"] .card-or .inp{background:linear-gradient(160deg,rgba(58,34,48,.55),rgba(32,48,80,.75))}
+
 .card-or.mode-retrait{border-color:rgba(26,39,68,.35)!important;
   background:linear-gradient(160deg,var(--blue-soft),var(--panel-solid) 58%,rgba(26,39,68,.07))!important;
   box-shadow:inset 0 2px 0 rgba(255,255,255,.75),
