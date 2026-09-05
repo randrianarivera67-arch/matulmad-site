@@ -618,6 +618,30 @@ body.dash .dock{display:grid}
 .dock button.active{background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,.12));color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),0 4px 12px rgba(255,255,255,.12)}
 .dock button.active .ic{stroke:#fff;filter:drop-shadow(0 0 6px rgba(255,255,255,.6))}
 
+/* ===== Bouton central : Depot ==========================================
+   Le geste le plus frequent merite la place la plus atteignable. Il deborde
+   volontairement vers le haut pour rester reconnaissable meme du coin de
+   l'oeil. La barre n'ecrete pas ce debordement (overflow visible). */
+.dock{overflow:visible}
+.dock .dock-main{position:relative}
+.dock .dock-main .ic-wrap{
+  width:56px;height:56px;border-radius:50%;margin-top:-24px;
+  display:grid;place-items:center;
+  background:linear-gradient(160deg,#f2536f,var(--gold-1) 55%,var(--gold-2));
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.4),
+             inset 0 -3px 8px rgba(0,0,0,.22),
+             0 12px 24px -8px rgba(230,52,85,.65);
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .22s}
+.dock .dock-main .ic{width:26px;height:26px;stroke:#fff!important;filter:none}
+.dock .dock-main span:last-child{color:var(--gold-1);font-weight:800}
+.dock .dock-main::before{display:none}          /* pas de pastille clay ici */
+.dock .dock-main.active::before{display:none}
+.dock .dock-main:active .ic-wrap{transform:translateY(2px) scale(.94)}
+.dock .dock-main.active .ic-wrap{transform:translateY(-2px) scale(1.04);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.5),
+             inset 0 -3px 8px rgba(0,0,0,.25),
+             0 16px 30px -8px rgba(230,52,85,.8)}
+
 /* --- Icones "clay" : volume obtenu par empilement d'ombres ---------------
    Le trait plat des SVG est remplace par un trait epais et arrondi, pose sur
    une pastille bombee. La lumiere vient du haut : ombre claire en haut a
@@ -1071,10 +1095,10 @@ body.dash .dock{ display:grid; }
 </div>
 
 <nav class="dock" id="dock">
-  <button data-go="depot" class="active" onclick="showPage('depot')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M12 4v13M18 11l-6 6-6-6"/><path d="M5 21h14"/></svg></span><span data-i18n="depot">Dépôt</span></button>
-  <button data-go="retrait" onclick="showPage('retrait')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M12 20V7M6 13l6-6 6 6"/><path d="M5 3h14"/></svg></span><span data-i18n="retrait">Retrait</span></button>
   <button data-go="wallets" onclick="showPage('wallets')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M3 7h18v12H3zM3 7l2-3h14l2 3M16 13h2"/></svg></span><span data-i18n="nav_wal">Wallets</span></button>
   <button data-go="fournisseurs" onclick="showPage('fournisseurs')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg></span><span data-i18n="nav_prov">Fournisseurs</span></button>
+  <button data-go="depot" class="active dock-main" onclick="showPage('depot')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M12 4v13M18 11l-6 6-6-6"/><path d="M5 21h14"/></svg></span><span data-i18n="depot">Dépôt</span></button>
+  <button data-go="retrait" onclick="showPage('retrait')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M12 20V7M6 13l6-6 6 6"/><path d="M5 3h14"/></svg></span><span data-i18n="retrait">Retrait</span></button>
   <button data-go="historique" onclick="showPage('historique')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M12 7v5l3 2M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z"/></svg></span><span data-i18n="nav_hist">Historique</span></button>
 </nav>
 </main>
