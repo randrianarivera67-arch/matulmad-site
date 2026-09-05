@@ -43,9 +43,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --gold-1:#e9ba43; --gold-2:#c9962a; --gold-soft:#fff6d8;
-  --blue-1:#2a6cf2; --blue-2:#1c52c4; --blue-soft:#dff1ff;
-  --green:#16a34a; --green-2:#13c06a; --red:#e23b4e; --rose:#ff4d8d; --yellow:#ffce3a;
+  /* Identite MATUL MADA : bleu nuit profond + rouge framboise.
+     Tout le site lit ces variables — les changer ici suffit a repeindre
+     l'ensemble, sans toucher une seule regle de mise en page. */
+  --navy-1:#1a2744; --navy-2:#0f1b33; --navy-3:#2a3a5c;
+  --gold-1:#e63455; --gold-2:#c62544; --gold-soft:#ffe8ed;
+  --blue-1:#1a2744; --blue-2:#0f1b33; --blue-soft:#e8ecf6;
+  --green:#16a34a; --green-2:#13c06a; --red:#e63455; --rose:#e63455; --yellow:#ffce3a;
   --radius:18px; --radius-sm:12px;
   --shadow:0 10px 30px rgba(20,50,110,.12);
   --shadow-lg:0 24px 60px rgba(20,50,110,.22);
@@ -53,22 +57,22 @@
   --font-d:"Rajdhani",sans-serif; --font-b:"Sora",sans-serif;
 }
 html[data-theme="light"]{
-  --bg:#eaf0fa; --bg-2:#dde7f7;
-  --panel:rgba(255,255,255,.86); --panel-solid:#ffffff;
-  --nav-bg:rgba(234,240,250,.82);
-  --ink:#12305f; --ink-2:#3a4f78; --ink-dim:#6b7c9c;
-  --line:rgba(20,50,110,.14); --field:#f3f7fe; --field-line:rgba(20,50,110,.18);
-  --glow:rgba(42,108,242,.25);
-  --dock-bg:#f6f8ff; --dock-line:#e2e8f6; --dock-ink:#0b1220;
+  --bg:#f6f7fb; --bg-2:#eef1f8;
+  --panel:rgba(255,255,255,.92); --panel-solid:#ffffff;
+  --nav-bg:rgba(246,247,251,.85);
+  --ink:#1a2744; --ink-2:#3d4b68; --ink-dim:#7b869e;
+  --line:rgba(26,39,68,.12); --field:#f4f6fb; --field-line:rgba(26,39,68,.15);
+  --glow:rgba(230,52,85,.22);
+  --dock-bg:#ffffff; --dock-line:#e8ebf4; --dock-ink:#1a2744;
 }
 html[data-theme="dark"]{
-  --bg:#081a38; --bg-2:#06142c;
-  --panel:rgba(17,40,82,.66); --panel-solid:#102650;
-  --nav-bg:rgba(8,20,40,.82);
-  --ink:#eaf2ff; --ink-2:#c4d6f5; --ink-dim:#8ba3cc;
-  --line:rgba(120,170,255,.16); --field:rgba(10,28,64,.6); --field-line:rgba(120,170,255,.22);
-  --glow:rgba(80,150,255,.35);
-  --dock-bg:#0c1c3c; --dock-line:rgba(120,170,255,.18); --dock-ink:#eaf2ff;
+  --bg:#0f1b33; --bg-2:#0a1425;
+  --panel:rgba(32,48,80,.72); --panel-solid:#1a2744;
+  --nav-bg:rgba(15,27,51,.85);
+  --ink:#eef1f8; --ink-2:#c3cde0; --ink-dim:#8b97b0;
+  --line:rgba(160,180,220,.16); --field:rgba(20,32,58,.7); --field-line:rgba(160,180,220,.2);
+  --glow:rgba(230,52,85,.35);
+  --dock-bg:#1a2744; --dock-line:rgba(160,180,220,.18); --dock-ink:#eef1f8;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{min-height:100%}
