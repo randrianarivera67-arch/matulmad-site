@@ -204,13 +204,25 @@ footer{padding:34px 0;border-top:1px solid var(--line);margin-top:36px}
 /* Pied de page en colonnes : la marque a gauche, puis des liens qui pointent
    vers des sections reellement presentes sur la page. */
 .foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:28px;padding:34px 0 26px}
+/* Tout est centre, et chaque colonne porte sa propre couleur : le regard
+   distingue les blocs sans avoir a lire les titres. */
+.foot-col{text-align:center}
 .foot-col h4{font-family:var(--font-d);font-weight:800;font-size:12px;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--ink-2);margin-bottom:12px}
-.foot-col a,.foot-col span{display:block;font-size:14px;color:var(--ink-2);font-weight:600;
-  text-decoration:none;line-height:2;transition:color .15s}
-.foot-col a:hover{color:var(--gold-1)}
+  text-transform:uppercase;margin-bottom:12px;
+  background:linear-gradient(110deg,#c9962a,#f4d580 45%,#c9962a);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.foot-col a,.foot-col span{display:block;font-size:14px;font-weight:700;
+  text-decoration:none;line-height:2;transition:color .15s,text-shadow .15s}
+/* Navigation : rose cristal. */
+.foot-col:nth-child(2) a{color:#e8698c;text-shadow:0 0 12px rgba(232,105,140,.35)}
+.foot-col:nth-child(2) a:hover{color:#f4a0b6}
+/* Fournisseurs : rouge profond. */
+.foot-col:nth-child(3) span{color:#c62544}
+/* Operateurs : bleu nuit de l'identite. */
+.foot-col:nth-child(4) span{color:var(--navy-3)}
+.foot-brand{text-align:center}
 .foot-brand .brand{font-size:24px;margin-bottom:10px;display:inline-flex}
-.foot-brand p{font-size:14px;color:var(--ink-2);line-height:1.6;max-width:280px}
+.foot-brand p{font-size:14px;color:var(--ink-2);line-height:1.6;max-width:280px;margin:0 auto}
 .foot-bottom{border-top:1px solid var(--line);padding:16px 0 22px;text-align:center}
 .foot-bottom small{color:var(--ink-2);font-size:13px;font-weight:600}
 /* Les boutons sociaux flottent a droite : sans cette marge, ils recouvraient
