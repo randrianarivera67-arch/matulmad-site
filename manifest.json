@@ -1,12 +1,12 @@
 {
   "name": "MATULMADA",
   "short_name": "MATULMADA",
-  "description": "Dépôt et retrait mobile money pour Deriv. Yas, Orange Money, Airtel Money. Sans frais de transfert.",
+  "description": "Dépôt et retrait mobile money instantanés. Yas, Orange Money, Airtel Money.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0a1f48",
+  "background_color": "#f6f7fb",
   "theme_color": "#f6f7fb",
   "lang": "fr",
   "categories": [
