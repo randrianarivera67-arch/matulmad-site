@@ -1262,7 +1262,39 @@ body.dash .dock{ display:grid; }
     <div class="field" id="fldPassConfirm" style="display:none"><label data-i18n="lbl_passconfirm">Confirmer le mot de passe</label>
       <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M6 10V7a6 6 0 0 1 12 0v3M5 10h14v10H5z"/></svg><input id="aPassConfirm" type="password" placeholder="••••••"></div></div>
     <button class="btn btn-primary btn-block" id="authSubmit" onclick="doAuth()"><span id="authBtnTxt" data-i18n="tab_login">Connexion</span></button>
+    <div id="forgotRow" style="text-align:center;margin-top:12px">
+      <a href="#" onclick="ouvrirOubli();return false" style="font-size:13.5px;font-weight:700;color:var(--gold-1);text-decoration:none" data-i18n="lbl_forgot">Mot de passe oublié ?</a>
+    </div>
     <div class="modal-foot" id="authSwitch"></div>
+  </div>
+</div>
+
+<!-- Mot de passe oublie : demande du lien -->
+<div class="modal" id="oubliModal">
+  <div class="modal-bd" onclick="fermerOubli()"></div>
+  <div class="modal-card">
+    <button class="modal-x" onclick="fermerOubli()"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <a class="brand" href="#" onclick="return false"><span class="m1">MATUL</span><span class="m2">MADA</span></a>
+    <p class="modal-sub" data-i18n="oubli_sub">Indiquez votre adresse email : vous recevrez un lien pour choisir un nouveau mot de passe.</p>
+    <div class="field"><label data-i18n="lbl_email">Email</label>
+      <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg><input id="oubliMail" type="email" placeholder="email@exemple.mg"></div></div>
+    <div class="msg" id="oubliMsg" style="display:none"></div>
+    <button class="btn btn-primary btn-block" id="oubliBtn" onclick="envoyerOubli()"><span data-i18n="oubli_send">Envoyer le lien</span></button>
+  </div>
+</div>
+
+<!-- Mot de passe oublie : choix du nouveau mot de passe -->
+<div class="modal" id="resetModal">
+  <div class="modal-bd"></div>
+  <div class="modal-card">
+    <a class="brand" href="#" onclick="return false"><span class="m1">MATUL</span><span class="m2">MADA</span></a>
+    <p class="modal-sub" data-i18n="reset_sub">Choisissez votre nouveau mot de passe.</p>
+    <div class="field"><label data-i18n="lbl_pass">Mot de passe</label>
+      <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M6 10V7a6 6 0 0 1 12 0v3M5 10h14v10H5z"/></svg><input id="rPass" type="password" placeholder="••••••"></div></div>
+    <div class="field"><label data-i18n="lbl_passconfirm">Confirmer le mot de passe</label>
+      <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M6 10V7a6 6 0 0 1 12 0v3M5 10h14v10H5z"/></svg><input id="rPass2" type="password" placeholder="••••••"></div></div>
+    <div class="msg" id="resetMsg" style="display:none"></div>
+    <button class="btn btn-primary btn-block" id="resetBtn" onclick="validerReset()"><span data-i18n="reset_ok">Enregistrer</span></button>
   </div>
 </div>
 
@@ -1380,6 +1412,7 @@ const I18N={
   s1t:"Créez un compte",s1d:"Email ou numéro de téléphone, c'est instantané.",s2t:"Passez un ordre",s2d:"Dépôt ou retrait, opérateur, montant et destinataire.",
   s3t:"Confirmez",s3d:"La page de paiement s'ouvre avec votre code.",s4t:"Payez",s4d:"Appelez le code, validation automatique.",
   cta_title:"Prêt à commencer ?",cta_sub:"Ouvrez votre compte en moins d'une minute.",cta_btn:"Ouvrir un compte",
+  lbl_forgot:"Mot de passe oublié ?",oubli_sub:"Indiquez votre adresse email : vous recevrez un lien pour choisir un nouveau mot de passe.",oubli_send:"Envoyer le lien",reset_sub:"Choisissez votre nouveau mot de passe.",reset_ok:"Enregistrer",lbl_email:"Email",
   auth_sub:"Votre espace client",tab_login:"Connexion",tab_register:"Inscription",lbl_name:"Nom",lbl_ident:"Email ou téléphone",lbl_phone:"Téléphone (optionnel)",lbl_pass:"Mot de passe",
   foot_tag:"Dépôt et retrait instantanés, en quelques minutes.",foot_nav:"Navigation",foot_why:"Pourquoi nous",foot_how:"Comment ça marche",foot_prov:"Fournisseurs",foot_ops:"Opérateurs",foot_rights:"MATULMADA — Tous droits réservés.",
   trust_t:"Transactions rapides et sécurisées",trust_s:"Simple, rapide et 100% sécurisé.",
@@ -1405,6 +1438,7 @@ const I18N={
   s1t:"Mamorona kaonty",s1d:"Email na numéro, avy hatrany.",s2t:"Manao ordre",s2d:"Dépôt na retrait, opérateur, montant, mpandray.",
   s3t:"Confirmer",s3d:"Misokatra ny pejy fandoavana misy ny kaody.",s4t:"Mandoa",s4d:"Antsoy ny kaody, validation automatika.",
   cta_title:"Vonona hanomboka?",cta_sub:"Sokafy ny kaontinao latsaky ny iray minitra.",cta_btn:"Hanokatra kaonty",
+  lbl_forgot:"Hadino ny tenimiafina?",oubli_sub:"Ampidiro ny adiresy mailakao : handray rohy ianao hisafidianana tenimiafina vaovao.",oubli_send:"Alefa ny rohy",reset_sub:"Safidio ny tenimiafinao vaovao.",reset_ok:"Tehirizo",lbl_email:"Email",
   auth_sub:"Ny espace client-nao",tab_login:"Hiditra",tab_register:"Hisoratra",lbl_name:"Anarana",lbl_ident:"Email na téléphone",lbl_phone:"Téléphone (tsy voatery)",lbl_pass:"Tenimiafina",
   lbl_prenom:"Fanampin'anarana",lbl_passconfirm:"Hamarino ny tenimiafina",lbl_pickmap:"Hifidy ny toerana marina (sarintany)",lbl_pickmap_title:"Toerana marina",lbl_mylocation:"Ampiasao ny toerako ankehitriny",lbl_confirm_point:"Hamarino ity toerana ity",
   dash_hi:'Manao ahoana, <span id="dashName">client</span>',dash_sub:"Tantano ny kaontinao ary manaova ordre.",
@@ -1574,6 +1608,8 @@ let authMode="login";
 function openAuth(m){authMode=m;switchTab(m);document.getElementById("authModal").classList.add("open");}
 function closeAuth(){document.getElementById("authModal").classList.remove("open");document.getElementById("authMsg").className="msg";}
 function switchTab(m){authMode=m;
+  var fr=document.getElementById("forgotRow");
+  if(fr) fr.style.display = (m==="login") ? "" : "none";
   document.getElementById("tabLogin").classList.toggle("active",m==="login");document.getElementById("tabReg").classList.toggle("active",m==="register");
   document.getElementById("fldPhoto").style.display=m==="register"?"block":"none";
   document.getElementById("fldPrenom").style.display=m==="register"?"block":"none";
@@ -1598,6 +1634,64 @@ function pickAcctType(km){
   if(c){ if(km){ for(var i=0;i<c.options.length;i++){ if(/comor/i.test(c.options[i].value||c.options[i].text)){c.selectedIndex=i;break;} } } }
 }
 function authError(msg){var e=document.getElementById("authMsg");e.textContent=msg;e.className="msg err";}
+/* ===== Mot de passe oublie ==============================================
+   Deux ecrans : on demande l'adresse, le serveur envoie un lien, puis ce lien
+   ramene ici avec ?reset=... pour choisir le nouveau mot de passe.
+   Les fonctions qui attendent le serveur sont declarees async : sans cela le
+   fichier entier cesse d'etre valide et rien ne demarre. */
+function ouvrirOubli(){
+  closeAuth();
+  var m=document.getElementById("oubliModal"); if(m) m.classList.add("open");
+  var e=document.getElementById("oubliMail"); if(e){ e.value=(document.getElementById("aIdent")||{}).value||""; e.focus(); }
+  var g=document.getElementById("oubliMsg"); if(g){ g.style.display="none"; g.className="msg"; }
+}
+function fermerOubli(){
+  var m=document.getElementById("oubliModal"); if(m) m.classList.remove("open");
+}
+async function envoyerOubli(){
+  var mail=((document.getElementById("oubliMail")||{}).value||"").trim();
+  var g=document.getElementById("oubliMsg"), b=document.getElementById("oubliBtn");
+  function dire(t,cls){ if(g){ g.textContent=t; g.className="msg "+cls; g.style.display=""; } }
+  if(!mail || mail.indexOf("@")<0){ dire("Adresse email invalide","err"); return; }
+  if(b) b.disabled=true;
+  try{
+    var r=await fetch(API+"/api/auth/forgot",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:mail})});
+    var d=await r.json();
+    dire((d&&d.message)||"Si un compte existe avec cette adresse, un email vient de partir.","ok");
+  }catch(e){ dire("Serveur injoignable","err"); }
+  if(b) b.disabled=false;
+}
+
+var _resetToken="";
+function ouvrirReset(tok){
+  _resetToken=tok;
+  var m=document.getElementById("resetModal"); if(m) m.classList.add("open");
+  var p1=document.getElementById("rPass"); if(p1) p1.focus();
+}
+async function validerReset(){
+  var p1=((document.getElementById("rPass")||{}).value||"");
+  var p2=((document.getElementById("rPass2")||{}).value||"");
+  var g=document.getElementById("resetMsg"), b=document.getElementById("resetBtn");
+  function dire(t,cls){ if(g){ g.textContent=t; g.className="msg "+cls; g.style.display=""; } }
+  if(p1.length<6){ dire("Mot de passe trop court (6 caractères minimum)","err"); return; }
+  if(p1!==p2){ dire("Les mots de passe ne correspondent pas","err"); return; }
+  if(b) b.disabled=true;
+  try{
+    var r=await fetch(API+"/api/auth/reset",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({token:_resetToken,password:p1,confirmPassword:p2})});
+    var d=await r.json();
+    if(d && d.ok && d.token){
+      token=d.token; localStorage.setItem("mm_token",token); me=d.user;
+      var m=document.getElementById("resetModal"); if(m) m.classList.remove("open");
+      history.replaceState(null,"",location.pathname);
+      updateProfBtn(); enterDash(); loadNotifs();
+      return;
+    }
+    dire((d&&d.error)||"Lien invalide ou expiré","err");
+  }catch(e){ dire("Serveur injoignable","err"); }
+  if(b) b.disabled=false;
+}
+
 async function doAuth(){
   var btn=document.getElementById("authSubmit");
   var ident=document.getElementById("aIdent").value.trim();var pass=document.getElementById("aPass").value;
@@ -2348,6 +2442,10 @@ async function init(){
   hideSplash();
 }
 console.log('%cMATUL MADA build v2.0 — '+new Date().toISOString().slice(0,10),'color:#e9ba43;font-weight:700');
+try{
+  var _t=new URLSearchParams(location.search).get("reset");
+  if(_t) setTimeout(function(){ ouvrirReset(_t); }, 600);
+}catch(e){}
 init();
 </script>
 
