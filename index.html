@@ -758,6 +758,44 @@ body.dash .install-banner.show{bottom:calc(86px + env(safe-area-inset-bottom,0px
 .prof-actions{display:flex;gap:10px;margin-top:6px}
 
 /* — Boutons sociaux flottants (WhatsApp + Telegram) — */
+
+/* ── Suivi de retrait en plein ecran ────────────────────────────────────
+   Un simple message sous le formulaire passait inapercu : un client qui ne
+   voyait pas de confirmation relançait sa demande. */
+.mm-suivi{position:fixed;inset:0;z-index:4000;display:none;align-items:center;justify-content:center;
+  padding:24px;background:rgba(6,10,22,.86);backdrop-filter:blur(5px)}
+.mm-suivi.open{display:flex}
+.mm-carte{position:relative;width:100%;max-width:340px;border-radius:26px;padding:38px 24px 30px;
+  text-align:center;background:var(--card,#fff);
+  box-shadow:0 26px 60px -18px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.5)}
+.mm-x{position:absolute;top:14px;right:14px;width:34px;height:34px;border:0;cursor:pointer;
+  border-radius:50%;display:none;place-items:center;background:rgba(127,127,127,.16);
+  color:var(--ink,#0b1020)}
+.mm-x.on{display:grid}
+.mm-x svg{width:17px;height:17px}
+.mm-rond{width:104px;height:104px;margin:0 auto 20px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(180,83,9,.12)}
+.mm-rond.ok{background:rgba(22,163,74,.14)}
+.mm-rond.ko{background:rgba(220,38,38,.14)}
+.mm-ic{width:64px;height:64px}
+.mm-cercle{fill:none;stroke:#b45309;stroke-width:3;stroke-dasharray:145;stroke-dashoffset:40;
+  transform-origin:center;animation:mmTourne 1.1s linear infinite}
+@keyframes mmTourne{to{transform:rotate(360deg)}}
+.mm-trait{display:none;fill:none;stroke:#16a34a;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:48;stroke-dashoffset:48}
+.mm-rond.ok .mm-cercle,.mm-rond.ko .mm-cercle{animation:none;stroke-dashoffset:0;stroke-dasharray:145}
+.mm-rond.ok .mm-cercle{stroke:#16a34a}
+.mm-rond.ko .mm-cercle{stroke:#dc2626}
+.mm-rond.ok .mm-trait,.mm-rond.ko .mm-trait{display:block;animation:mmTrace .45s .1s ease forwards}
+.mm-rond.ko .mm-trait{stroke:#dc2626}
+@keyframes mmTrace{to{stroke-dashoffset:0}}
+.mm-rond.ok{animation:mmPoc .5s ease}
+@keyframes mmPoc{0%{transform:scale(.7)}55%{transform:scale(1.12)}100%{transform:scale(1)}}
+.mm-titre{font-family:var(--font-d);font-size:19px;font-weight:800;color:var(--ink,#0b1020)}
+.mm-txt{margin-top:8px;font-size:13.5px;line-height:1.5;color:var(--ink-dim,#64748b)}
+.mm-montant{margin-top:14px;font-family:var(--font-d);font-size:26px;font-weight:900;
+  color:#16a34a;display:none}
+.mm-montant.on{display:block}
 .social-fab{position:fixed;right:14px;bottom:calc(94px + env(safe-area-inset-bottom,0px));z-index:60;display:flex;flex-direction:column;gap:11px}
 body:not(.dash) .social-fab{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
 .social-fab a{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;box-shadow:0 8px 22px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.3);transition:.18s;color:#fff}
@@ -1348,6 +1386,20 @@ body.dash .dock{ display:grid; }
   </div></div>
 
 <!-- Boutons sociaux flottants (prototype) -->
+<div class="mm-suivi" id="mmSuivi" aria-hidden="true">
+  <div class="mm-carte">
+    <button class="mm-x" id="mmX" onclick="fermerSuivi()" aria-label="Fermer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <div class="mm-rond" id="mmRond">
+      <svg class="mm-ic" id="mmIc" viewBox="0 0 52 52"><circle class="mm-cercle" cx="26" cy="26" r="23"/><path class="mm-trait" id="mmTrait" d="M14 27l8 8 16-17"/></svg>
+    </div>
+    <div class="mm-titre" id="mmTitre">Traitement en cours</div>
+    <div class="mm-txt" id="mmTxt">Ne fermez pas cette page.</div>
+    <div class="mm-montant" id="mmMontant"></div>
+  </div>
+</div>
+
 <div class="social-fab" id="socialFab">
   <a class="s-wa" href="https://wa.me/261380990983" target="_blank" rel="noopener" title="WhatsApp" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-1.207zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.148-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.612-.916-2.207-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg></a>
   <a class="s-tg" href="https://t.me/Matulmajunga" target="_blank" rel="noopener" title="Telegram" aria-label="Telegram"><svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></a>
@@ -2810,6 +2862,7 @@ async function mmStartOAuth(){
   function mmSuivreRetrait(id, m, btn){
     if(btn) btn.disabled = true;
     mmVerrouOrdre(true);
+    try{ ouvrirSuivi(); }catch(e){}
     if(!id){ if(m){m.style.color="#16804a";m.textContent="Retrait confirmé — traitement en cours.";} return; }
     var t0 = Date.now(), timer = null;
     function tick(){
@@ -2831,6 +2884,7 @@ async function mmStartOAuth(){
               m.style.color = "#b45309";
               m.textContent = "⏳ Confirmation Deriv en cours… (ne fermez pas)";
             }
+            try{ majSuivi(d.etape, d.montant, d.devise, d.message); }catch(e4){}
           }
           if(d.done){
             if(timer) clearInterval(timer);
@@ -3137,6 +3191,48 @@ function majBandeauSecurite(){
   el.textContent = jr!==null
     ? 'Compte d\u00e9sactiv\u00e9 — suppression dans '+jr+' jour(s). Toucher pour r\u00e9activer.'
     : 'Compte d\u00e9sactiv\u00e9 — toucher pour r\u00e9activer.';
+}
+
+
+/* Ecran de suivi : etats pending, envoi, succes, echec. */
+function ouvrirSuivi(){
+  var e = document.getElementById('mmSuivi');
+  if(!e) return;
+  e.classList.add('open'); e.setAttribute('aria-hidden','false');
+  document.body.style.overflow = 'hidden';
+  majSuivi('attente');
+}
+function fermerSuivi(){
+  var e = document.getElementById('mmSuivi');
+  if(!e) return;
+  e.classList.remove('open'); e.setAttribute('aria-hidden','true');
+  document.body.style.overflow = '';
+}
+function majSuivi(etape, montant, devise, message){
+  var rond = document.getElementById('mmRond'), titre = document.getElementById('mmTitre');
+  var txt = document.getElementById('mmTxt'), mnt = document.getElementById('mmMontant');
+  var x = document.getElementById('mmX');
+  if(!rond) return;
+  rond.className = 'mm-rond'; mnt.className = 'mm-montant'; x.className = 'mm-x';
+  if(etape === 'succes'){
+    rond.classList.add('ok');
+    titre.textContent = 'Retrait envoye';
+    txt.textContent = 'Le Mobile Money est parti vers votre numero.';
+    if(montant){ mnt.textContent = Number(montant).toLocaleString('fr-FR') + ' ' + (devise||'Ar');
+                 mnt.classList.add('on'); }
+    x.classList.add('on');
+  } else if(etape === 'echec'){
+    rond.classList.add('ko');
+    titre.textContent = 'Retrait non abouti';
+    txt.textContent = message || "L'envoi n'a pas pu etre effectue. Contactez l'equipe avec la reference de l'ordre.";
+    x.classList.add('on');
+  } else if(etape === 'envoi'){
+    titre.textContent = 'Envoi en cours';
+    txt.textContent = 'Le Mobile Money part vers votre numero. Ne fermez pas cette page.';
+  } else {
+    titre.textContent = 'Traitement en cours';
+    txt.textContent = 'Votre demande est en cours de verification. Ne fermez pas cette page.';
+  }
 }
 
 </script>
