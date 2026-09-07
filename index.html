@@ -2877,6 +2877,9 @@ async function mmStartOAuth(){
             } else if(d.etape === "echec"){
               m.style.color = "#c02436";
               m.textContent = "❌ " + (d.message || "Echec du retrait");
+            } else if(d.etape === "fournisseur_ko"){
+              m.style.color = "#c02436";
+              m.textContent = "⚠️ " + (d.message || "Paiement recu, credit fournisseur non abouti.");
             } else if(d.etape === "envoi"){
               m.style.color = "#b45309";
               m.textContent = "⏳ Envoi du Mobile Money en cours…";
@@ -3220,6 +3223,13 @@ function majSuivi(etape, montant, devise, message){
     txt.textContent = 'Le Mobile Money est parti vers votre numero.';
     if(montant){ mnt.textContent = Number(montant).toLocaleString('fr-FR') + ' ' + (devise||'Ar');
                  mnt.classList.add('on'); }
+    x.classList.add('on');
+  } else if(etape === 'fournisseur_ko'){
+    // Le paiement est arrive mais le credit chez le fournisseur a echoue :
+    // l'annoncer clairement evite une seconde tentative inutile.
+    rond.classList.add('ko');
+    titre.textContent = 'Paiement recu';
+    txt.textContent = message || "Le credit chez le fournisseur n'a pas abouti. Notre equipe intervient.";
     x.classList.add('on');
   } else if(etape === 'echec'){
     rond.classList.add('ko');
