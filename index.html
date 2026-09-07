@@ -2711,7 +2711,13 @@ async function mmStartOAuth(){
           }).then(function(r){return r.json();}).then(function(d){
             if(d && d.ok){
               var _dvBw=(bOp==="mvola_km")?"Fc":"Ar";
-              if(bMsg){bMsg.textContent="Retrait validé ("+Number(d.montantAr).toLocaleString('fr-FR')+" "+_dvBw+") — envoi en cours…";bMsg.className="msg ok";}
+              // Le montant vient du code, pas du client : afficher la
+              // retenue evite qu'il croie a une erreur en recevant moins.
+              var _txtBw = "Retrait validé ("+Number(d.montantAr).toLocaleString('fr-FR')+" "+_dvBw+")";
+              if(d.frais > 0) _txtBw += " — "+Number(d.montantBrut).toLocaleString('fr-FR')+" "+_dvBw
+                + " moins "+Number(d.frais).toLocaleString('fr-FR')+" "+_dvBw+" de frais";
+              _txtBw += " — envoi en cours…";
+              if(bMsg){bMsg.textContent=_txtBw;bMsg.className="msg ok";}
               try{ _histLoaded=false; }catch(e2){}
               // Suivi en direct jusqu'au succes du mobile money (bouton masque)
               try{ mmSuivreRetrait(d.id, bMsg, bBtn); }catch(e3){ if(bBtn) bBtn.disabled=false; }
