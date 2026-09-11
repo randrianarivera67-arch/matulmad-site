@@ -1692,6 +1692,52 @@ async function validerReset(){
   if(b) b.disabled=false;
 }
 
+/* ===== Notifications Firebase =========================================
+   Le client est prevenu quand son ordre aboutit ou echoue, et quand une
+   annonce parait — meme site ferme. La permission n'est demandee qu'apres
+   connexion : un navigateur qui la reclame au premier chargement se fait
+   refuser, et la demande n'est plus jamais reproposee. */
+var FB_VAPID = "BD291DHPNQGZBz4l3Z3KS0g9PCdtAFwNM8e4-Idk986dqeveWoc0isphvDvTDDyqkBWdB8TgVv-BRdtD7ForsLU";
+var FB_CONFIG = {
+  apiKey: "AIzaSyDVn7qsXMRYN-0jY3-oGpV8g-E3hDg-sVc",
+  authDomain: "matulmada-3be39.firebaseapp.com",
+  projectId: "matulmada-3be39",
+  storageBucket: "matulmada-3be39.firebasestorage.app",
+  messagingSenderId: "297315413732",
+  appId: "1:297315413732:web:1255e736d67ee0a56a06f1"
+};
+
+function chargerScript(src){
+  return new Promise(function(ok, ko){
+    if(document.querySelector('script[src="'+src+'"]')) return ok();
+    var el=document.createElement("script");
+    el.src=src; el.onload=ok; el.onerror=ko;
+    document.head.appendChild(el);
+  });
+}
+
+async function activerNotifs(){
+  try{
+    if(!("Notification" in window) || !("serviceWorker" in navigator)) return;
+    if(Notification.permission === "denied") return;   // refus deja exprime
+    if(Notification.permission === "default"){
+      var rep = await Notification.requestPermission();
+      if(rep !== "granted") return;
+    }
+    await chargerScript("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js");
+    await chargerScript("https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js");
+    if(!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
+    var reg = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+    var jeton = await firebase.messaging().getToken({ vapidKey: FB_VAPID, serviceWorkerRegistration: reg });
+    if(!jeton) return;
+    // Le jeton change (reinstallation, nettoyage du navigateur) : on ne
+    // renvoie au serveur que s'il differe du dernier enregistre.
+    if(localStorage.getItem("mm_fcm") === jeton) return;
+    var d = await api("/api/auth/push", { method:"POST", body: JSON.stringify({ token: jeton }) });
+    if(d && d.ok) localStorage.setItem("mm_fcm", jeton);
+  }catch(e){ /* notification indisponible : le site fonctionne sans */ }
+}
+
 async function doAuth(){
   var btn=document.getElementById("authSubmit");
   var ident=document.getElementById("aIdent").value.trim();var pass=document.getElementById("aPass").value;
@@ -1775,7 +1821,8 @@ async function enterDash(){go("dashboard");setDashName();
   // options, puis remplit les listes numero et compte a partir des
   // enregistrements du client.
   autofillOrder();
-  renderWallets();renderProviders();showPage("depot");loadRates();}
+  renderWallets();renderProviders();showPage("depot");loadRates();
+  setTimeout(activerNotifs, 2500);}
 function populateProviderSelect(){var sel=document.getElementById("fProvider");if(!sel)return;
   var opts='<option value="">—</option>';var seen={};
   if(me&&me.providers)for(var i=0;i<me.providers.length;i++){var nm=me.providers[i].name||"Deriv";
