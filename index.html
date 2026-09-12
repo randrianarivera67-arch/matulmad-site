@@ -290,6 +290,19 @@ footer{background:linear-gradient(180deg,transparent,var(--blue-soft));padding-b
    panneau sans perdre le contraste du texte. En sombre, la variable prend une
    valeur foncee et la regle reste lisible. */
 .card-or .inp{background:linear-gradient(160deg,#fffdf4,var(--gold-soft) 120%)}
+/* Fournisseur d'abord, puis numero, montant en dernier. */
+.card-or .seg{order:0}
+.card-or .field:has(#opPick){order:1}
+#rowFournisseur{order:2}
+#rowMontant{order:3}
+/* Dans la rangee montant+numero, le numero passe devant. */
+#rowMontant{display:flex;gap:14px}
+#rowMontant > .field:first-child{order:2}
+#rowMontant > .field:last-child{order:1}
+#bwCodeRow{order:4}
+#emailRetraitRow{order:5}
+.card-or > .msg,.card-or > #btnOrder,.card-or > button{order:9}
+.card-or{display:flex;flex-direction:column}
 html[data-theme="dark"] .card-or .inp{background:linear-gradient(160deg,rgba(58,34,48,.55),rgba(32,48,80,.75))}
 
 .card-or.mode-retrait{border-color:rgba(26,39,68,.35)!important;
@@ -1150,7 +1163,7 @@ body.dash .dock{ display:grid; }
       <div class="field"><label data-i18n="lbl_op">Opérateur</label>
         <div class="op-pick" id="opPick"></div>
       </div>
-      <div class="row2">
+      <div class="row2" id="rowMontant">
         <div class="field"><label id="lblMontant" data-i18n="lbl_amount">Montant (Ar)</label>
           <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M6 8h12M6 12h12M9 4l-2 16M17 4l-2 16"/></svg><input id="fMontant" type="text" inputmode="decimal" placeholder="50000" oninput="convAr()"></div>
           <div id="arBox" style="display:none;margin-top:7px"><div class="amt-cur" style="margin-bottom:4px">&#8776; <span data-i18n="in_ariary">EN ARIARY</span></div><div class="inp" style="opacity:.9"><svg class="ic" viewBox="0 0 24 24"><path d="M6 8h12M6 12h12M9 4l-2 16M17 4l-2 16"/></svg><input id="fMontantAr" type="text" readonly placeholder="0 Ar" style="font-weight:800"></div></div>
@@ -1160,7 +1173,7 @@ body.dash .dock{ display:grid; }
           <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 5 5L16 13l5 2v3a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/></svg><select id="fNumero"></select></div>
         </div>
       </div>
-      <div class="row2">
+      <div class="row2" id="rowFournisseur">
         <div class="field"><label data-i18n="lbl_prov">Fournisseur</label>
           <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M3 7h18v12H3zM3 7l3-4h12l3 4M9 12h6"/></svg><select id="fProvider" onchange="onProviderChange()"><option value="">—</option></select></div>
         </div>
