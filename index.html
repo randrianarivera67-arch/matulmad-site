@@ -379,7 +379,21 @@ html[data-theme="dark"] .card-or .inp{background:linear-gradient(160deg,rgba(58,
    s'affichent que pour Deriv et 1WIN, seuls a fonctionner avec un cours ;
    pour Betwinner et 1XBET les boutons restent, sans chiffre. */
 .hero-rate{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;margin-bottom:18px}
-.hero-rate .rp-foot{grid-column:1/-1;font-size:11.5px;color:var(--ink-dim);line-height:1.5;margin-top:2px}
+.hero-rate 
+/* Apercu du cours affilie : une respiration toutes les dix secondes, assez
+   breve pour ne pas gener la lecture du cours en vigueur. */
+@keyframes flashAff{
+  0%,100%{opacity:0;transform:translateY(6px) scale(.96)}
+  8%,72%{opacity:1;transform:none}
+}
+.rp-aff{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;border-radius:inherit;
+  background:linear-gradient(135deg,rgba(124,58,237,.96),rgba(79,70,229,.96));
+  color:#fff;opacity:0;pointer-events:none;text-align:center;padding:8px}
+.rp-aff.on{animation:flashAff 3s ease}
+.rp-aff b{font-family:var(--font-d,inherit);font-size:26px;font-weight:900;line-height:1}
+.rp-aff small{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.9}
+.rp-foot{grid-column:1/-1;font-size:11.5px;color:var(--ink-dim);line-height:1.5;margin-top:2px}
 
 .hr-circle{width:132px;height:132px;border-radius:50%;flex:none;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
@@ -1921,8 +1935,16 @@ function paintRatePanel(){
   var dep=document.getElementById("rateDep"),ret=document.getElementById("rateRet");
   var dv=devise();  // "Ar" (Madagascar) na "Fc" (Comores)
   // Compte Comores -> cours Fc (rate_depot_km/rate_retrait_km) ; sinon Ar
-  var rDep = kmMode ? _rates.rate_depot_km : _rates.rate_depot;
-  var rRet = kmMode ? _rates.rate_retrait_km : _rates.rate_retrait;
+  // Un affilie voit directement SON cours : afficher le cours public puis le
+  // corriger a la commande sèmerait le doute sur le montant annonce.
+  var aff = !!(typeof me !== 'undefined' && me && me.affilie);
+  var suf = aff ? '_aff' : '';
+  var cle = function(base){
+    var v = Number(_rates[base + suf]) || 0;
+    return v > 0 ? v : (Number(_rates[base]) || 0);
+  };
+  var rDep = kmMode ? cle('rate_depot_km') : cle('rate_depot');
+  var rRet = kmMode ? cle('rate_retrait_km') : cle('rate_retrait');
   if(dep)dep.textContent=rDep?(Number(rDep).toLocaleString('fr-FR')+" "+dv):("— "+dv);
   if(ret)ret.textContent=rRet?(Number(rRet).toLocaleString('fr-FR')+" "+dv):("— "+dv);
   // Footer: adapte la devise
@@ -1937,9 +1959,12 @@ function convAr(){
   var usd=parseM((document.getElementById("fMontant")||{}).value);
   var dv=devise();  // "Ar" (Madagascar) na "Fc" (Comores)
   if(isDeriv()){
+    // Meme regle qu'au panneau : le cours affilie prime quand il est defini.
+    var _aff=!!(typeof me!=="undefined" && me && me.affilie), _sf=_aff?"_aff":"";
+    var _c=function(b){var v=Number(_rates[b+_sf])||0;return v>0?v:(Number(_rates[b])||0);};
     var rate=kmMode
-      ? ((orderType==="depot")?_rates.rate_depot_km:_rates.rate_retrait_km)
-      : ((orderType==="depot")?_rates.rate_depot:_rates.rate_retrait);
+      ? ((orderType==="depot")?_c("rate_depot_km"):_c("rate_retrait_km"))
+      : ((orderType==="depot")?_c("rate_depot"):_c("rate_retrait"));
     rate=Number(rate)||0;
     var ar=Math.round(usd*rate);
     if(box)box.style.display="block";
@@ -3310,6 +3335,47 @@ function majSuivi(etape, montant, devise, message){
     txt.textContent = 'Votre demande est en cours de verification. Ne fermez pas cette page.';
   }
 }
+
+
+/* Le cours affilie passe en surimpression toutes les dix secondes : le client
+   ordinaire voit ce qu'il gagnerait, sans que le cours en vigueur disparaisse
+   plus de trois secondes. Un affilie, lui, l'a deja — rien ne clignote. */
+(function(){
+  var minuteur = null;
+
+  function cible(){
+    var e = document.getElementById('rateDep');
+    return e ? e.parentNode : null;
+  }
+
+  function montrer(){
+    var aff = !!(typeof me !== 'undefined' && me && me.affilie);
+    var rAff = Number(_rates && _rates.rate_depot_aff) || 0;
+    if(aff || !rAff) return;                 // rien a proposer
+    var p = cible();
+    if(!p) return;
+    if(getComputedStyle(p).position === 'static') p.style.position = 'relative';
+    var v = p.querySelector('.rp-aff');
+    if(!v){
+      v = document.createElement('div');
+      v.className = 'rp-aff';
+      p.appendChild(v);
+    }
+    v.innerHTML = '<small>Cours affili\u00e9</small><b>'
+      + Number(rAff).toLocaleString('fr-FR') + ' Ar</b>';
+    v.classList.remove('on');
+    void v.offsetWidth;                      // relance l'animation
+    v.classList.add('on');
+  }
+
+  function demarrer(){
+    if(minuteur) return;
+    minuteur = setInterval(montrer, 10000);
+  }
+  if(document.readyState === 'loading')
+    document.addEventListener('DOMContentLoaded', demarrer);
+  else demarrer();
+})();
 
 </script>
 </body>
