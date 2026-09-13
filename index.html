@@ -925,6 +925,55 @@ html.lite .lift:hover{transform:none!important}
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+/* Bandeau d'accueil : les messages se relaient a la place d'un texte fixe.
+   Le survol d'un seul element evite d'empiler des noeuds a chaque rotation. */
+.bandeau{position:relative;height:34px;margin-top:10px;overflow:hidden}
+.bd-item{position:absolute;left:0;top:0;overflow:hidden;display:flex;align-items:center;gap:8px;
+  height:34px;padding:0 14px;border-radius:17px;white-space:nowrap;
+  font-family:var(--font-d,inherit);font-size:12.5px;font-weight:800;
+  letter-spacing:.02em;color:#fff;
+  background:linear-gradient(120deg,rgba(124,58,237,.95),rgba(37,99,235,.95));
+  box-shadow:0 6px 18px -8px rgba(37,99,235,.7);
+  opacity:0;transform:translateY(10px)}
+.bd-item.on{animation:bdCycle 4s cubic-bezier(.22,.9,.3,1)}
+.bd-item .pt{width:7px;height:7px;border-radius:50%;background:#fff;opacity:.85;
+  flex-shrink:0;box-shadow:0 0 8px rgba(255,255,255,.9)}
+.bd-item b{font-size:14.5px;font-weight:900;letter-spacing:.01em}
+@keyframes bdCycle{
+  0%{opacity:0;transform:translateY(12px) scale(.94)}
+  9%{opacity:1;transform:translateY(-2px) scale(1.04)}
+  14%{transform:translateY(0) scale(1)}
+  80%{opacity:1;transform:none}
+  100%{opacity:0;transform:translateY(-12px) scale(.97)}
+}
+
+/* Reflet qui balaie la pastille : c'est lui qui donne l'impression de relief,
+   plutot qu'un simple fondu. */
+.bd-item::after{content:'';position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.42) 50%,transparent 65%);
+  transform:translateX(-120%);pointer-events:none}
+.bd-item.on::after{animation:bdReflet 4s ease-in-out}
+@keyframes bdReflet{
+  0%,18%{transform:translateX(-120%)}
+  46%{transform:translateX(120%)}
+  100%{transform:translateX(120%)}
+}
+
+/* Respiration lente de l'ombre : le bandeau reste vivant entre deux messages. */
+.bd-item.on{box-shadow:0 6px 18px -8px rgba(37,99,235,.7)}
+.bd-item .pt{animation:bdPouls 1.6s ease-in-out infinite}
+@keyframes bdPouls{
+  0%,100%{transform:scale(1);opacity:.85}
+  50%{transform:scale(1.35);opacity:1}
+}
+
+/* Le chiffre mis en avant arrive juste apres le texte, l'oeil le suit. */
+.bd-item b{display:inline-block;animation:bdChiffre 4s ease-out}
+@keyframes bdChiffre{
+  0%,12%{opacity:0;transform:translateY(6px)}
+  22%{opacity:1;transform:none}
+}
 </style>
 
 <style id="nav-robuste">
@@ -1107,6 +1156,7 @@ body.dash .dock{ display:grid; }
     <div class="hello-txt">
       <div class="welcome" data-i18n="dash_hi">Bonjour, <span id="dashName">client</span></div>
       <div class="dash-sub" id="pageSub" data-i18n="dash_sub">Gérez vos comptes et passez vos ordres.</div>
+      <div class="bandeau" id="bandeau" aria-live="polite"><span class="bd-item" id="bdItem"></span></div>
     </div>
     <!-- Illustration dessinee en SVG plutot qu'en image : nette a toute taille,
          suit les couleurs du theme et ne coute aucun telechargement. -->
@@ -3337,42 +3387,51 @@ function majSuivi(etape, montant, devise, message){
 }
 
 
-/* Le cours affilie passe en surimpression toutes les dix secondes : le client
-   ordinaire voit ce qu'il gagnerait, sans que le cours en vigueur disparaisse
-   plus de trois secondes. Un affilie, lui, l'a deja — rien ne clignote. */
-(function(){
-  var minuteur = null;
 
-  function cible(){
-    var e = document.getElementById('rateDep');
-    // Le parent direct est un petit span : la surimpression doit couvrir tout
-    // le bouton, sinon elle passe inapercue.
-    return e ? (e.closest('.hr-btn') || e.parentNode) : null;
+
+
+/* Bandeau d'accueil : messages qui se relaient toutes les quatre secondes.
+   Le cours affilie n'y figure que pour ceux qui n'en beneficient pas encore —
+   pour un affilie, ce serait une redite. */
+(function(){
+  var idx = 0, minuteur = null;
+
+  function messages(){
+    var l = [];
+    var aff = !!(typeof me !== 'undefined' && me && me.affilie);
+    var rAff = Number((typeof _rates !== 'undefined' && _rates) ? _rates.rate_depot_aff : 0) || 0;
+    var rDep = Number((typeof _rates !== 'undefined' && _rates) ? _rates.rate_depot : 0) || 0;
+
+    if(!aff && rAff > 0 && rAff !== rDep)
+      l.push('Cours affili\u00e9 <b>' + rAff.toLocaleString('fr-FR') + ' Ar</b> \u2014 demandez-le');
+    if(aff && rAff > 0)
+      l.push('Votre cours affili\u00e9 : <b>' + rAff.toLocaleString('fr-FR') + ' Ar</b>');
+    if(rDep > 0)
+      l.push('D\u00e9p\u00f4t Deriv <b>' + rDep.toLocaleString('fr-FR') + ' Ar</b> / USD');
+    l.push('D\u00e9p\u00f4t et retrait en <b>2 minutes</b>');
+    l.push('Deriv \u00b7 1XBET \u00b7 Betwinner \u00b7 1WIN');
+    l.push('Service ouvert <b>24h/24</b>');
+    return l;
   }
 
-  function montrer(){
-    var aff = !!(typeof me !== 'undefined' && me && me.affilie);
-    var rAff = Number(_rates && _rates.rate_depot_aff) || 0;
-    if(aff || !rAff) return;                 // rien a proposer
-    var p = cible();
-    if(!p) return;
-    if(getComputedStyle(p).position === 'static') p.style.position = 'relative';
-    var v = p.querySelector('.rp-aff');
-    if(!v){
-      v = document.createElement('div');
-      v.className = 'rp-aff';
-      p.appendChild(v);
-    }
-    v.innerHTML = '<small>Cours affili\u00e9</small><b>'
-      + Number(rAff).toLocaleString('fr-FR') + ' Ar</b>';
-    v.classList.remove('on');
-    void v.offsetWidth;                      // relance l'animation
-    v.classList.add('on');
+  function tour(){
+    var box = document.getElementById('bandeau');
+    var el  = document.getElementById('bdItem');
+    if(!box || !el) return;
+    var l = messages();
+    if(!l.length){ box.style.display = 'none'; return; }
+    box.style.display = '';
+    el.innerHTML = '<span class="pt"></span>' + l[idx % l.length];
+    idx++;
+    el.classList.remove('on');
+    void el.offsetWidth;              // relance l'animation
+    el.classList.add('on');
   }
 
   function demarrer(){
     if(minuteur) return;
-    minuteur = setInterval(montrer, 10000);
+    tour();
+    minuteur = setInterval(tour, 4000);
   }
   if(document.readyState === 'loading')
     document.addEventListener('DOMContentLoaded', demarrer);
