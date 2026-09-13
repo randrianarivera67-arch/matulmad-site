@@ -3345,7 +3345,9 @@ function majSuivi(etape, montant, devise, message){
 
   function cible(){
     var e = document.getElementById('rateDep');
-    return e ? e.parentNode : null;
+    // Le parent direct est un petit span : la surimpression doit couvrir tout
+    // le bouton, sinon elle passe inapercue.
+    return e ? (e.closest('.hr-btn') || e.parentNode) : null;
   }
 
   function montrer(){
