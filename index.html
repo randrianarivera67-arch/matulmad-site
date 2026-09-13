@@ -3402,10 +3402,27 @@ function majSuivi(etape, montant, devise, message){
     var rAff = Number((typeof _rates !== 'undefined' && _rates) ? _rates.rate_depot_aff : 0) || 0;
     var rDep = Number((typeof _rates !== 'undefined' && _rates) ? _rates.rate_depot : 0) || 0;
 
-    if(!aff && rAff > 0 && rAff !== rDep)
-      l.push('Cours affili\u00e9 <b>' + rAff.toLocaleString('fr-FR') + ' Ar</b> \u2014 demandez-le');
-    if(aff && rAff > 0)
-      l.push('Votre cours affili\u00e9 : <b>' + rAff.toLocaleString('fr-FR') + ' Ar</b>');
+    var rRetAff = Number((typeof _rates !== 'undefined' && _rates) ? _rates.rate_retrait_aff : 0) || 0;
+    var rRet = Number((typeof _rates !== 'undefined' && _rates) ? _rates.rate_retrait : 0) || 0;
+
+    if(!aff){
+      // Les deux cours cote a cote : c'est le couple qui fait l'interet, un
+      // seul chiffre ne dit pas ce que le client gagne vraiment.
+      if(rAff > 0 && rRetAff > 0)
+        l.push('Devenir affili\u00e9 Deriv \u2014 d\u00e9p\u00f4t <b>'
+          + rAff.toLocaleString('fr-FR') + ' Ar</b> \u00b7 retrait <b>'
+          + rRetAff.toLocaleString('fr-FR') + ' Ar</b>');
+      else if(rAff > 0 && rAff !== rDep)
+        l.push('Devenir affili\u00e9 Deriv \u2014 d\u00e9p\u00f4t <b>'
+          + rAff.toLocaleString('fr-FR') + ' Ar</b>');
+      else if(rRetAff > 0 && rRetAff !== rRet)
+        l.push('Devenir affili\u00e9 Deriv \u2014 retrait <b>'
+          + rRetAff.toLocaleString('fr-FR') + ' Ar</b>');
+    } else if(rAff > 0 || rRetAff > 0){
+      l.push('Cours affili\u00e9 actif \u2014 d\u00e9p\u00f4t <b>'
+        + (rAff || rDep).toLocaleString('fr-FR') + ' Ar</b> \u00b7 retrait <b>'
+        + (rRetAff || rRet).toLocaleString('fr-FR') + ' Ar</b>');
+    }
     if(rDep > 0)
       l.push('D\u00e9p\u00f4t Deriv <b>' + rDep.toLocaleString('fr-FR') + ' Ar</b> / USD');
     l.push('D\u00e9p\u00f4t et retrait en <b>2 minutes</b>');
