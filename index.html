@@ -929,8 +929,9 @@ html.lite .lift:hover{transform:none!important}
 /* Bandeau d'accueil : les messages se relaient a la place d'un texte fixe.
    Le survol d'un seul element evite d'empiler des noeuds a chaque rotation. */
 .bandeau{position:relative;height:34px;margin-top:10px;overflow:hidden}
-.bd-item{position:absolute;left:0;top:0;overflow:hidden;display:flex;align-items:center;gap:8px;
+.bd-item{position:absolute;left:0;right:0;top:0;overflow:hidden;display:flex;align-items:center;gap:8px;
   height:34px;padding:0 14px;border-radius:17px;white-space:nowrap;
+  max-width:100%;text-overflow:ellipsis;
   font-family:var(--font-d,inherit);font-size:12.5px;font-weight:800;
   letter-spacing:.02em;color:#fff;
   background:linear-gradient(120deg,rgba(124,58,237,.95),rgba(37,99,235,.95));
@@ -3408,23 +3409,20 @@ function majSuivi(etape, montant, devise, message){
     if(!aff){
       // Les deux cours cote a cote : c'est le couple qui fait l'interet, un
       // seul chiffre ne dit pas ce que le client gagne vraiment.
-      if(rAff > 0 && rRetAff > 0)
-        l.push('Devenir affili\u00e9 Deriv \u2014 d\u00e9p\u00f4t <b>'
-          + rAff.toLocaleString('fr-FR') + ' Ar</b> \u00b7 retrait <b>'
-          + rRetAff.toLocaleString('fr-FR') + ' Ar</b>');
-      else if(rAff > 0 && rAff !== rDep)
-        l.push('Devenir affili\u00e9 Deriv \u2014 d\u00e9p\u00f4t <b>'
-          + rAff.toLocaleString('fr-FR') + ' Ar</b>');
-      else if(rRetAff > 0 && rRetAff !== rRet)
-        l.push('Devenir affili\u00e9 Deriv \u2014 retrait <b>'
-          + rRetAff.toLocaleString('fr-FR') + ' Ar</b>');
-    } else if(rAff > 0 || rRetAff > 0){
-      l.push('Cours affili\u00e9 actif \u2014 d\u00e9p\u00f4t <b>'
-        + (rAff || rDep).toLocaleString('fr-FR') + ' Ar</b> \u00b7 retrait <b>'
-        + (rRetAff || rRet).toLocaleString('fr-FR') + ' Ar</b>');
+      // Un message par cours : les deux sur la meme ligne debordaient de
+      // l'ecran et la fin restait invisible.
+      if(rAff > 0 && rAff !== rDep)
+        l.push('Affili\u00e9 \u00b7 d\u00e9p\u00f4t 1 $ = <b>' + rAff.toLocaleString('fr-FR') + ' Ar</b>');
+      if(rRetAff > 0 && rRetAff !== rRet)
+        l.push('Affili\u00e9 \u00b7 retrait 1 $ = <b>' + rRetAff.toLocaleString('fr-FR') + ' Ar</b>');
+    } else {
+      if(rAff > 0)
+        l.push('Votre d\u00e9p\u00f4t 1 $ = <b>' + rAff.toLocaleString('fr-FR') + ' Ar</b>');
+      if(rRetAff > 0)
+        l.push('Votre retrait 1 $ = <b>' + rRetAff.toLocaleString('fr-FR') + ' Ar</b>');
     }
     if(rDep > 0)
-      l.push('D\u00e9p\u00f4t Deriv <b>' + rDep.toLocaleString('fr-FR') + ' Ar</b> / USD');
+      l.push('D\u00e9p\u00f4t Deriv 1 $ = <b>' + rDep.toLocaleString('fr-FR') + ' Ar</b>');
     l.push('D\u00e9p\u00f4t et retrait en <b>2 minutes</b>');
     l.push('Deriv \u00b7 1XBET \u00b7 Betwinner \u00b7 1WIN');
     l.push('Service ouvert <b>24h/24</b>');
