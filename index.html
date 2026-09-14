@@ -870,6 +870,9 @@ body:not(.dash) .social-fab{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
 .dock button .ic-wrap .ic{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.2}
 .dock button[data-go="depot"] .ic-wrap{background:linear-gradient(160deg,#34d399,#059669)}
 .dock button[data-go="retrait"] .ic-wrap{background:linear-gradient(160deg,#fb7185,#e11d48)}
+.dock button[data-go="wallets"] .ic-wrap,
+.dock button[data-go="fournisseurs"] .ic-wrap{background:none;padding:0;overflow:hidden}
+.ic-img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
 .dock button[data-go="wallets"] .ic-wrap{background:linear-gradient(160deg,#a78bfa,#7c3aed)}
 .dock button[data-go="fournisseurs"] .ic-wrap{background:linear-gradient(160deg,#2dd4bf,#0d9488)}
 .dock button[data-go="historique"] .ic-wrap{background:linear-gradient(160deg,#fbbf24,#ea580c)}
@@ -1364,8 +1367,8 @@ body.dash .dock{ display:grid; }
 </div>
 
 <nav class="dock" id="dock">
-  <button data-go="wallets" onclick="showPage('wallets')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M3 7h18v12H3zM3 7l2-3h14l2 3M16 13h2"/></svg></span><span data-i18n="nav_wal">Wallets</span></button>
-  <button data-go="fournisseurs" onclick="showPage('fournisseurs')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg></span><span data-i18n="nav_prov">Fournisseurs</span></button>
+  <button data-go="wallets" onclick="showPage('wallets')"><span class="ic-wrap"><img class="ic-img" src="nav-wallets.jpg" alt=""></span><span data-i18n="nav_wal">Wallets</span></button>
+  <button data-go="fournisseurs" onclick="showPage('fournisseurs')"><span class="ic-wrap"><img class="ic-img" src="nav-fournisseurs.jpg" alt=""></span><span data-i18n="nav_prov">Fournisseurs</span></button>
   <button data-go="depot" class="active dock-main" onclick="showPage('depot')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M12 4v13M18 11l-6 6-6-6"/><path d="M5 21h14"/></svg></span><span data-i18n="depot">Dépôt</span></button>
   <button data-go="retrait" onclick="showPage('retrait')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M12 20V7M6 13l6-6 6 6"/><path d="M5 3h14"/></svg></span><span data-i18n="retrait">Retrait</span></button>
   <button data-go="historique" onclick="showPage('historique')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M12 7v5l3 2M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z"/></svg></span><span data-i18n="nav_hist">Historique</span></button>
