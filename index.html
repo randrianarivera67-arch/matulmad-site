@@ -158,7 +158,9 @@ header.nav{position:sticky;top:0;z-index:50;background:transparent;border-bottom
 .hero h1{font-family:var(--font-d);font-weight:700;font-size:clamp(38px,8vw,70px);line-height:1.03;letter-spacing:-.01em;margin-bottom:16px}
 .hero h1 .grad{background:linear-gradient(110deg,var(--gold-2),var(--gold-1));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .hero p.lead{font-size:clamp(16px,2.4vw,20px);color:var(--ink-2);max-width:560px;margin-bottom:28px}
-.hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;
+  max-width:430px;margin:0 auto}
+@media (max-width:520px){.hero-cta{max-width:300px}}
 .hero-stats{display:flex;gap:30px;margin-top:38px;flex-wrap:wrap}
 .stat .n{font-family:var(--font-d);font-weight:700;font-size:32px;color:var(--ink)}
 .stat .l{font-size:13px;color:var(--ink-dim);letter-spacing:.04em}
@@ -1241,7 +1243,7 @@ body.dash .dock{ display:grid; }
       <p class="lead" data-i18n="hero_lead">Dépôt et retrait instantanés via Yas, Orange Money et Airtel Money. Créez votre compte, passez un ordre, payez. C'est tout.</p>
       <!-- Le logo complet juste avant l'appel a l'action : c'est lui que les
            anciens clients reconnaissent, il doit etre vu avant le bouton. -->
-      <video class="hero-logo" src="logo-hero.mp4" poster="logo-hero.jpg"
+      <video class="hero-logo" src="logo-hero.mp4"
              autoplay muted loop playsinline preload="metadata"
              aria-label="MatulMada — Exchange Madagascar"></video>
       <div class="hero-cta">
