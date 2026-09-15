@@ -28,7 +28,7 @@
 })();
 </script>
 <title>MATULMADA</title>
-<meta name="description" content="MATUL MADA — Dépôt et retrait mobile money instantanés. Yas, Orange Money, Airtel Money.">
+<meta name="description" content="MATUL MADA — Dépôt et retrait mobile money instantanés. MVola, Orange Money, Airtel Money.">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/logo.png">
 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
@@ -1242,7 +1242,7 @@ body.dash .dock{ display:grid; }
   <div class="wrap">
     <section class="hero">
             <h1 data-i18n="hero_title">Dépôt et retrait <span class="grad">instantanés</span></h1>
-      <p class="lead" data-i18n="hero_lead">Dépôt et retrait instantanés via Yas, Orange Money et Airtel Money. Créez votre compte, passez un ordre, payez. C'est tout.</p>
+      <p class="lead" data-i18n="hero_lead">Dépôt et retrait instantanés via MVola, Orange Money et Airtel Money. Créez votre compte, passez un ordre, payez. C'est tout.</p>
       <!-- Le logo complet juste avant l'appel a l'action : c'est lui que les
            anciens clients reconnaissent, il doit etre vu avant le bouton. -->
       <video class="hero-logo" src="logo-hero.mp4"
@@ -1312,7 +1312,7 @@ body.dash .dock{ display:grid; }
           <path d="M34 16 22 34h9l-3 14 12-18h-9z" fill="#fff"/>
         </svg>
         <h3>Dépôt &amp; retrait par Airtel Money</h3>
-        <p>Airtel Money rejoint Yas et Orange : vos dépôts et retraits passent par l'opérateur que vous avez déjà en poche.</p>
+        <p>Airtel Money rejoint MVola et Orange : vos dépôts et retraits passent par l'opérateur que vous avez déjà en poche.</p>
       </article>
 
       <article class="why-card">
@@ -1401,7 +1401,7 @@ body.dash .dock{ display:grid; }
       </div>
       <div class="foot-col">
         <h4 data-i18n="foot_ops">Opérateurs</h4>
-        <span>Yas</span><span>Orange Money</span><span>Airtel Money</span>
+        <span>MVola</span><span>Orange Money</span><span>Airtel Money</span>
       </div>
     </div>
     <div class="wrap foot-bottom">
@@ -1780,7 +1780,7 @@ const PAYMENT = "https://payment-webview.vercel.app";
 
 /* Opérateurs : icône PNG réelle (téléversée à la racine) + couleur de secours */
 const OPS = {
-  mvola:  { brand:"Yas",    color:"#0a1a52", icon:"yas.jpg" },
+  mvola:  { brand:"MVola",    color:"#0a1a52", icon:"yas.jpg" },
   orange: { brand:"Orange", color:"#ff7900", icon:"orange.png" },
   airtel: { brand:"Airtel", color:"#e2001a", icon:"data:image/png;base64,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" }
 };
@@ -1800,7 +1800,7 @@ function opName(op){var o=OPS[op];return o?o.brand:(op||"").toUpperCase();}
 const I18N={
  fr:{nav_login:"Connexion",nav_logout:"Déconnexion",install:"Installer",add:"Ajouter",all:"Tout",
   hero_eyebrow:"",hero_title:'Dépôt et retrait <span class="grad">instantanés</span>',
-  hero_lead:"Dépôt et retrait instantanés via Yas, Orange Money et Airtel Money. Créez votre compte, passez un ordre, payez. C'est tout.",
+  hero_lead:"Dépôt et retrait instantanés via MVola, Orange Money et Airtel Money. Créez votre compte, passez un ordre, payez. C'est tout.",
   hero_cta1:"S&#39;inscrire",hero_cta2:"Comment ça marche",hero_cta3:"Connexion",stat1:"",stat2:"Traitement moyen",stat3:"Disponible",
   feat_eyebrow:"Pourquoi MATUL MADA",feat_title:"Pensé pour vous",feat_sub:"Rapide, transparent, et fait pour le mobile money malgache.",
   f1t:"Instantané",f1d:"Validation automatique dès réception du paiement.",
@@ -1827,7 +1827,7 @@ const I18N={
   m_added:"Ajouté",m_saved:"Enregistré",m_deleted:"Supprimé",m_err:"Erreur",confirm_del:"Supprimer ?"},
  mg:{nav_login:"Hiditra",nav_logout:"Hivoaka",install:"Apetraho",add:"Hanampy",all:"Rehetra",
   hero_eyebrow:"",hero_title:'Fampidirana sy fisintonam-bola <span class="grad">avy hatrany</span>',
-  hero_lead:"Dépôt sy retrait avy hatrany amin'ny Yas, Orange Money ary Airtel Money. Mamorona kaonty, manao ordre, mandoa. Vita.",
+  hero_lead:"Dépôt sy retrait avy hatrany amin'ny MVola, Orange Money ary Airtel Money. Mamorona kaonty, manao ordre, mandoa. Vita.",
   hero_cta1:"Hisoratra anarana",hero_cta2:"Ahoana no fombany",hero_cta3:"Hiditra",stat1:"",stat2:"Faharetana antonony",stat3:"Misokatra",
   feat_eyebrow:"Nahoana MATUL MADA",feat_title:"Natao ho anao",feat_sub:"Haingana, mangarahara, natao ho an'ny mobile money malagasy.",
   f1t:"Avy hatrany",f1d:"Validation automatika raha vao tonga ny vola.",
@@ -2413,7 +2413,7 @@ function openWallet(id){
       '<div class="field"><label>'+t("w_num")+'</label><div class="inp"><input id="wNum" inputmode="numeric" placeholder="'+exNum((activeOpKeys()[0]||'mvola'))+'" value=""></div></div>';
   }
   document.getElementById("fsBody").innerHTML= bloc+
-    '<div class="field"><label>'+t("w_label")+'</label><div class="inp"><input id="wLabel" placeholder="Yas perso" value="'+(w&&w.label?w.label.replace(/"/g,"&quot;"):'')+'"></div></div>'+
+    '<div class="field"><label>'+t("w_label")+'</label><div class="inp"><input id="wLabel" placeholder="MVola perso" value="'+(w&&w.label?w.label.replace(/"/g,"&quot;"):'')+'"></div></div>'+
     '<button class="btn btn-gold btn-block" id="wSave"'+(enAttente?' disabled':'')+'>'
     +(w ? (lang==="fr"?"Demander la modification":"Hangataka fanovana") : t("w_save"))+'</button>';
   document.getElementById("wSave").onclick=function(){saveWallet(id);};
@@ -2635,7 +2635,7 @@ function smsTemplate(o){
   var L=[];
   L.push("Session : "+ref);
   L.push("Opérateur : "+opName(o.operator));
-  if(o.operator==="mvola"){L.push("USSD : "+(o.ussdCode||"#111#"));L.push("Yas/MVola : "+(isDep?"Vous avez recu ":"Transfert de ")+montantAr+" - "+o.numero+". Ref "+ref+".");}
+  if(o.operator==="mvola"){L.push("USSD : "+(o.ussdCode||"#111#"));L.push("MVola : "+(isDep?"Vous avez recu ":"Transfert de ")+montantAr+" - "+o.numero+". Ref "+ref+".");}
   else if(o.operator==="orange"){L.push("USSD : "+(o.ussdCode||"#144#"));L.push("Orange Money : "+(isDep?"Depot de ":"Retrait de ")+montantAr+" - "+o.numero+". Ref "+ref+".");}
   else{L.push("USSD : "+(o.ussdCode||"*436#"));L.push("Airtel Money : "+(isDep?"Credit de ":"Debit de ")+montantAr+" sur "+o.numero+". Ref "+ref+".");}
   if(isProv(o))L.push("Deriv : "+(isDep?"Credit ":"Debit ")+"$"+Number(o.montant).toLocaleString('fr-FR')+(o.providerId?" ("+o.providerId+")":"")+".");
