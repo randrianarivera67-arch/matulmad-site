@@ -2853,7 +2853,8 @@ async function saveProfile(){
     // pas alourdir le balisage de dizaines de classes.
     document.querySelectorAll(
       '.cta-band > *, .why-h > *, footer .foot-col > *, ' +
-      '.hero h1, .hero p, .step-card, .feat-card'
+      '.hero h1, .hero p, .step, .feature, .stat, ' +
+      '.sect-head > *, .sect > h2, .sect > p'
     ).forEach(function(el){ el.classList.add('monte'); });
     var cibles = document.querySelectorAll('.why-card, .why-end, .monte, .illus');
     if(!cibles.length) return;
