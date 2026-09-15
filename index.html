@@ -873,6 +873,30 @@ body.dash .social-fab{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
 .social-fab .s-fb{background:linear-gradient(180deg,#4a86f7,#1877f2)}
 .dock button .ic-wrap{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;transition:.18s;box-shadow:0 3px 8px rgba(0,0,0,.15)}
 .dock button .ic-wrap .ic{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.2}
+/* ===== Reflet des boutons =========================================
+   Un trait de lumiere traverse le bouton au survol et au relachement du
+   doigt. C'est court et ca ne se repete pas : le bouton reste lisible, il
+   signale juste qu'il repond. */
+.btn{position:relative;overflow:hidden}
+.btn::before{content:"";position:absolute;top:0;left:-60%;width:45%;height:100%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.42),transparent);
+  transform:skewX(-18deg);opacity:0;pointer-events:none}
+.btn:hover::before,.btn:focus-visible::before{animation:reflet .75s ease}
+@keyframes reflet{
+  0%{left:-60%;opacity:0}
+  12%{opacity:1}
+  100%{left:120%;opacity:0}
+}
+
+/* ===== Textes qui montent au scroll ===============================
+   Meme principe que les panneaux : un deplacement court, joue une fois. */
+.monte{opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease}
+.monte.vu{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .monte{opacity:1;transform:none;transition:none}
+  .btn::before{display:none}
+}
+
 /* ===== Arguments d'accueil =========================================
    Quatre panneaux qui montent un par un a l'approche du regard. Le mouvement
    n'est la que pour guider la lecture : il part de 18px, pas de 100, et ne
@@ -1216,12 +1240,6 @@ body.dash .dock{ display:grid; }
       </div>
     </section>
 
-    <div class="cta-band">
-      <img src="banner.png" alt="MATUL MADA" class="cta-banner" loading="lazy">
-      <h2 data-i18n="cta_title">Prêt à commencer ?</h2>
-      <p data-i18n="cta_sub">Ouvrez votre compte en moins d'une minute.</p>
-      <button class="btn btn-gold" onclick="openAuth('register')"><span data-i18n="cta_btn">Ouvrir un compte</span></button>
-    </div>
   </div>
 
   <!-- Arguments d'accueil : ce que le service change concretement, en quatre
@@ -1298,6 +1316,13 @@ body.dash .dock{ display:grid; }
       <p style="margin-top:8px">Une plateforme pensee pour vous, ou que vous soyez.</p>
     </div>
   </section>
+
+  <div class="cta-band" id="ctaBand">
+      <img src="banner.png" alt="MATUL MADA" class="cta-banner" loading="lazy">
+      <h2 data-i18n="cta_title">Prêt à commencer ?</h2>
+      <p data-i18n="cta_sub">Ouvrez votre compte en moins d'une minute.</p>
+      <button class="btn btn-gold" onclick="openAuth('register')"><span data-i18n="cta_btn">Ouvrir un compte</span></button>
+  </div>
 
   <footer>
     <div class="wrap foot-grid">
@@ -2783,7 +2808,14 @@ async function saveProfile(){
    une fois vue, la carte est oubliee de l'observateur. */
 (function(){
   function demarrer(){
-    var cibles = document.querySelectorAll('.why-card, .why-end');
+    // Les titres, paragraphes et bandes de la page d'accueil montent eux
+    // aussi : on les marque au chargement plutot que dans le HTML, pour ne
+    // pas alourdir le balisage de dizaines de classes.
+    document.querySelectorAll(
+      '.cta-band > *, .why-h > *, footer .foot-col > *, ' +
+      '.hero h1, .hero p, .step-card, .feat-card'
+    ).forEach(function(el){ el.classList.add('monte'); });
+    var cibles = document.querySelectorAll('.why-card, .why-end, .monte');
     if(!cibles.length) return;
     if(!('IntersectionObserver' in window)){
       cibles.forEach(function(el){ el.classList.add('vu'); });
