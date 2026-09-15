@@ -873,6 +873,45 @@ body.dash .social-fab{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
 .social-fab .s-fb{background:linear-gradient(180deg,#4a86f7,#1877f2)}
 .dock button .ic-wrap{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;transition:.18s;box-shadow:0 3px 8px rgba(0,0,0,.15)}
 .dock button .ic-wrap .ic{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.2}
+/* ===== Arguments d'accueil =========================================
+   Quatre panneaux qui montent un par un a l'approche du regard. Le mouvement
+   n'est la que pour guider la lecture : il part de 18px, pas de 100, et ne
+   se rejoue pas. Sur un appareil regle sur "animations reduites", tout
+   s'affiche d'emblee. */
+.why{max-width:1080px;margin:56px auto 0;padding:0 18px}
+.why-h{text-align:center;margin-bottom:34px}
+.why-h h2{font-family:var(--font-d);font-size:clamp(21px,4.6vw,30px);font-weight:800;
+  background:linear-gradient(100deg,var(--navy-1),var(--gold-1) 70%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;margin:0 0 8px}
+.why-h p{color:var(--ink-dim);font-size:14.5px;margin:0}
+.why-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:18px}
+.why-card{position:relative;background:var(--panel);border:1px solid var(--line);
+  border-radius:22px;padding:26px 22px 24px;box-shadow:var(--shadow);
+  opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease,box-shadow .2s}
+.why-card.vu{opacity:1;transform:none}
+.why-card:active{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.why-ic{width:66px;height:66px;margin-bottom:16px}
+.why-card h3{font-family:var(--font-d);font-size:16.5px;font-weight:800;color:var(--ink);margin:0 0 9px;line-height:1.3}
+.why-card p{font-size:13.8px;line-height:1.62;color:var(--ink-dim);margin:0}
+.why-card .why-tag{position:absolute;top:18px;right:18px;font-size:10.5px;font-weight:800;
+  letter-spacing:.6px;color:var(--gold-1);opacity:.7}
+
+/* Banniere de cloture : le meme bleu nuit que l'en-tete, pour refermer la
+   page sur l'identite de la marque. */
+.why-end{margin:34px auto 0;max-width:1080px;border-radius:24px;padding:34px 26px;text-align:center;
+  background:linear-gradient(150deg,var(--navy-1),var(--navy-2));color:#fff;
+  box-shadow:var(--shadow-lg);opacity:0;transform:translateY(18px);
+  transition:opacity .6s ease,transform .6s ease;overflow:hidden;position:relative}
+.why-end.vu{opacity:1;transform:none}
+.why-end::after{content:"";position:absolute;inset:-40% -10% auto auto;width:280px;height:280px;
+  background:radial-gradient(circle,rgba(230,52,85,.26),transparent 68%);pointer-events:none}
+.why-end h3{font-family:var(--font-d);font-size:clamp(18px,4.4vw,25px);font-weight:800;margin:0 0 10px;letter-spacing:.4px}
+.why-end p{font-size:14.5px;line-height:1.66;margin:0 0 6px;color:rgba(255,255,255,.88)}
+.why-end .why-pays{font-family:var(--font-d);font-weight:800;font-size:16px;margin-top:14px;color:#fff}
+@media (prefers-reduced-motion:reduce){
+  .why-card,.why-end{opacity:1;transform:none;transition:none}
+}
+
 /* Vignettes de la barre : l'image porte son propre libelle et son propre
    fond, donc ni pastille ni texte en dessous. Plus grandes que les icones
    qu'elles remplacent, puisqu'il faut y lire un mot. */
@@ -1184,6 +1223,156 @@ body.dash .dock{ display:grid; }
       <button class="btn btn-gold" onclick="openAuth('register')"><span data-i18n="cta_btn">Ouvrir un compte</span></button>
     </div>
   </div>
+
+  <!-- Arguments d'accueil : ce que le service change concretement, en quatre
+       points. Les icones sont dessinees en SVG plutot qu'importees : elles
+       suivent ainsi le theme clair ou sombre sans seconde image. -->
+  <section class="why" id="whySection">
+    <div class="why-h">
+      <h2>Pourquoi choisir MatulMada ?</h2>
+      <p>Quatre raisons, en quelques secondes.</p>
+    </div>
+    <div class="why-grid">
+
+      <article class="why-card">
+        <span class="why-tag">01</span>
+        <svg class="why-ic" viewBox="0 0 64 64">
+          <defs><linearGradient id="gA" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#ff6b8a"/><stop offset="1" stop-color="#c62544"/></linearGradient>
+            <filter id="sA"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity=".22"/></filter></defs>
+          <rect x="6" y="6" width="52" height="52" rx="17" fill="url(#gA)" filter="url(#sA)"/>
+          <path d="M34 16 22 34h9l-3 14 12-18h-9z" fill="#fff"/>
+        </svg>
+        <h3>Depot &amp; retrait par Airtel Money</h3>
+        <p>Airtel Money rejoint Yas et Orange : vos depots et retraits passent par l'operateur que vous avez deja en poche.</p>
+      </article>
+
+      <article class="why-card">
+        <span class="why-tag">02</span>
+        <svg class="why-ic" viewBox="0 0 64 64">
+          <defs><linearGradient id="gB" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#ffd977"/><stop offset="1" stop-color="#e0a021"/></linearGradient>
+            <filter id="sB"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity=".22"/></filter></defs>
+          <rect x="6" y="6" width="52" height="52" rx="17" fill="url(#gB)" filter="url(#sB)"/>
+          <path d="M32 17v30M25 24h11a5 5 0 0 1 0 10h-8a5 5 0 0 0 0 10h11"
+                stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none"/>
+        </svg>
+        <h3>Montant souple</h3>
+        <p>Les frais de retrait de votre operateur peuvent modifier legerement la somme qui nous parvient. Votre depot reste validable automatiquement.</p>
+      </article>
+
+      <article class="why-card">
+        <span class="why-tag">03</span>
+        <svg class="why-ic" viewBox="0 0 64 64">
+          <defs><linearGradient id="gC" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#5eead4"/><stop offset="1" stop-color="#0d9488"/></linearGradient>
+            <filter id="sC"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity=".22"/></filter></defs>
+          <rect x="6" y="6" width="52" height="52" rx="17" fill="url(#gC)" filter="url(#sC)"/>
+          <path d="M20 30a12 12 0 0 1 21-8M44 34a12 12 0 0 1-21 8"
+                stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none"/>
+          <path d="M41 16v7h-7M23 48v-7h7" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <h3>Ordre apres l'envoi</h3>
+        <p>Vous avez transfere avant de creer votre ordre ? L'argent est retrouve et rattache a votre demande, sans refaire l'operation.</p>
+      </article>
+
+      <article class="why-card">
+        <span class="why-tag">04</span>
+        <svg class="why-ic" viewBox="0 0 64 64">
+          <defs><linearGradient id="gD" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#a78bfa"/><stop offset="1" stop-color="#6d28d9"/></linearGradient>
+            <filter id="sD"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity=".22"/></filter></defs>
+          <rect x="6" y="6" width="52" height="52" rx="17" fill="url(#gD)" filter="url(#sD)"/>
+          <path d="M23 18h5l3 7-4 2a14 14 0 0 0 8 8l2-4 7 3v5a3 3 0 0 1-3 3A22 22 0 0 1 20 21a3 3 0 0 1 3-3z" fill="#fff"/>
+        </svg>
+        <h3>« Appel code » : plus de copier-coller</h3>
+        <p>Un appui lance le code directement sur votre telephone. Plus rien a recopier, plus d'erreur de chiffre.</p>
+      </article>
+
+    </div>
+
+    <div class="why-end" id="whyEnd">
+      <h3>MATULMADA &mdash; au-dela des frontieres</h3>
+      <p>Depot et retrait instantanes, simplement et en toute securite.</p>
+      <p class="why-pays">Madagascar &#127474;&#127468; &nbsp;&bull;&nbsp; Comores &#127472;&#127474;</p>
+      <p style="margin-top:8px">Une plateforme pensee pour vous, ou que vous soyez.</p>
+    </div>
+  </section>
+
+  <!-- Arguments d'accueil : ce que le service change concretement, en quatre
+       points. Les icones sont dessinees en SVG plutot qu'importees : elles
+       suivent ainsi le theme clair ou sombre sans seconde image. -->
+  <section class="why" id="whySection">
+    <div class="why-h">
+      <h2>Pourquoi choisir MatulMada ?</h2>
+      <p>Quatre raisons, en quelques secondes.</p>
+    </div>
+    <div class="why-grid">
+
+      <article class="why-card">
+        <span class="why-tag">01</span>
+        <svg class="why-ic" viewBox="0 0 64 64">
+          <defs><linearGradient id="gA" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#ff6b8a"/><stop offset="1" stop-color="#c62544"/></linearGradient>
+            <filter id="sA"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity=".22"/></filter></defs>
+          <rect x="6" y="6" width="52" height="52" rx="17" fill="url(#gA)" filter="url(#sA)"/>
+          <path d="M34 16 22 34h9l-3 14 12-18h-9z" fill="#fff"/>
+        </svg>
+        <h3>Depot &amp; retrait par Airtel Money</h3>
+        <p>Airtel Money rejoint Yas et Orange : vos depots et retraits passent par l'operateur que vous avez deja en poche.</p>
+      </article>
+
+      <article class="why-card">
+        <span class="why-tag">02</span>
+        <svg class="why-ic" viewBox="0 0 64 64">
+          <defs><linearGradient id="gB" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#ffd977"/><stop offset="1" stop-color="#e0a021"/></linearGradient>
+            <filter id="sB"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity=".22"/></filter></defs>
+          <rect x="6" y="6" width="52" height="52" rx="17" fill="url(#gB)" filter="url(#sB)"/>
+          <path d="M32 17v30M25 24h11a5 5 0 0 1 0 10h-8a5 5 0 0 0 0 10h11"
+                stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none"/>
+        </svg>
+        <h3>Montant souple</h3>
+        <p>Les frais de retrait de votre operateur peuvent modifier legerement la somme qui nous parvient. Votre depot reste validable automatiquement.</p>
+      </article>
+
+      <article class="why-card">
+        <span class="why-tag">03</span>
+        <svg class="why-ic" viewBox="0 0 64 64">
+          <defs><linearGradient id="gC" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#5eead4"/><stop offset="1" stop-color="#0d9488"/></linearGradient>
+            <filter id="sC"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity=".22"/></filter></defs>
+          <rect x="6" y="6" width="52" height="52" rx="17" fill="url(#gC)" filter="url(#sC)"/>
+          <path d="M20 30a12 12 0 0 1 21-8M44 34a12 12 0 0 1-21 8"
+                stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none"/>
+          <path d="M41 16v7h-7M23 48v-7h7" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <h3>Ordre apres l'envoi</h3>
+        <p>Vous avez transfere avant de creer votre ordre ? L'argent est retrouve et rattache a votre demande, sans refaire l'operation.</p>
+      </article>
+
+      <article class="why-card">
+        <span class="why-tag">04</span>
+        <svg class="why-ic" viewBox="0 0 64 64">
+          <defs><linearGradient id="gD" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#a78bfa"/><stop offset="1" stop-color="#6d28d9"/></linearGradient>
+            <filter id="sD"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity=".22"/></filter></defs>
+          <rect x="6" y="6" width="52" height="52" rx="17" fill="url(#gD)" filter="url(#sD)"/>
+          <path d="M23 18h5l3 7-4 2a14 14 0 0 0 8 8l2-4 7 3v5a3 3 0 0 1-3 3A22 22 0 0 1 20 21a3 3 0 0 1 3-3z" fill="#fff"/>
+        </svg>
+        <h3>« Appel code » : plus de copier-coller</h3>
+        <p>Un appui lance le code directement sur votre telephone. Plus rien a recopier, plus d'erreur de chiffre.</p>
+      </article>
+
+    </div>
+
+    <div class="why-end" id="whyEnd">
+      <h3>MATULMADA &mdash; au-dela des frontieres</h3>
+      <p>Depot et retrait instantanes, simplement et en toute securite.</p>
+      <p class="why-pays">Madagascar &#127474;&#127468; &nbsp;&bull;&nbsp; Comores &#127472;&#127474;</p>
+      <p style="margin-top:8px">Une plateforme pensee pour vous, ou que vous soyez.</p>
+    </div>
+  </section>
 
   <footer>
     <div class="wrap foot-grid">
@@ -2661,6 +2850,33 @@ async function saveProfile(){
     last=y;ticking=false;
   }
   window.addEventListener('scroll',function(){if(!ticking){window.requestAnimationFrame(onScroll);ticking=true;}},{passive:true});
+})();
+/* Les panneaux d'accueil montent a l'approche du regard.
+   IntersectionObserver plutot qu'un calcul au scroll : le navigateur previent
+   lui-meme quand l'element entre dans le champ, sans occuper le fil principal
+   a chaque pixel. Un decalage de 90 ms par carte donne la lecture en cascade ;
+   une fois vue, la carte est oubliee de l'observateur. */
+(function(){
+  function demarrer(){
+    var cibles = document.querySelectorAll('.why-card, .why-end');
+    if(!cibles.length) return;
+    if(!('IntersectionObserver' in window)){
+      cibles.forEach(function(el){ el.classList.add('vu'); });
+      return;
+    }
+    var vus = 0;
+    var obs = new IntersectionObserver(function(entrees){
+      entrees.forEach(function(e){
+        if(!e.isIntersecting) return;
+        var el = e.target;
+        setTimeout(function(){ el.classList.add('vu'); }, (vus++ % 4) * 90);
+        obs.unobserve(el);
+      });
+    }, { threshold: 0.16, rootMargin: '0px 0px -40px 0px' });
+    cibles.forEach(function(el){ obs.observe(el); });
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', demarrer);
+  else demarrer();
 })();
 /* Boutons sociaux (prototype) */
 function socialSoon(n){toast((lang==='fr'?n+' — bientôt disponible':n+' — tsy ela'),'ok');return false;}
