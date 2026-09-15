@@ -1236,7 +1236,7 @@ body.dash .dock{ display:grid; }
       </div>
       <div class="ops" id="heroOps"></div>
       <div class="hero-stats">
-                <div class="stat"><div class="n">~2 min</div><div class="l" data-i18n="stat2">Traitement moyen</div></div>
+                <div class="stat"><div class="n" data-i18n="stat2n">Quelques secondes</div><div class="l" data-i18n="stat2">Traitement moyen</div></div>
         <div class="stat"><div class="n">24/7</div><div class="l" data-i18n="stat3">Disponible</div></div>
       </div>
     </section>
@@ -1784,6 +1784,7 @@ const I18N={
   f3t:"Sécurisé",f3d:"Chaque transaction est vérifiée avant validation.",how_eyebrow:"En 4 étapes",how_title:"Comment ça marche",
   s1t:"Créez un compte",s1d:"Email ou numéro de téléphone, c'est instantané.",s2t:"Passez un ordre",s2d:"Dépôt ou retrait, opérateur, montant et destinataire.",
   s3t:"Confirmez",s3d:"La page de paiement s'ouvre avec votre code.",s4t:"Payez",s4d:"Appelez le code, validation automatique.",
+  stat2n:"Quelques secondes",
   cta_title:"Prêt à commencer ?",cta_sub:"Ouvrez votre compte en moins d'une minute.",cta_btn:"Ouvrir un compte",
   lbl_forgot:"Mot de passe oublié ?",oubli_sub:"Indiquez votre adresse email : vous recevrez un lien pour choisir un nouveau mot de passe.",oubli_send:"Envoyer le lien",reset_sub:"Choisissez votre nouveau mot de passe.",reset_ok:"Enregistrer",lbl_email:"Email",
   auth_sub:"Votre espace client",tab_login:"Connexion",tab_register:"Inscription",lbl_name:"Nom",lbl_ident:"Email ou téléphone",lbl_phone:"Téléphone (optionnel)",lbl_pass:"Mot de passe",
@@ -1810,6 +1811,7 @@ const I18N={
   f3t:"Voaaro",f3d:"Hamarinina alohan'ny valider ny transaction tsirairay.",how_eyebrow:"Dingana 4",how_title:"Ahoana no fombany",
   s1t:"Mamorona kaonty",s1d:"Email na numéro, avy hatrany.",s2t:"Manao ordre",s2d:"Dépôt na retrait, opérateur, montant, mpandray.",
   s3t:"Confirmer",s3d:"Misokatra ny pejy fandoavana misy ny kaody.",s4t:"Mandoa",s4d:"Antsoy ny kaody, validation automatika.",
+  stat2n:"Segondra vitsy",
   cta_title:"Vonona hanomboka?",cta_sub:"Sokafy ny kaontinao latsaky ny iray minitra.",cta_btn:"Hanokatra kaonty",
   lbl_forgot:"Hadino ny tenimiafina?",oubli_sub:"Ampidiro ny adiresy mailakao : handray rohy ianao hisafidianana tenimiafina vaovao.",oubli_send:"Alefa ny rohy",reset_sub:"Safidio ny tenimiafinao vaovao.",reset_ok:"Tehirizo",lbl_email:"Email",
   auth_sub:"Ny espace client-nao",tab_login:"Hiditra",tab_register:"Hisoratra",lbl_name:"Anarana",lbl_ident:"Email na téléphone",lbl_phone:"Téléphone (tsy voatery)",lbl_pass:"Tenimiafina",
@@ -3706,7 +3708,7 @@ function majSuivi(etape, montant, devise, message){
     }
     if(rDep > 0)
       l.push('D\u00e9p\u00f4t Deriv 1 $ = <b>' + rDep.toLocaleString('fr-FR') + ' Ar</b>');
-    l.push('D\u00e9p\u00f4t et retrait en <b>2 minutes</b>');
+    l.push('D\u00e9p\u00f4t et retrait en <b>quelques secondes</b>');
     l.push('Deriv \u00b7 1XBET \u00b7 Betwinner \u00b7 1WIN');
     l.push('Service ouvert <b>24h/24</b>');
     return l;
