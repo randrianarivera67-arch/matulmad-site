@@ -673,11 +673,11 @@ body.dash .landing-only{display:none !important}
 /* Parametres sorti de la barre du haut : bouton flottant au bord, place
    au-dessus de la barre de navigation pour ne pas la recouvrir. */
 .tb-set-float{position:fixed;left:14px;
-  bottom:calc(112px + env(safe-area-inset-bottom,0px));
+  bottom:calc(130px + env(safe-area-inset-bottom,0px));
   z-index:71;width:46px;height:46px;border-radius:50%;
   background:var(--panel);
   box-shadow:0 8px 22px -6px rgba(10,25,60,.5),0 2px 8px rgba(10,25,60,.22)}
-@media (max-width:520px){.tb-set-float{left:12px;bottom:calc(108px + env(safe-area-inset-bottom,0px))}}
+@media (max-width:520px){.tb-set-float{left:12px;bottom:calc(126px + env(safe-area-inset-bottom,0px))}}
 .tb-login .ic{color:#1FAE6B;filter:drop-shadow(0 0 5px rgba(31,174,107,.55)) drop-shadow(0 0 2px rgba(31,174,107,.35))}
 .tb-login:hover{border-color:#1FAE6B;box-shadow:0 0 14px rgba(31,174,107,.45)}
 /* Notification — cloche animée (balancement) */
@@ -825,6 +825,9 @@ body.dash .install-banner.show{bottom:calc(86px + env(safe-area-inset-bottom,0px
 .mm-montant.on{display:block}
 .social-fab{position:fixed;right:14px;bottom:calc(94px + env(safe-area-inset-bottom,0px));z-index:60;display:flex;flex-direction:column;gap:11px}
 body:not(.dash) .social-fab{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+/* La barre porte desormais des vignettes plus hautes : on decale les boutons
+   flottants pour qu'ils restent au-dessus d'elle. */
+body.dash .social-fab{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
 .social-fab a{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;box-shadow:0 8px 22px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.3);transition:.18s;color:#fff}
 .social-fab a:active{transform:scale(.9)}
 .social-fab .s-wa{background:linear-gradient(180deg,#3ee07a,#22b85a)}
@@ -871,7 +874,7 @@ body:not(.dash) .social-fab{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
 /* Vignettes de la barre : l'image porte son propre libelle et son propre
    fond, donc ni pastille ni texte en dessous. Plus grandes que les icones
    qu'elles remplacent, puisqu'il faut y lire un mot. */
-.dock button .nv-img{width:100%;max-width:52px;height:46px;object-fit:contain;display:block;margin:0 auto}
+.dock button .nv-img{width:100%;max-width:58px;height:auto;max-height:54px;object-fit:contain;display:block;margin:0 auto}
 .dock button{padding:4px 2px;gap:0;background:none;border:none}
 .dock button .nv-img{filter:saturate(.85) brightness(.97);transition:.18s}
 .dock button.active .nv-img{filter:none;transform:translateY(-2px) scale(1.06)}
