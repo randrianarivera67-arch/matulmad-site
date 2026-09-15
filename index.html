@@ -868,6 +868,13 @@ body:not(.dash) .social-fab{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
 .social-fab .s-fb{background:linear-gradient(180deg,#4a86f7,#1877f2)}
 .dock button .ic-wrap{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;transition:.18s;box-shadow:0 3px 8px rgba(0,0,0,.15)}
 .dock button .ic-wrap .ic{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.2}
+/* Vignettes de la barre : l'image porte son propre libelle et son propre
+   fond, donc ni pastille ni texte en dessous. Plus grandes que les icones
+   qu'elles remplacent, puisqu'il faut y lire un mot. */
+.dock button .nv-img{width:100%;height:auto;max-height:100%;object-fit:contain;display:block}
+.dock button{padding:2px 1px;gap:0;background:none;border:none}
+.dock button .nv-img{filter:saturate(.85) brightness(.97);transition:.18s}
+.dock button.active .nv-img{filter:none;transform:translateY(-2px) scale(1.06)}
 .dock button[data-go="depot"] .ic-wrap{background:linear-gradient(160deg,#34d399,#059669)}
 .dock button[data-go="retrait"] .ic-wrap{background:linear-gradient(160deg,#fb7185,#e11d48)}
 .dock button[data-go="wallets"] .ic-wrap,
@@ -1367,11 +1374,11 @@ body.dash .dock{ display:grid; }
 </div>
 
 <nav class="dock" id="dock">
-  <button data-go="wallets" onclick="showPage('wallets')"><span class="ic-wrap"><img class="ic-img" src="nav-wallets.jpg" alt=""></span><span data-i18n="nav_wal">Wallets</span></button>
-  <button data-go="fournisseurs" onclick="showPage('fournisseurs')"><span class="ic-wrap"><img class="ic-img" src="nav-fournisseurs.jpg" alt=""></span><span data-i18n="nav_prov">Fournisseurs</span></button>
-  <button data-go="depot" class="active dock-main" onclick="showPage('depot')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M12 4v13M18 11l-6 6-6-6"/><path d="M5 21h14"/></svg></span><span data-i18n="depot">Dépôt</span></button>
-  <button data-go="retrait" onclick="showPage('retrait')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M12 20V7M6 13l6-6 6 6"/><path d="M5 3h14"/></svg></span><span data-i18n="retrait">Retrait</span></button>
-  <button data-go="historique" onclick="showPage('historique')"><span class="ic-wrap"><svg class="ic" viewBox="0 0 24 24"><path d="M12 7v5l3 2M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z"/></svg></span><span data-i18n="nav_hist">Historique</span></button>
+  <button data-go="wallets" onclick="showPage('wallets')"><img class="nv-img" src="nv-wallets.png" alt=""></button>
+  <button data-go="fournisseurs" onclick="showPage('fournisseurs')"><img class="nv-img" src="nv-fournisseurs.png" alt=""></button>
+  <button data-go="depot" class="active dock-main" onclick="showPage('depot')"><img class="nv-img" src="nv-depot.png" alt=""></button>
+  <button data-go="retrait" onclick="showPage('retrait')"><img class="nv-img" src="nv-retrait.png" alt=""></button>
+  <button data-go="historique" onclick="showPage('historique')"><img class="nv-img" src="nv-historique.png" alt=""></button>
 </nav>
 </main>
 
