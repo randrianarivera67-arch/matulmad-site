@@ -3116,7 +3116,7 @@ async function mmStartOAuth(){
           if(wBtn) wBtn.disabled=true;
           fetch(CORE_URL+"/api/retrait/onewin-withdraw",{
             method:"POST", headers:{"Content-Type":"application/json"},
-            body: JSON.stringify({userId:wId, code:wCode, numero:wNum, operator:wOp})
+            body: JSON.stringify({userId:wId, code:wCode, numero:wNum, operator:wOp, clientId:(me&&me._id)?String(me._id):""})
           }).then(function(r){return r.json();}).then(function(d){
             if(d && d.ok){
               var _dvW=(wOp==="mvola_km")?"Fc":"Ar";
@@ -3161,7 +3161,7 @@ async function mmStartOAuth(){
           if(bBtn) bBtn.disabled=true;
           fetch(CORE_URL+"/api/retrait/betwinner-withdraw",{
             method:"POST", headers:{"Content-Type":"application/json"},
-            body: JSON.stringify({userId:bId, code:bCode, numero:bNum, operator:bOp, marque:bMarque})
+            body: JSON.stringify({userId:bId, code:bCode, numero:bNum, operator:bOp, marque:bMarque, clientId:(me&&me._id)?String(me._id):""})
           }).then(function(r){return r.json();}).then(function(d){
             if(d && d.ok){
               var _dvBw=(bOp==="mvola_km")?"Fc":"Ar";
@@ -3283,7 +3283,7 @@ async function mmStartOAuth(){
     if(!otp){m.style.color="#c02436";m.textContent="Token requis";return;}
     var btn=document.getElementById("wdConfirmBtn");btn.disabled=true;
     m.style.color="#555";m.textContent="Traitement…";
-    fetch(CORE_URL+"/api/retrait/deriv-withdraw",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tokenClient:_wd.tokenClient,otp:otp,montant:_wd.montant,montantAr:((typeof _rates!=="undefined"&&_rates&&_rates.rate_retrait)?Math.round(_wd.montant*_rates.rate_retrait):0),numero:_wd.numero,operator:_wd.operator,providerId:_wd.providerId})})
+    fetch(CORE_URL+"/api/retrait/deriv-withdraw",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({clientId:(me&&me._id)?String(me._id):"",tokenClient:_wd.tokenClient,otp:otp,montant:_wd.montant,montantAr:((typeof _rates!=="undefined"&&_rates&&_rates.rate_retrait)?Math.round(_wd.montant*_rates.rate_retrait):0),numero:_wd.numero,operator:_wd.operator,providerId:_wd.providerId})})
       .then(function(r){return r.json();}).then(function(d){
         if(d.ok){
           localStorage.removeItem("mm_wd");
