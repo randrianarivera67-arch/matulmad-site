@@ -842,6 +842,21 @@ body.dash .social-fab{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
 .boot-splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
   background:var(--bg);background-image:radial-gradient(120% 90% at 50% 30%,var(--bg-2) 0%,transparent 60%);transition:opacity .4s ease}
 .boot-splash.gone{opacity:0;pointer-events:none}
+.bs-mm{width:108px;height:108px;display:block;
+  filter:drop-shadow(0 12px 30px rgba(26,39,68,.28))}
+/* Les deux arcs tournent en sens inverse, a des vitesses proches mais pas
+   egales : le motif ne se repete jamais tout a fait, l'oeil reste accroche. */
+.mm-arc{transform-origin:60px 60px}
+.mm-arc-1{animation:mmTourne 2.2s linear infinite}
+.mm-arc-2{animation:mmTourneInv 2.8s linear infinite}
+@keyframes mmTourne   {to{transform:rotate(360deg)}}
+@keyframes mmTourneInv{to{transform:rotate(-360deg)}}
+/* L'ile respire au centre, immobile : c'est le point fixe de l'echange. */
+.mm-ile{transform-origin:60px 60px;animation:mmRespire 2.2s ease-in-out infinite}
+@keyframes mmRespire{0%,100%{transform:scale(1);opacity:.92}50%{transform:scale(1.07);opacity:1}}
+@media (prefers-reduced-motion:reduce){
+  .mm-arc,.mm-ile{animation:none!important}
+}
 .boot-splash img{width:92px;height:92px;border-radius:24px;box-shadow:0 16px 40px rgba(20,50,110,.3);animation:bootPulse 1.6s ease-in-out infinite}
 .boot-splash .bs-ring{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--blue-1);animation:sp .8s linear infinite}
 @keyframes bootPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
@@ -1751,7 +1766,38 @@ body.dash .dock{ display:grid; }
 </div>
 
 <!-- Loading splash -->
-<div class="boot-splash" id="bootSplash"><img class="js-logo" alt="MATUL MADA"><div class="bs-ring"></div></div>
+<div class="boot-splash" id="bootSplash">
+  <svg class="bs-mm" viewBox="0 0 120 120" aria-label="MATUL MADA">
+    <defs>
+      <linearGradient id="mmOr" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#ffd977"/><stop offset="1" stop-color="#e0a021"/></linearGradient>
+      <linearGradient id="mmRose" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#ff6b8a"/><stop offset="1" stop-color="#c62544"/></linearGradient>
+    </defs>
+
+    <circle cx="60" cy="60" r="46" fill="none" stroke="#1a2744" stroke-opacity=".10" stroke-width="2"/>
+
+    <!-- Deux arcs qui tournent en sens inverse : l'aller et le retour. -->
+    <g class="mm-arc mm-arc-1">
+      <path d="M60 14 A46 46 0 0 1 106 60" fill="none" stroke="url(#mmOr)"
+            stroke-width="5" stroke-linecap="round"/>
+      <path d="M100 48 L106 60 L94 62" fill="none" stroke="url(#mmOr)"
+            stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g class="mm-arc mm-arc-2">
+      <path d="M60 106 A46 46 0 0 1 14 60" fill="none" stroke="url(#mmRose)"
+            stroke-width="5" stroke-linecap="round"/>
+      <path d="M20 72 L14 60 L26 58" fill="none" stroke="url(#mmRose)"
+            stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+
+    <!-- Madagascar, simplifiee : reconnaissable a cette taille. -->
+    <path class="mm-ile" d="M66 30 q7 6 6 16 q-1 11 -5 20 q-4 10 -6 20 q-2 8 -8 8 q-5 0 -5 -7
+                            q1 -11 4 -21 q3 -12 5 -23 q2 -10 9 -13z"
+          fill="#1a2744"/>
+  </svg>
+  <div class="bs-ring"></div>
+</div>
 
 <!-- Sheet notifications -->
 <div class="sheet" id="notifSheet"><div class="sheet-bd" onclick="closeSheet('notifSheet')"></div>
