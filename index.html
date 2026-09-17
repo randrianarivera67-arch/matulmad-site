@@ -937,6 +937,17 @@ body.dash .social-fab{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
   color:var(--ink-dim);font-style:italic}
 @media (prefers-reduced-motion:reduce){.illus{opacity:1;transform:none;transition:none}}
 
+.nv-txt{display:none}
+@media (min-width:760px){
+  .dock button .nv-img{display:none}
+  .dock button .nv-txt{display:block;font-family:var(--font-d);font-weight:700;
+    font-size:13.5px;letter-spacing:.02em;white-space:nowrap;
+    padding:9px 14px;border-radius:11px;transition:.18s;color:var(--ink-dim)}
+  .dock button.active .nv-txt{color:var(--gold-1);background:rgba(230,52,85,.10)}
+  .dock button:hover .nv-txt{color:var(--ink)}
+  .dock button{padding:0}
+}
+
 /* ===== Reflet des boutons =========================================
    Un trait de lumiere traverse le bouton au survol et au relachement du
    doigt. C'est court et ca ne se repete pas : le bouton reste lisible, il
@@ -1602,11 +1613,11 @@ body.dash .dock{ display:grid; }
 </div>
 
 <nav class="dock" id="dock">
-  <button data-go="wallets" onclick="showPage('wallets')"><img class="nv-img" src="nv-wallets.png" alt=""></button>
-  <button data-go="fournisseurs" onclick="showPage('fournisseurs')"><img class="nv-img" src="nv-fournisseurs.png" alt=""></button>
-  <button data-go="depot" class="active dock-main" onclick="showPage('depot')"><img class="nv-img" src="nv-depot.png" alt=""></button>
-  <button data-go="retrait" onclick="showPage('retrait')"><img class="nv-img" src="nv-retrait.png" alt=""></button>
-  <button data-go="historique" onclick="showPage('historique')"><img class="nv-img" src="nv-historique.png" alt=""></button>
+  <button data-go="wallets" onclick="showPage('wallets')"><img class="nv-img" src="nv-wallets.png" alt=""><span class="nv-txt" data-i18n="nav_wal">Wallets</span></button>
+  <button data-go="fournisseurs" onclick="showPage('fournisseurs')"><img class="nv-img" src="nv-fournisseurs.png" alt=""><span class="nv-txt" data-i18n="nav_prov">Fournisseurs</span></button>
+  <button data-go="depot" class="active dock-main" onclick="showPage('depot')"><img class="nv-img" src="nv-depot.png" alt=""><span class="nv-txt" data-i18n="depot">Dépôt</span></button>
+  <button data-go="retrait" onclick="showPage('retrait')"><img class="nv-img" src="nv-retrait.png" alt=""><span class="nv-txt" data-i18n="retrait">Retrait</span></button>
+  <button data-go="historique" onclick="showPage('historique')"><img class="nv-img" src="nv-historique.png" alt=""><span class="nv-txt" data-i18n="nav_hist">Historique</span></button>
 </nav>
 </main>
 
