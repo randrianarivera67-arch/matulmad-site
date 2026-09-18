@@ -1,4 +1,4 @@
-const CACHE = 'matulmad-v36';
+const CACHE = 'matulmad-v37';
 const ASSETS = ['/', '/index.html', '/logo.png', '/icon-192.png', '/icon-512.png', '/manifest.json',
   '/nv-wallets.png', '/nv-fournisseurs.png', '/nv-depot.png', '/nv-retrait.png', '/nv-historique.png'];
 self.addEventListener('install', (e) => {
