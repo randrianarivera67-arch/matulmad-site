@@ -2096,6 +2096,7 @@ function switchTab(m){authMode=m;
   document.getElementById("authBtnTxt").textContent=m==="login"?t("tab_login"):t("tab_register");
   document.getElementById("authMsg").className="msg";}
 function pickAcctType(km){
+  setTimeout(majAideTel, 0);
   document.getElementById("aKmAccount").value=km?"1":"0";
   var mg=document.getElementById("acctMg"),k=document.getElementById("acctKm"),note=document.getElementById("kmAcctNote");
   function on(b){b.style.borderColor="var(--blue-1)";b.style.color="var(--blue-1)";b.style.boxShadow="0 0 0 3px var(--glow)";}
@@ -2213,10 +2214,37 @@ async function activerNotifs(){
 /* Le numero se saisit sans espace ni indicatif : on retire tout ce qui n'est
    pas un chiffre au fil de la frappe, et on ramene un +261 colle depuis un
    contact vers la forme locale 03X, plutot que de le refuser sechement. */
+function estComores(){
+  var k = document.getElementById("aKmAccount");
+  return !!(k && k.value === "1");
+}
 function nettoyerTel(el){
   var v = String(el.value || '').replace(/\D/g, '');
+  if(estComores()){
+    // Comores : sept chiffres, sans indicatif (exemple 4771015).
+    if(v.indexOf('269') === 0) v = v.slice(3);
+    el.value = v.slice(0, 7);
+    return;
+  }
+  // Madagascar : dix chiffres commencant par 03X. Un +261 colle depuis un
+  // contact est ramene a la forme locale plutot que refuse sechement.
   if(v.indexOf('261') === 0) v = '0' + v.slice(3);
   el.value = v.slice(0, 10);
+}
+/* Le libelle sous le champ change avec le pays : une consigne qui ne
+   correspond pas au compte choisi fait saisir un numero invalide. */
+function majAideTel(){
+  var h = document.querySelector('.hint-tel');
+  var e = document.getElementById('aPhone');
+  if(!h) return;
+  if(estComores()){
+    h.textContent = "Sans espace, 7 chiffres (exemple 4771015). L'indicatif +269 n'est pas attendu.";
+    if(e) e.placeholder = "4771015";
+  } else {
+    h.textContent = "Sans espace, en commençant par 03X. Le format +261 n'est pas accepté.";
+    if(e) e.placeholder = "0341234567";
+  }
+  if(e && e.value) nettoyerTel(e);
 }
 
 async function doAuth(){
