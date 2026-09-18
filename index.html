@@ -691,6 +691,9 @@ body.dash .landing-only{display:none !important}
   background:var(--panel);
   box-shadow:0 8px 22px -6px rgba(10,25,60,.5),0 2px 8px rgba(10,25,60,.22)}
 @media (max-width:520px){.tb-set-float{left:12px;bottom:calc(126px + env(safe-area-inset-bottom,0px))}}
+@media (min-width:760px){
+  .tb-set-float{position:static;left:auto;bottom:auto;box-shadow:none}
+}
 .tb-login .ic{color:#1FAE6B;filter:drop-shadow(0 0 5px rgba(31,174,107,.55)) drop-shadow(0 0 2px rgba(31,174,107,.35))}
 .tb-login:hover{border-color:#1FAE6B;box-shadow:0 0 14px rgba(31,174,107,.45)}
 /* Notification — cloche animée (balancement) */
