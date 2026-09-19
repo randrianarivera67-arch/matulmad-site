@@ -3047,6 +3047,9 @@ if("serviceWorker" in navigator){window.addEventListener("load",function(){
     try{
       var q = location.search || '';
       if(q.indexOf('code=') >= 0 || q.indexOf('error=') >= 0) return;
+      var m = document.getElementById('wdModal');
+      if(m && m.style.display && m.style.display !== 'none') return;
+      if(window._mmOperationEnCours) return;
     }catch(e){}
     refreshing=true; window.location.reload();
   });
@@ -3109,6 +3112,7 @@ async function mmStartOAuth(){
     challenge=mmB64url(digest);
   }catch(e){ alert("Navigateur non compatible (HTTPS requis)."); return; }
   try{ localStorage.setItem("mm_pkce", JSON.stringify({v:verifier,s:state})); }catch(e){}
+  window._mmOperationEnCours = true;
   window.location.href = "https://auth.deriv.com/oauth2/auth"
     + "?response_type=code"
     + "&client_id=" + encodeURIComponent(id)
@@ -3498,6 +3502,7 @@ async function mmStartOAuth(){
           body:JSON.stringify({code:code, code_verifier:(pk&&pk.v)||"", redirect_uri:location.origin+"/"})
         }).then(function(r){return r.json();}).then(function(d){
           try{ localStorage.removeItem("mm_pkce"); }catch(e){}
+          window._mmOperationEnCours = true;
           if(!d || !d.token){ alert("Connexion Deriv echouee: "+((d&&d.error)||"token indisponible")); return; }
           saved.tokenClient=d.token; saved.matchedCR=d.loginid||"";
           _wd=saved; ensureModal();
