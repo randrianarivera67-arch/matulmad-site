@@ -420,7 +420,11 @@ html[data-theme="dark"] .card-or .inp{background:linear-gradient(160deg,rgba(58,
   letter-spacing:.02em;text-align:center;padding:0 8px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:112px}
 
-.hr-btns{display:flex;flex-direction:column;gap:10px;min-width:0}
+.hr-btns{display:flex;gap:10px;min-width:0}
+.hr-btns .hr-btn{flex:1;min-width:0}
+.hr-btns .hr-btn.ret{order:0}
+.hr-btns .hr-btn.dep{order:1}
+@media (max-width:420px){ .hr-btns{flex-direction:column} }
 .hr-btn{display:flex;align-items:center;gap:12px;width:100%;padding:14px 14px;
   border:0;border-radius:18px;cursor:pointer;text-align:left;color:#fff;
   font-family:var(--font-d);
@@ -3860,7 +3864,6 @@ function majSuivi(etape, montant, devise, message){
     }
     if(rDep > 0)
       l.push('D\u00e9p\u00f4t Deriv 1 $ = <b>' + rDep.toLocaleString('fr-FR') + ' Ar</b>');
-    l.push('D\u00e9p\u00f4t et retrait en <b>quelques secondes</b>');
     l.push('Deriv \u00b7 1XBET \u00b7 Betwinner \u00b7 1WIN');
     l.push('Service ouvert <b>24h/24</b>');
     return l;
