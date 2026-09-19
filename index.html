@@ -2472,15 +2472,21 @@ async function enterDash(){go("dashboard");setDashName();
 function populateProviderSelect(){var sel=document.getElementById("fProvider");if(!sel)return;
   var opts='<option value="">—</option>';var seen={};
   if(me&&me.providers)for(var i=0;i<me.providers.length;i++){var nm=me.providers[i].name||"Deriv";
+    if(kmMode && /betwinner/i.test(nm)) continue;
     if(!seen[nm]){seen[nm]=1;opts+='<option>'+nm+'</option>';}}
-  if(!seen["Deriv"])opts+='<option>Deriv</option>';
-  // Betwinner: azo amin'ny compte REHETRA (anisan'ny Comores)
-  // Betwinner : Madagascar uniquement. Aux Comores la caisse est celle de 1XBET.
-  if(!kmMode && !seen["Betwinner"])opts+='<option>Betwinner</option>';
-  // 1XBET : disponible partout, y compris aux Comores (montants en Fc).
-  if(!seen["1XBET"])opts+='<option>1XBET</option>';
-  // 1WIN : caisse en dollars, montants convertis au cours du jour comme Deriv.
-  if(!seen["1WIN"])opts+='<option>1WIN</option>';
+  // Un client qui a enregistre ses comptes ne voit que les siens : lui
+  // proposer un fournisseur qu'il n'a pas le menait a une saisie qu'il ne
+  // pouvait pas terminer. Tant qu'il n'en a aucun, la liste reste entiere —
+  // c'est ainsi qu'il enregistre le premier.
+  if(!Object.keys(seen).length){
+    opts+='<option>Deriv</option>';
+    // Betwinner : Madagascar uniquement. Aux Comores la caisse est celle de 1XBET.
+    if(!kmMode) opts+='<option>Betwinner</option>';
+    // 1XBET : disponible partout, y compris aux Comores (montants en Fc).
+    opts+='<option>1XBET</option>';
+    // 1WIN : caisse en dollars, montants convertis au cours du jour comme Deriv.
+    opts+='<option>1WIN</option>';
+  }
   sel.innerHTML=opts;
   if(kmMode && /betwinner/i.test(sel.value||"")) sel.value="Deriv";}
 function isBetwinner(){var p=document.getElementById("fProvider");return p&&(p.value||"").toLowerCase()==="betwinner";}
