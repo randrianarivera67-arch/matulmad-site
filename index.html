@@ -3039,7 +3039,16 @@ if("serviceWorker" in navigator){window.addEventListener("load",function(){
   }).catch(function(){});
   var refreshing=false;
   navigator.serviceWorker.addEventListener('controllerchange',function(){
-    if(refreshing) return; refreshing=true; window.location.reload();
+    if(refreshing) return;
+    // Un retour de connexion Deriv porte son code d'autorisation dans l'URL,
+    // et ce code ne sert qu'une fois. Recharger la page a cet instant le
+    // perdait : le client revenait a son espace sans que le retrait aboutisse.
+    // La nouvelle version attendra la prochaine visite.
+    try{
+      var q = location.search || '';
+      if(q.indexOf('code=') >= 0 || q.indexOf('error=') >= 0) return;
+    }catch(e){}
+    refreshing=true; window.location.reload();
   });
 });}
 
