@@ -1973,6 +1973,9 @@ function renderHeroOps(){var box=document.getElementById("heroOps");if(!box)retu
   box.innerHTML=OP_KEYS_VITRINE.map(function(k){return '<span class="op-chip">'+opBadge(k,'smd')+opName(k)+'</span>';}).join('');}
 function renderOpPick(){var box=document.getElementById("opPick");if(!box)return;
   var keys=activeOpKeys();
+  var siens = (me && me.wallets) ? me.wallets.map(function(x){ return x.operator; }) : [];
+  var avecWallet = keys.filter(function(k){ return siens.indexOf(k) >= 0; });
+  if(avecWallet.length) keys = avecWallet;
   if(keys.indexOf(orderOp)<0){orderOp=keys[0];}
   box.innerHTML=keys.map(function(k){return '<button class="op-opt'+(k===orderOp?' active':'')+'" data-op="'+k+'" onclick="pickOp(\''+k+'\')">'+opBadge(k,'md')+opName(k)+'</button>';}).join('');}
 /* ===== COMORES: bascule Madagascar <-> Comores ===== */
