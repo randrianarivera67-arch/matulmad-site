@@ -2022,6 +2022,66 @@ function chargerCoursAffilie(){
   }).catch(function(){});
 }
 
+/* Guidage du formulaire d'ordre.
+   Le client remplit une case, la suivante vient a lui : elle remonte a
+   l'ecran et prend le curseur. Sur telephone, la case a remplir se trouvait
+   souvent sous le clavier, et l'ordre restait incomplet sans que rien ne le
+   signale. On ne change ni l'ordre des cases ni leur contenu — seulement le
+   deplacement. */
+function guideOrdreSuivant(depuis){
+  try{
+    var form = document.getElementById('opPick');
+    form = form ? form.closest('.page') : null;
+    if(!form) return;
+
+    // Les cases reellement affichees, dans l'ordre de la page.
+    var champs = [].slice.call(form.querySelectorAll('.field'))
+      .filter(function(f){
+        if(f.offsetParent === null) return false;      // masquee
+        return !!f.querySelector('input, select');
+      });
+
+    var i = champs.indexOf(depuis);
+    if(i < 0 || i + 1 >= champs.length) return;
+
+    var suite = champs[i + 1];
+    var ctrl  = suite.querySelector('input, select');
+    suite.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Le curseur apres le defilement : l'inverse fait sauter la page.
+    setTimeout(function(){ try{ ctrl && ctrl.focus({ preventScroll: true }); }catch(e){} }, 320);
+  }catch(e){}
+}
+
+/* Une case compte comme remplie quand elle porte une valeur et qu'on la
+   quitte — pas a chaque frappe, sinon la page bougerait sous les doigts. */
+function activerGuidageOrdre(){
+  var box = document.getElementById('opPick');
+  var page = box ? box.closest('.page') : null;
+  if(!page || page._guide) return;
+  page._guide = 1;
+
+  page.addEventListener('change', function(e){
+    var c = e.target;
+    if(!c || !c.value) return;
+    var f = c.closest('.field');
+    if(f) guideOrdreSuivant(f);
+  });
+
+  // Le choix de l'operateur n'est pas un champ de formulaire : on le traite
+  // a part pour que la premiere case suive aussi.
+  page.addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('.op-opt') : null;
+    if(!b) return;
+    setTimeout(function(){
+      var premier = page.querySelector('.field');
+      if(!premier) return;
+      var ctrl = premier.querySelector('input, select');
+      premier.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(function(){ try{ ctrl && ctrl.focus({ preventScroll: true }); }catch(e){} }, 320);
+    }, 60);
+  });
+}
+
 function renderHeroOps(){var box=document.getElementById("heroOps");if(!box)return;
   box.innerHTML=OP_KEYS_VITRINE.map(function(k){return '<span class="op-chip">'+opBadge(k,'smd')+opName(k)+'</span>';}).join('');}
 function renderOpPick(){var box=document.getElementById("opPick");if(!box)return;
@@ -3138,6 +3198,7 @@ if("serviceWorker" in navigator){window.addEventListener("load",function(){
 /* init */
 async function init(){
   applyLogo();applyTheme();applyLang();renderHeroOps();chargerCoursAffilie();fillCountrySelects();
+  try{ activerGuidageOrdre(); }catch(e){}
   document.getElementById("authModal").addEventListener("click",function(e){if(e.target.id==="authModal")closeAuth();});
   if(token){
     try{var d=await api("/api/auth/me");if(d.user){me=d.user;updateProfBtn();enterDash();loadNotifs();}}catch(e){logout();}
