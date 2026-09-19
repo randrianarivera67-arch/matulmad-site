@@ -420,11 +420,7 @@ html[data-theme="dark"] .card-or .inp{background:linear-gradient(160deg,rgba(58,
   letter-spacing:.02em;text-align:center;padding:0 8px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:112px}
 
-.hr-btns{display:flex;gap:10px;min-width:0}
-.hr-btns .hr-btn{flex:1;min-width:0}
-.hr-btns .hr-btn.ret{order:0}
-.hr-btns .hr-btn.dep{order:1}
-@media (max-width:420px){ .hr-btns{flex-direction:column} }
+.hr-btns{display:flex;flex-direction:column;gap:10px;min-width:0}
 .hr-btn{display:flex;align-items:center;gap:12px;width:100%;padding:14px 14px;
   border:0;border-radius:18px;cursor:pointer;text-align:left;color:#fff;
   font-family:var(--font-d);
@@ -434,6 +430,10 @@ html[data-theme="dark"] .card-or .inp{background:linear-gradient(160deg,rgba(58,
   transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s}
 .hr-btn.dep{background:linear-gradient(150deg,var(--navy-3),var(--navy-1) 60%,var(--navy-2))}
 .hr-btn.ret{background:linear-gradient(150deg,#f2536f,var(--gold-1) 55%,var(--gold-2))}
+/* Le panneau sert aussi de reperage : l'acces correspondant a la page ouverte
+   garde ses couleurs, l'autre s'estompe. Le client voit ou il se trouve sans
+   avoir a chercher. */
+.hr-btn.terne{opacity:.42;filter:saturate(.35)}
 .hr-btn:hover{transform:translateY(-2px)}
 .hr-btn:active{transform:translateY(1px) scale(.985);
   box-shadow:inset 0 3px 8px rgba(0,0,0,.32),0 4px 10px -5px rgba(15,27,51,.5)}
@@ -1997,7 +1997,15 @@ function go(v){
   else{site.style.display="block";dash.style.display="none";
     document.body.classList.remove("dash");}
 }
+function majAccesCours(view){
+  var d = document.querySelector('.hr-btn.dep');
+  var r = document.querySelector('.hr-btn.ret');
+  if(!d || !r) return;
+  d.classList.toggle('terne', view === 'retrait');
+  r.classList.toggle('terne', view === 'depot');
+}
 function showPage(view){
+  try{ majAccesCours(view); }catch(e){}
   var sec=(view==="depot"||view==="retrait")?"order":view;
   var pages=document.querySelectorAll("#dashboard .page");for(var i=0;i<pages.length;i++)pages[i].classList.toggle("active",pages[i].dataset.page===sec);
   var btns=document.querySelectorAll("#dock button");for(var j=0;j<btns.length;j++)btns[j].classList.toggle("active",btns[j].dataset.go===view);
