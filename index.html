@@ -2500,7 +2500,17 @@ function openWallet(id){
   var w=id?findWallet(id):null;
   document.getElementById("fsTitle").textContent=t(w?"w_edittitle":"w_addtitle");
   document.getElementById("fsMsg").className="msg";
-  var opts=activeOpKeys().map(function(k){return '<option value="'+k+'"'+(w&&w.operator===k?' selected':'')+'>'+opName(k)+'</option>';}).join('');
+  var dejaPris = (me && me.wallets) ? me.wallets.map(function(x){ return x.operator; }) : [];
+  var choix = activeOpKeys().filter(function(k){
+    if (w && w.operator === k) return true;
+    return dejaPris.indexOf(k) < 0;
+  });
+  if (!choix.length) {
+    var _m = document.getElementById("fsMsg");
+    if (_m) { _m.className = "msg err"; _m.textContent = "Vous avez deja un numero pour chaque operateur. Modifiez celui a changer."; }
+    return;
+  }
+  var opts=choix.map(function(k){return '<option value="'+k+'"'+(w&&w.operator===k?' selected':'')+'>'+opName(k)+'</option>';}).join('');
   var enAttente = w ? demandeEnCours(w._id) : null;
   var bloc;
   if(w){
