@@ -162,37 +162,37 @@ header.nav{position:sticky;top:0;z-index:50;background:transparent;border-bottom
 }
 /* Cours affilie en tete d'accueil. Le cadre respire lentement : assez pour
    attirer l'oeil, pas assez pour gener la lecture du reste. */
-.aff-cours{max-width:420px;margin:22px auto 4px;padding:16px 20px;border-radius:18px;
-  background:linear-gradient(150deg,rgba(230,52,85,.14),rgba(26,39,68,.55));
-  border:1.5px solid rgba(230,52,85,.38);
-  box-shadow:0 14px 34px rgba(0,0,0,.28);
-  animation:affRespire 5.5s ease-in-out infinite}
-@keyframes affRespire{
-  0%,100%{box-shadow:0 14px 34px rgba(0,0,0,.28),0 0 0 0 rgba(230,52,85,.26)}
-  50%    {box-shadow:0 14px 34px rgba(0,0,0,.28),0 0 0 9px rgba(230,52,85,0)}
-}
-.aff-tag{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--gold-1);margin-bottom:11px}
-.aff-lignes{display:flex;align-items:center;justify-content:center;gap:22px}
-/* Deux disques identiques, aux couleurs des acces de l'espace client : le
-   client retrouve le meme repere d'un bout a l'autre du site. L'anneau tourne
-   lentement autour, assez pour accrocher l'oeil sans gener la lecture. */
-.aff-rond{position:relative;width:118px;height:118px;border-radius:50%;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-  color:#fff;text-align:center;flex:none}
-.aff-rond::before{content:"";position:absolute;inset:-4px;border-radius:50%;
-  background:conic-gradient(from 0deg,transparent 0deg,rgba(255,255,255,.85) 45deg,transparent 110deg);
-  animation:affTourne 3.4s linear infinite}
+/* Cours affilie : deux disques, sans cadre. Ils suivent les couleurs des
+   acces de l'espace client, pour que le client retrouve le meme repere d'un
+   bout a l'autre du site. */
+.aff-cours{margin:26px auto 4px;text-align:center}
+.aff-tag{font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold-1);margin-bottom:16px;opacity:.9}
+.aff-lignes{display:flex;align-items:center;justify-content:center;gap:26px;flex-wrap:wrap}
+/* L'anneau tourne lentement autour du disque : assez pour accrocher l'oeil,
+   pas assez pour gener la lecture du chiffre. */
+.aff-rond{position:relative;width:132px;height:132px;border-radius:50%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  color:#fff;text-align:center;flex:none;
+  box-shadow:0 14px 30px rgba(0,0,0,.30)}
+.aff-rond::before{content:"";position:absolute;inset:-5px;border-radius:50%;
+  background:conic-gradient(from 0deg,transparent 0deg,rgba(255,255,255,.9) 50deg,transparent 120deg);
+  animation:affTourne 3.6s linear infinite;z-index:0}
 .aff-rond::after{content:"";position:absolute;inset:0;border-radius:50%;
-  background:inherit;box-shadow:inset 0 2px 0 rgba(255,255,255,.22)}
+  background:inherit;box-shadow:inset 0 2px 0 rgba(255,255,255,.22);z-index:1}
 .aff-rond>*{position:relative;z-index:2}
 @keyframes affTourne{ to{ transform:rotate(360deg) } }
-.aff-dep{background:linear-gradient(150deg,var(--navy-3,#24365c),var(--navy-1) 60%,var(--navy-2))}
+.aff-dep{background:linear-gradient(150deg,#2b4173,var(--navy-1) 58%,var(--navy-2))}
 .aff-ret{background:linear-gradient(150deg,#f2536f,var(--gold-1) 55%,var(--gold-2))}
-.aff-k{display:block;font-size:11px;font-weight:700;opacity:.85;letter-spacing:.04em}
-.aff-v{display:block;font-size:18px;font-weight:800;line-height:1.15;color:#fff}
-.aff-note{margin-top:10px;font-size:11px;opacity:.62}
-@media (max-width:420px){ .aff-v{font-size:17.5px} .aff-cours{padding:14px 16px} }
+.aff-k{display:block;font-size:12px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;opacity:.9;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.aff-v{display:block;font-size:21px;font-weight:800;line-height:1.15;color:#fff;
+  text-shadow:0 2px 4px rgba(0,0,0,.4)}
+@media (max-width:420px){
+  .aff-rond{width:116px;height:116px}
+  .aff-v{font-size:18px}
+  .aff-lignes{gap:18px}
+}
 
 .hero-player{margin:28px auto 6px;max-width:640px;border-radius:18px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.35),0 0 0 1px var(--line);background:#000;aspect-ratio:16/9}
 .hero-player video{width:100%;height:100%;display:block;object-fit:cover}
@@ -1327,24 +1327,6 @@ body.dash .dock{ display:grid; }
     <section class="hero">
             <h1 data-i18n="hero_title">Dépôt et retrait <span class="grad">instantanés</span></h1>
       <p class="lead" data-i18n="hero_lead">Dépôt et retrait instantanés via MVola, Orange Money et Airtel Money. Créez votre compte, passez un ordre, payez. C'est tout.</p>
-      <!-- Cours affilie, en tete d'accueil : c'est l'argument qui decide un
-           visiteur, il ne doit pas etre a chercher. Sans valeurs, le bloc
-           reste invisible plutot que d'afficher un tiret. -->
-      <div class="aff-cours" id="affCours" hidden>
-        <div class="aff-tag">Cours affilie</div>
-        <div class="aff-lignes">
-          <div class="aff-rond aff-dep">
-            <span class="aff-k">Depot</span>
-            <span class="aff-v" id="affDep">&mdash;</span>
-          </div>
-          <div class="aff-rond aff-ret">
-            <span class="aff-k">Retrait</span>
-            <span class="aff-v" id="affRet">&mdash;</span>
-          </div>
-        </div>
-        <div class="aff-note">pour 1 USD &middot; Deriv</div>
-      </div>
-
       <!-- Le logo complet juste avant l'appel a l'action : c'est lui que les
            anciens clients reconnaissent, il doit etre vu avant le bouton. -->
       <video class="hero-logo" src="logo-hero.mp4"
@@ -1402,6 +1384,21 @@ body.dash .dock{ display:grid; }
       <h2>Pourquoi choisir MatulMada ?</h2>
       <p>Quatre raisons, en quelques secondes.</p>
     </div>
+      <!-- Cours affilie : l'argument chiffre arrive apres la promesse, la ou
+           le visiteur est deja convaincu et cherche le detail. -->
+      <div class="aff-cours" id="affCours" hidden>
+        <div class="aff-tag">Cours affilie &middot; 1 USD Deriv</div>
+        <div class="aff-lignes">
+          <div class="aff-rond aff-dep">
+            <span class="aff-k">Depot</span>
+            <span class="aff-v" id="affDep">&mdash;</span>
+          </div>
+          <div class="aff-rond aff-ret">
+            <span class="aff-k">Retrait</span>
+            <span class="aff-v" id="affRet">&mdash;</span>
+          </div>
+        </div>
+      </div>
     <div class="why-grid">
 
       <article class="why-card">
