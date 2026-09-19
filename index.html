@@ -173,13 +173,24 @@ header.nav{position:sticky;top:0;z-index:50;background:transparent;border-bottom
 }
 .aff-tag{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
   color:var(--gold-1);margin-bottom:11px}
-.aff-lignes{display:flex;align-items:center;gap:14px}
-.aff-l{flex:1;min-width:0;text-align:center}
-.aff-sep{width:1.5px;align-self:stretch;background:rgba(255,255,255,.16)}
-.aff-k{display:block;font-size:11.5px;font-weight:700;opacity:.72;margin-bottom:3px}
-.aff-v{display:block;font-size:20px;font-weight:800;line-height:1.15;
-  background:linear-gradient(120deg,var(--gold-1),var(--gold-2));
-  -webkit-background-clip:text;background-clip:text;color:transparent}
+.aff-lignes{display:flex;align-items:center;justify-content:center;gap:22px}
+/* Deux disques identiques, aux couleurs des acces de l'espace client : le
+   client retrouve le meme repere d'un bout a l'autre du site. L'anneau tourne
+   lentement autour, assez pour accrocher l'oeil sans gener la lecture. */
+.aff-rond{position:relative;width:118px;height:118px;border-radius:50%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  color:#fff;text-align:center;flex:none}
+.aff-rond::before{content:"";position:absolute;inset:-4px;border-radius:50%;
+  background:conic-gradient(from 0deg,transparent 0deg,rgba(255,255,255,.85) 45deg,transparent 110deg);
+  animation:affTourne 3.4s linear infinite}
+.aff-rond::after{content:"";position:absolute;inset:0;border-radius:50%;
+  background:inherit;box-shadow:inset 0 2px 0 rgba(255,255,255,.22)}
+.aff-rond>*{position:relative;z-index:2}
+@keyframes affTourne{ to{ transform:rotate(360deg) } }
+.aff-dep{background:linear-gradient(150deg,var(--navy-3,#24365c),var(--navy-1) 60%,var(--navy-2))}
+.aff-ret{background:linear-gradient(150deg,#f2536f,var(--gold-1) 55%,var(--gold-2))}
+.aff-k{display:block;font-size:11px;font-weight:700;opacity:.85;letter-spacing:.04em}
+.aff-v{display:block;font-size:18px;font-weight:800;line-height:1.15;color:#fff}
 .aff-note{margin-top:10px;font-size:11px;opacity:.62}
 @media (max-width:420px){ .aff-v{font-size:17.5px} .aff-cours{padding:14px 16px} }
 
@@ -1322,9 +1333,14 @@ body.dash .dock{ display:grid; }
       <div class="aff-cours" id="affCours" hidden>
         <div class="aff-tag">Cours affilie</div>
         <div class="aff-lignes">
-          <div class="aff-l"><span class="aff-k">Depot</span><span class="aff-v" id="affDep">&mdash;</span></div>
-          <div class="aff-sep"></div>
-          <div class="aff-l"><span class="aff-k">Retrait</span><span class="aff-v" id="affRet">&mdash;</span></div>
+          <div class="aff-rond aff-dep">
+            <span class="aff-k">Depot</span>
+            <span class="aff-v" id="affDep">&mdash;</span>
+          </div>
+          <div class="aff-rond aff-ret">
+            <span class="aff-k">Retrait</span>
+            <span class="aff-v" id="affRet">&mdash;</span>
+          </div>
         </div>
         <div class="aff-note">pour 1 USD &middot; Deriv</div>
       </div>
@@ -2119,6 +2135,14 @@ function majAccesCours(view){
 }
 function showPage(view){
   try{ majAccesCours(view); }catch(e){}
+  if(view === 'depot' || view === 'retrait'){
+    setTimeout(function(){
+      try{
+        var f = document.getElementById('opPick');
+        if(f) f.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }catch(e){}
+    }, 80);
+  }
   var sec=(view==="depot"||view==="retrait")?"order":view;
   var pages=document.querySelectorAll("#dashboard .page");for(var i=0;i<pages.length;i++)pages[i].classList.toggle("active",pages[i].dataset.page===sec);
   var btns=document.querySelectorAll("#dock button");for(var j=0;j<btns.length;j++)btns[j].classList.toggle("active",btns[j].dataset.go===view);
