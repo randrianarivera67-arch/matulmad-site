@@ -2559,13 +2559,13 @@ async function saveWallet(id){
       var dm=await api("/api/wallet/"+id,{method:"PATCH",body:JSON.stringify({numero:num,label:lbl})});
       if(dm.error){fsErr(dm.error);btn.disabled=false;btn.textContent=t("w_save");return;}
       await chargerDemandes();
-      renderWallets();remplirNumeros();closeSheet("formSheet");
+      renderWallets();remplirNumeros();renderOpPick();closeSheet("formSheet");
       toast(lang==="fr"?"Demande envoyee — en attente de validation":"Nalefa ny fangatahana — miandry fankatoavana","ok");
     } else {
       var d=await api("/api/wallet",{method:"POST",body:JSON.stringify({operator:op,numero:num,label:lbl})});
       if(d.error){fsErr(d.error);btn.disabled=false;btn.textContent=t("w_save");return;}
       if(d.wallets)me.wallets=d.wallets;
-      renderWallets();remplirNumeros();closeSheet("formSheet");toast(t("m_added"),"ok");
+      renderWallets();remplirNumeros();renderOpPick();closeSheet("formSheet");toast(t("m_added"),"ok");
     }
   }catch(e){btn.disabled=false;btn.textContent=t("w_save");fsErr(t("m_err"));}
 }
