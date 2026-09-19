@@ -2528,7 +2528,7 @@ async function saveWallet(id){
   var op=document.getElementById("wOp").value,num=document.getElementById("wNum").value.trim(),lbl=document.getElementById("wLabel").value.trim();
   if(!num){fsErr(lang==="fr"?"Numéro requis":"Mila numéro");return;}
   // Meme regle que le serveur : un numero Orange ne peut pas etre un wallet Telma.
-  var PREF={mvola:['034','038'],orange:['032','037'],airtel:['033']};
+  var PREF={mvola:['034','038'],orange:['032','037'],airtel:['033','035']};
   var opRef = id ? (findWallet(id)||{}).operator : op;
   if(PREF[opRef] && !PREF[opRef].some(function(p){return num.replace(/\s/g,'').indexOf(p)===0;})){
     fsErr((lang==="fr"?"Num\u00e9ro incompatible — attendu ":"Numéro tsy mifanaraka — andrasana ")+PREF[opRef].join(' / '));
