@@ -2657,8 +2657,9 @@ function openWallet(id){
     return dejaPris.indexOf(k) < 0;
   });
   if (!choix.length) {
-    var _m = document.getElementById("fsMsg");
-    if (_m) { _m.className = "msg err"; _m.textContent = "Vous avez deja un numero pour chaque operateur. Modifiez celui a changer."; }
+    toast(lang === "fr"
+      ? "Vous avez deja un numero pour chaque operateur. Modifiez celui a changer."
+      : "Efa manana numero isaky ny operateur ianao. Ovay izay tianao hasolo.", "err");
     return;
   }
   var opts=choix.map(function(k){return '<option value="'+k+'"'+(w&&w.operator===k?' selected':'')+'>'+opName(k)+'</option>';}).join('');
