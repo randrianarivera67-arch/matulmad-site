@@ -2817,7 +2817,15 @@ async function saveProv(id){
     var d=await api("/api/wallet/provider",{method:"POST",body:JSON.stringify({name:name,accountId:acc,label:lbl,email:eml})});
     if(d.providers)me.providers=d.providers;
     if(id){var d2=await api("/api/wallet/provider/"+id,{method:"DELETE"});if(d2.providers)me.providers=d2.providers;}
-    renderProviders();populateProviderSelect();remplirComptes();closeSheet("formSheet");toast(t(id?"m_saved":"m_added"),"ok");
+    renderProviders();populateProviderSelect();remplirComptes();closeSheet("formSheet");
+    var _n = Number(d && d.ordresRepris) || 0;
+    if(_n > 0){
+      toast(lang === "fr"
+        ? (_n + (_n > 1 ? " depots en cours repartent" : " depot en cours repart") + " automatiquement.")
+        : (_n + " fangatahana eo am-panaovana no handeha ho azy."), "ok");
+    } else {
+      toast(t(id?"m_saved":"m_added"),"ok");
+    }
   }catch(e){btn.disabled=false;btn.textContent=t("w_save");fsErr(t("m_err"));}
 }
 async function delProv(id){if(!confirm(t("confirm_del")))return;try{var d=await api("/api/wallet/provider/"+id,{method:"DELETE"});if(d.providers){me.providers=d.providers;renderProviders();populateProviderSelect();remplirComptes();toast(t("m_deleted"),"ok");}}catch(e){toast(t("m_err"),"err");}}
