@@ -3227,7 +3227,12 @@ if("serviceWorker" in navigator){window.addEventListener("load",function(){
       if(m && m.style.display && m.style.display !== 'none') return;
       if(window._mmOperationEnCours) return;
     }catch(e){}
-    refreshing=true; window.location.reload();
+    // Plus aucun rechargement automatique. Les gardes precedentes (code Deriv
+    // dans l'URL, fenetre de code ouverte, operation en cours) laissaient
+    // passer des cas ou le client perdait sa saisie. Une version nouvelle
+    // n'a aucune raison d'interrompre quelqu'un : elle s'appliquera a la
+    // prochaine ouverture.
+    refreshing = true;
   });
 });}
 
