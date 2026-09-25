@@ -286,7 +286,16 @@ footer{background:linear-gradient(180deg,transparent,var(--blue-soft));padding-b
 /* Modale */
 .modal{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(6,16,38,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .modal.open{display:flex}
-.modal-card{width:100%;max-width:430px;background:var(--panel-solid);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-lg);padding:28px 24px;max-height:94vh;overflow:auto;position:relative}
+.modal-card{width:100%;max-width:430px;background:var(--panel-solid);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-lg);padding:28px 24px;max-height:94vh;max-height:94dvh;overflow:auto;overscroll-behavior:contain;position:relative}
+#authSubmit{position:sticky;bottom:-28px;z-index:2;margin-top:4px;
+  box-shadow:0 -14px 22px -10px var(--panel-solid),var(--shadow)}
+/* Oeil qui devoile le mot de passe : sans lui, une faute de frappe sur un
+   telephone ne se voit jamais. */
+.eye{background:none;border:none;padding:4px;margin:-4px -2px -4px 0;cursor:pointer;
+  color:var(--ink-dim);display:grid;place-items:center;flex:none;border-radius:8px}
+.eye:hover,.eye:focus-visible{color:var(--blue-1)}
+.eye svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round}
 .modal-card .brand{font-size:30px;justify-content:center;display:flex;margin-bottom:6px}
 .modal-card .sub{text-align:center;color:var(--ink-dim);font-size:14px;margin-bottom:20px}
 .tabs{display:flex;background:var(--field);border-radius:12px;padding:4px;margin-bottom:18px}
@@ -1733,9 +1742,9 @@ body.dash .dock{ display:grid; }
       <span id="aMapBtnTxt" data-i18n="lbl_pickmap">Choisir le point exact (carte)</span>
     </button>
     <div class="field"><label data-i18n="lbl_pass">Mot de passe</label>
-      <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M6 10V7a6 6 0 0 1 12 0v3M5 10h14v10H5z"/></svg><input id="aPass" type="password" placeholder="••••••"></div></div>
+      <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M6 10V7a6 6 0 0 1 12 0v3M5 10h14v10H5z"/></svg><input id="aPass" type="password" placeholder="••••••"><button type="button" class="eye" onclick="voirMdp(this)" aria-label="Afficher le mot de passe"><svg viewBox="0 0 24 24" class="ferme"><path d="M2 12s3.8-7 10-7 10 7 10 7-3.8 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><svg viewBox="0 0 24 24" class="ouvert" style="display:none"><path d="M2 12s3.8-7 10-7c2 0 3.7.7 5.2 1.6M22 12s-3.8 7-10 7c-2 0-3.7-.7-5.2-1.6"/><path d="M3 3l18 18"/></svg></button></div></div>
     <div class="field" id="fldPassConfirm" style="display:none"><label data-i18n="lbl_passconfirm">Confirmer le mot de passe</label>
-      <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M6 10V7a6 6 0 0 1 12 0v3M5 10h14v10H5z"/></svg><input id="aPassConfirm" type="password" placeholder="••••••"></div></div>
+      <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M6 10V7a6 6 0 0 1 12 0v3M5 10h14v10H5z"/></svg><input id="aPassConfirm" type="password" placeholder="••••••"><button type="button" class="eye" onclick="voirMdp(this)" aria-label="Afficher le mot de passe"><svg viewBox="0 0 24 24" class="ferme"><path d="M2 12s3.8-7 10-7 10 7 10 7-3.8 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><svg viewBox="0 0 24 24" class="ouvert" style="display:none"><path d="M2 12s3.8-7 10-7c2 0 3.7.7 5.2 1.6M22 12s-3.8 7-10 7c-2 0-3.7-.7-5.2-1.6"/><path d="M3 3l18 18"/></svg></button></div></div>
     <button class="btn btn-primary btn-block" id="authSubmit" onclick="doAuth()"><span id="authBtnTxt" data-i18n="tab_login">Connexion</span></button>
     <div id="forgotRow" style="text-align:center;margin-top:12px">
       <a href="#" onclick="ouvrirOubli();return false" style="font-size:13.5px;font-weight:700;color:var(--gold-1);text-decoration:none" data-i18n="lbl_forgot">Mot de passe oublié ?</a>
@@ -2399,6 +2408,19 @@ function majAideTel(){
     if(e) e.placeholder = "0341234567";
   }
   if(e && e.value) nettoyerTel(e);
+}
+
+/* Montre ou cache le mot de passe du champ voisin. */
+function voirMdp(btn){
+  var champ = btn.parentNode.querySelector('input');
+  if(!champ) return;
+  var cache = champ.type === 'password';
+  champ.type = cache ? 'text' : 'password';
+  btn.setAttribute('aria-label', cache ? 'Masquer le mot de passe' : 'Afficher le mot de passe');
+  var f = btn.querySelector('.ferme'), ov = btn.querySelector('.ouvert');
+  if(f)  f.style.display  = cache ? 'none' : '';
+  if(ov) ov.style.display = cache ? '' : 'none';
+  try{ champ.focus({preventScroll:true}); }catch(e){}
 }
 
 async function doAuth(){
