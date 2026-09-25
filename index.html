@@ -1723,7 +1723,7 @@ body.dash .dock{ display:grid; }
       <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg><input id="aIdent" placeholder="email@exemple.mg / 034…"></div></div>
     <div class="field" id="fldPhone" style="display:none"><label data-i18n="lbl_phone">Téléphone (optionnel)</label>
       <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 5 5L16 13l5 2v3a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/></svg><input id="aPhone" type="tel" inputmode="numeric" placeholder="0341234567" oninput="nettoyerTel(this)"></div>
-      <div class="hint-tel">Sans espace, en commençant par 03X. Le format +261 n'est pas accepté.</div></div>
+      <div class="hint-tel">Sans espace. Madagascar : 10 chiffres (0341234567). Comores : 7 chiffres (4771015).</div></div>
     <div class="field" id="fldKmAccount" style="display:none"><label>Type de compte</label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <button type="button" id="acctMg" onclick="pickAcctType(false)" class="active" style="padding:14px 8px;border-radius:12px;border:1.5px solid var(--blue-1);background:var(--field);font-family:var(--font-d);font-weight:700;font-size:16px;color:var(--blue-1);box-shadow:0 0 0 3px var(--glow)">Madagascar<br><span style="font-size:12.5px;font-weight:600;opacity:.8">Ariary (Ar)</span></button>
@@ -2378,8 +2378,27 @@ async function activerNotifs(){
    pas un chiffre au fil de la frappe, et on ramene un +261 colle depuis un
    contact vers la forme locale 03X, plutot que de le refuser sechement. */
 function estComores(){
-  var k = document.getElementById("aKmAccount");
-  return !!(k && k.value === "1");
+  var modal = document.getElementById("authModal");
+  if (modal && modal.classList.contains("open")) {
+    var k = document.getElementById("aKmAccount");
+    return !!(k && k.value === "1");
+  }
+  try { return !!(me && me.kmAccount); } catch (e) { return false; }
+}
+
+/* Longueur d'un numero mobile money : dix chiffres a Madagascar, sept aux
+   Comores. Trop long n'arrive jamais — la saisie s'arrete d'elle-meme, donc
+   aucun message ; trop court est signale au moment de l'envoi. */
+function longueurTel(comores){ return comores ? 7 : 10; }
+function verifTel(valeur, comores){
+  var v = String(valeur || '').replace(/\D/g, '');
+  var n = longueurTel(comores === undefined ? estComores() : comores);
+  if (v.length === n) return null;
+  return (lang === "fr")
+    ? ("Num\u00e9ro incomplet : " + n + " chiffres attendus, " + v.length
+       + " saisi" + (v.length > 1 ? "s" : "") + ".")
+    : ("Tsy feno ny num\u00e9ro : " + n + " isa no ilaina, " + v.length
+       + " no voasoratra.");
 }
 function nettoyerTel(el){
   var v = String(el.value || '').replace(/\D/g, '');
@@ -2438,6 +2457,7 @@ async function doAuth(){
       var prenom=document.getElementById("aPrenom").value.trim();var nomF=document.getElementById("aName").value.trim();
       if(!prenom||!nomF){btn.disabled=false;return authError(lang==="fr"?"Prénom et nom requis":"Mila prénom sy nom");}
       var name=(prenom+" "+nomF).trim();var phone=document.getElementById("aPhone").value.trim();
+      if(phone){var errTel=verifTel(phone);if(errTel){btn.disabled=false;return authError(errTel);}}
       var country=document.getElementById("aCountry").value||"Madagascar";
       var address=document.getElementById("aAddress").value.trim();
       var addrLat=document.getElementById("aAddrLat").value;var addrLng=document.getElementById("aAddrLng").value;
@@ -2705,11 +2725,11 @@ function openWallet(id){
               : ((enAttente.nouveau&&enAttente.nouveau.numero)||''))
           +'</div>'
         : '')+
-      '<div class="field"><label>'+(lang==="fr"?"Nouveau num\u00e9ro":"Numéro vaovao")+'</label><div class="inp"><input id="wNum" inputmode="numeric" placeholder="'+exNum(w.operator)+'" value=""'+(enAttente?' disabled':'')+'></div></div>';
+      '<div class="field"><label>'+(lang==="fr"?"Nouveau num\u00e9ro":"Numéro vaovao")+'</label><div class="inp"><input id="wNum" inputmode="numeric" oninput="nettoyerTel(this)" placeholder="'+exNum(w.operator)+'" value=""'+(enAttente?' disabled':'')+'></div></div>';
   } else {
     bloc =
       '<div class="field"><label>'+t("w_op")+'</label><div class="inp"><select id="wOp">'+opts+'</select></div></div>'+
-      '<div class="field"><label>'+t("w_num")+'</label><div class="inp"><input id="wNum" inputmode="numeric" placeholder="'+exNum((activeOpKeys()[0]||'mvola'))+'" value=""></div></div>';
+      '<div class="field"><label>'+t("w_num")+'</label><div class="inp"><input id="wNum" inputmode="numeric" oninput="nettoyerTel(this)" placeholder="'+exNum((activeOpKeys()[0]||'mvola'))+'" value=""></div></div>';
   }
   document.getElementById("fsBody").innerHTML= bloc+
     '<div class="field"><label>'+t("w_label")+'</label><div class="inp"><input id="wLabel" placeholder="MVola perso" value="'+(w&&w.label?w.label.replace(/"/g,"&quot;"):'')+'"></div></div>'+
@@ -2721,6 +2741,7 @@ function openWallet(id){
 async function saveWallet(id){
   var op=document.getElementById("wOp").value,num=document.getElementById("wNum").value.trim(),lbl=document.getElementById("wLabel").value.trim();
   if(!num){fsErr(lang==="fr"?"Numéro requis":"Mila numéro");return;}
+  var errNum = verifTel(num); if(errNum){fsErr(errNum);return;}
   // Meme regle que le serveur : un numero Orange ne peut pas etre un wallet Telma.
   var PREF={mvola:['034','038'],orange:['032','037'],airtel:['033','035']};
   var opRef = id ? (findWallet(id)||{}).operator : op;
@@ -2746,8 +2767,8 @@ async function saveWallet(id){
 }
 /* Demandes en attente : le wallet concerne reste actif jusqu'a la decision. */
 var _demandes=[];
-var EX_NUM={mvola:'034 12 345 67',orange:'032 12 345 67',airtel:'033 12 345 67',mvola_km:'321 23 45'};
-function exNum(op){ return EX_NUM[op] || '034 12 345 67'; }
+var EX_NUM={mvola:'0341234567',orange:'0321234567',airtel:'0331234567',mvola_km:'3212345'};
+function exNum(op){ return EX_NUM[op] || '0341234567'; }
 async function chargerDemandes(){
   try{var d=await api("/api/wallet/demandes");_demandes=(d&&d.demandes)||[];}catch(e){_demandes=[];}
 }
