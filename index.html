@@ -1290,13 +1290,13 @@ body.dash .dock{ display:grid; }
 
 /* ===== PC (≥1024px) : navbar VERTICAL a droite — Facebook premium ===== */
 @media(min-width:1024px){
-  /* PC : la navigation passe en barre horizontale juste sous l'en-tete,
-     en texte seul, et reste visible pendant le defilement. */
+  /* PC : la navigation se place DANS l'en-tete, centree entre le logo et
+     les icones, en texte seul, sans pastille 3D, toujours visible. */
   body.dash .dock{
     display:flex; flex-direction:row; align-items:center; justify-content:center; gap:4px;
-    left:50%; right:auto; top:64px; bottom:auto; transform:translateX(-50%);
-    width:auto; max-width:calc(100vw - 40px); padding:6px; border-radius:16px;
-    background:var(--panel-solid); border:1px solid var(--line); box-shadow:var(--shadow);
+    left:50%; right:auto; top:0; bottom:auto; transform:translateX(-50%); height:64px;
+    width:auto; max-width:none; padding:0; border-radius:0;
+    background:transparent; border:0; box-shadow:none;
   }
   body.dash .dock.hide{ transform:translateX(-50%); opacity:1; pointer-events:auto; }
   body.dash .dock>button,
@@ -1304,15 +1304,16 @@ body.dash .dock{ display:grid; }
     flex-direction:row; width:auto; padding:0; border-radius:11px;
     background:transparent; box-shadow:none;
   }
+  body.dash .dock>button::before,
+  body.dash .dock>button::after,
+  body.dash .dock>button.active::before,
   body.dash .dock>button.active::after,
   body.dash .dock .nv-img,
   body.dash .dock .ic,
   body.dash .dock .ic-wrap{ display:none; }
-  body.dash .dock .nv-txt{ display:block; color:var(--ink-dim); font-weight:700; text-shadow:none; }
+  body.dash .dock .nv-txt{ display:block; color:var(--ink-dim); font-weight:700; text-shadow:none; padding:8px 11px; box-shadow:none; }
   body.dash .dock>button:hover .nv-txt{ color:var(--ink); }
   body.dash .dock>button.active .nv-txt{ color:var(--gold-1); background:rgba(230,52,85,.10); }
-  /* La barre fixe ne doit pas couvrir le haut de la page. */
-  body.dash main{ padding-top:60px; }
 }
 
 </style>
