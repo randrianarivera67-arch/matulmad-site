@@ -2548,11 +2548,15 @@ function paintRatePanel(){
     : "Appliqué aux ordres Deriv (1 USD). Mobile money : montants en Ariary.";
 }
 function isDeriv(){var p=document.getElementById("fProvider");return p&&(p.value||"").toLowerCase()==="deriv";}
+// 1WIN se regle en dollars comme Deriv : le serveur lui envoie deja montantUsd.
+// La case annoncait pourtant des ariary, et un client saisissant 1000 en croyant
+// donner 1 000 Ar commandait 4 400 000 Ar.
+function enUsd(){var p=document.getElementById("fProvider");return p && /^(deriv|1win)$/i.test((p.value||"").trim());}
 function convAr(){
   var box=document.getElementById("arBox"),info=document.getElementById("rateInfo"),lbl=document.getElementById("lblMontant");
   var usd=parseM((document.getElementById("fMontant")||{}).value);
   var dv=devise();  // "Ar" (Madagascar) na "Fc" (Comores)
-  if(isDeriv()){
+  if(enUsd()){
     // Meme regle qu'au panneau : le cours affilie prime quand il est defini.
     var _aff=!!(typeof me!=="undefined" && me && me.affilie), _sf=_aff?"_aff":"";
     var _c=function(b){var v=Number(_rates[b+_sf])||0;return v>0?v:(Number(_rates[b])||0);};
