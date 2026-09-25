@@ -3475,6 +3475,12 @@ async function mmStartOAuth(){
         var wOp=(typeof orderOp!=="undefined")?orderOp:"";
         if(!/^[0-9]+$/.test(wId)){ if(wMsg){wMsg.textContent="ID 1WIN invalide (chiffres uniquement)";wMsg.className="msg err";} return; }
         if(!wNum){ if(wMsg){wMsg.textContent="Numéro requis";wMsg.className="msg err";} return; }
+      // L'operateur mobile money n'etait pas verifie : parti vide, le serveur
+      // repondait « champs requis » sans que le client sache quoi corriger.
+      if(!wOp){ if(wMsg){wMsg.textContent=lang==="fr"
+        ? "Choisissez l'opérateur mobile money avant de valider."
+        : "Fidio ny opérateur mobile money alohan'ny hanamarinana.";
+        wMsg.className="msg err";} return; }
         var wBtn=document.getElementById("btnOrder");
 
         if(ot==="retrait"){
