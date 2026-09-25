@@ -2887,10 +2887,26 @@ function fsErr(m){var e=document.getElementById("fsMsg");e.textContent=m;e.class
 /* historique : devise correcte + tiroir + calendrier */
 let _histLoaded=false;
 async function loadHistory(){
-  if(_histLoaded){paintHistory();return;}
-  try{var d=await api("/api/order");_hist=(d&&d.data)?d.data:[];}catch(e){_hist=[];}
-  _histLoaded=true;paintHistory();
+  // Toujours relire le serveur : un ordre peut passer d'"en attente" a
+  // "valide" ou "refuse" pendant que le client est sur le site. L'ancienne
+  // liste s'affiche d'abord, la nouvelle la remplace si un statut a change.
+  if(_histLoaded)paintHistory();
+  var sig=function(){return JSON.stringify((_hist||[]).map(function(o){return o._id+":"+o.status;}));};
+  var avant=sig();
+  try{var d=await api("/api/order");if(d&&d.data)_hist=d.data;else if(!_histLoaded)_hist=[];}
+  catch(e){if(!_histLoaded)_hist=[];}
+  var premier=!_histLoaded;_histLoaded=true;
+  if(premier||sig()!==avant)paintHistory();
 }
+// Tant que l'historique est affiche et qu'un ordre est encore en attente ou
+// en cours, le relire toutes les 15 s pour montrer son issue sans recharger.
+setInterval(function(){
+  if(document.hidden||!_histLoaded)return;
+  var pg=document.querySelector('section.page[data-page="historique"]');
+  if(!pg||pg.offsetParent===null)return;
+  var enCours=(_hist||[]).some(function(o){return o.status==="pending"||o.status==="processing";});
+  if(enCours)loadHistory();
+},15000);
 function setHistTab(tb){_histTab=tb;var b=document.querySelectorAll("#histTabs .ftab");for(var i=0;i<b.length;i++)b[i].classList.toggle("active",b[i].dataset.tab===tb);paintHistory();}
 function clearDate(){_histDate="";document.getElementById("histDate").value="";paintHistory();}
 function dkey(iso){var x=new Date(iso);return x.getFullYear()+"-"+p2(x.getMonth()+1)+"-"+p2(x.getDate());}
