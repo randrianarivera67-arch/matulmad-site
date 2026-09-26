@@ -2553,10 +2553,14 @@ function populateProviderSelect(){var sel=document.getElementById("fProvider");i
     // 1XBET : disponible partout, y compris aux Comores (montants en Fc).
     opts+='<option>1XBET</option>';
     // 1WIN : caisse en dollars, montants convertis au cours du jour comme Deriv.
-    opts+='<option>1WIN</option>';
+    // Madagascar uniquement : aux Comores, seuls Deriv et 1XBET sont ouverts.
+    if(!kmMode) opts+='<option>1WIN</option>';
   }
   sel.innerHTML=opts;
-  if(kmMode && /betwinner/i.test(sel.value||"")) sel.value="Deriv";}
+  // Un choix hors service aux Comores (garde d'un ancien ordre, ou fournisseur
+  // enregistre depuis Madagascar) est ramene sur Deriv : sans cela le client
+  // remplissait un formulaire que le serveur allait refuser.
+  if(kmMode && /betwinner|1win/i.test(sel.value||"")) sel.value="Deriv";}
 function isBetwinner(){var p=document.getElementById("fProvider");return p&&(p.value||"").toLowerCase()==="betwinner";}
 
 /* type / opérateur */
@@ -2827,9 +2831,14 @@ function openProv(id){
   document.getElementById("fsBody").innerHTML=
     '<div class="field"><label>'+t("p_name")+'</label><div class="inp"><select id="pName" onchange="provFields()">'+
       '<option value="Deriv"'+(/deriv/i.test(curName)?' selected':'')+'>Deriv</option>'+
-      '<option value="Betwinner"'+(/betwinner/i.test(curName)?' selected':'')+'>Betwinner</option>'+
+      // Aux Comores, seuls Deriv et 1XBET sont ouverts : proposer les deux
+      // autres menait a un compte inutilisable. Un compte deja enregistre
+      // reste visible, sinon sa modification le ferait disparaitre.
+      ((!kmMode || /betwinner/i.test(curName))
+        ? '<option value="Betwinner"'+(/betwinner/i.test(curName)?' selected':'')+'>Betwinner</option>' : '')+
       '<option value="1XBET"'+(/1xbet/i.test(curName)?' selected':'')+'>1XBET</option>'+
-      '<option value="1WIN"'+(/1win/i.test(curName)?' selected':'')+'>1WIN</option>'+
+      ((!kmMode || /1win/i.test(curName))
+        ? '<option value="1WIN"'+(/1win/i.test(curName)?' selected':'')+'>1WIN</option>' : '')+
     '</select></div></div>'+
     '<div id="provDyn"></div>'+
     '<button class="btn btn-primary btn-block" id="pSave">'+t("w_save")+'</button>';
