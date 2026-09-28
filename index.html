@@ -704,6 +704,23 @@ body:not(.dash) .install-banner.show{bottom:calc(env(safe-area-inset-bottom,0px)
 /* ════════════════ REFONTE 2026 ════════════════ */
 /* — Topbar : 3 boutons (Paramètres néon · Notification animée · Profil) en mode dashboard — */
 .dash-only{display:none !important}
+.tb-menu{display:none !important}
+@media (max-width:860px){ body.dash .tb-menu{display:grid !important} }
+.mnu-bd{position:fixed;inset:0;z-index:130;background:rgba(6,16,38,.5);
+  opacity:0;pointer-events:none;transition:opacity .18s}
+.mnu-bd.open{opacity:1;pointer-events:auto}
+.mnu-pan{position:fixed;top:0;right:0;bottom:0;width:min(82vw,320px);z-index:131;
+  background:var(--panel-solid);border-left:1px solid var(--line);
+  box-shadow:var(--shadow-lg);transform:translateX(100%);transition:transform .22s;
+  display:flex;flex-direction:column;padding:16px 0 calc(16px + env(safe-area-inset-bottom,0px))}
+.mnu-pan.open{transform:none}
+.mnu-tt{font-family:var(--font-d);font-weight:800;font-size:13px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-dim);padding:6px 20px 10px}
+.mnu-pan a{display:block;padding:14px 20px;font-family:var(--font-d);font-weight:700;
+  font-size:16px;color:var(--ink);text-decoration:none;cursor:pointer;border:none;
+  background:none;width:100%;text-align:left}
+.mnu-pan a:active,.mnu-pan a:hover{background:var(--field);color:var(--blue-1)}
+.mnu-sep{height:1px;background:var(--line);margin:10px 20px}
 body.dash .dash-only{display:grid !important}
 body.dash .landing-only{display:none !important}
 .tb-btn{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;border:1px solid var(--line);background:var(--panel);position:relative;transition:.16s;flex:none}
@@ -1331,6 +1348,9 @@ body.dash .dock{ display:grid; }
       <button class="tb-btn tb-set dash-only tb-set-float" onclick="openSettings()" title="Paramètres"><svg class="ic" viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
       <button class="tb-btn tb-notif dash-only" id="bellBtn" onclick="openNotif()" title="Annonces"><svg class="ic" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="bell-dot hidden" id="bellDot"></span></button>
       <button class="tb-prof dash-only" id="profBtn" onclick="openProfile()" title="Profil"><span class="av-fb" id="profInit">?</span><img id="profImg" alt=""></button>
+      <button class="tb-btn tb-menu" id="menuBtn" onclick="ouvrirMenu()" title="Menu" aria-label="Menu">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
     </div>
   </div>
 </header>
@@ -2133,7 +2153,7 @@ function setKmMode(on){
 function go(v){
   var site=document.getElementById("site"),dash=document.getElementById("dashboard");
   if(v==="dashboard"){site.style.display="none";dash.style.display="block";
-    document.body.classList.add("dash");window.scrollTo(0,0);}
+    document.body.classList.add("dash");window.scrollTo(0,0);try{document.getElementById("dock").classList.remove("hide");}catch(e){}}
   else{site.style.display="block";dash.style.display="none";
     document.body.classList.remove("dash");}
 }
@@ -2446,6 +2466,52 @@ function voirMdp(btn){
   if(ov) ov.style.display = cache ? '' : 'none';
   try{ champ.focus({preventScroll:true}); }catch(e){}
 }
+
+/* Menu telephone : une copie en texte des entrees de la barre du bas, plus
+   les reglages et les annonces. Les entrees sont LUES depuis la barre, donc
+   toute page ajoutee plus tard y apparait sans rien changer ici. */
+function construireMenu(){
+  var bd = document.getElementById('mnuBd');
+  if(bd) return bd;
+  bd = document.createElement('div');
+  bd.id = 'mnuBd'; bd.className = 'mnu-bd';
+  bd.onclick = fermerMenu;
+  var pan = document.createElement('div');
+  pan.id = 'mnuPan'; pan.className = 'mnu-pan';
+  pan.onclick = function(ev){ ev.stopPropagation(); };
+  document.body.appendChild(bd);
+  document.body.appendChild(pan);
+  return bd;
+}
+function ouvrirMenu(){
+  construireMenu();
+  var pan = document.getElementById('mnuPan');
+  var h = '<div class="mnu-tt">Menu</div>';
+  var btns = document.querySelectorAll('#dock button[data-go]');
+  for(var i=0;i<btns.length;i++){
+    var sp = btns[i].querySelector('span');
+    var txt = sp ? sp.textContent.trim() : btns[i].dataset.go;
+    h += '<a onclick="allerDepuisMenu(\'' + btns[i].dataset.go + '\')">' + txt + '</a>';
+  }
+  h += '<div class="mnu-sep"></div>'
+     + '<a onclick="depuisMenu(openSettings)">' + (lang==="fr"?"Param\u00e8tres":"Fandrindrana") + '</a>'
+     + '<a onclick="depuisMenu(openNotif)">' + (lang==="fr"?"Notifications":"Fampandrenesana") + '</a>';
+  pan.innerHTML = h;
+  document.getElementById('mnuBd').classList.add('open');
+  pan.classList.add('open');
+}
+function fermerMenu(){
+  var bd = document.getElementById('mnuBd'), pan = document.getElementById('mnuPan');
+  if(bd) bd.classList.remove('open');
+  if(pan) pan.classList.remove('open');
+}
+function allerDepuisMenu(page){
+  fermerMenu();
+  try{ showPage(page); }catch(e){}
+  try{ document.getElementById('dock').classList.remove('hide'); }catch(e){}
+}
+function depuisMenu(fn){ fermerMenu(); try{ fn(); }catch(e){} }
+document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape') fermerMenu(); });
 
 async function doAuth(){
   var btn=document.getElementById("authSubmit");
@@ -3226,7 +3292,7 @@ async function saveProfile(){
     dock=dock||document.getElementById('dock');if(!dock)return;
     var y=window.scrollY||document.documentElement.scrollTop;
     if(y>last+6 && y>90){dock.classList.add('hide');}
-    else if(y<last-6){dock.classList.remove('hide');}
+    else if(y<last-6 || y<=90){dock.classList.remove('hide');}
     last=y;ticking=false;
   }
   window.addEventListener('scroll',function(){if(!ticking){window.requestAnimationFrame(onScroll);ticking=true;}},{passive:true});
