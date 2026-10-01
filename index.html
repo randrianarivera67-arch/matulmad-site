@@ -3070,11 +3070,11 @@ function smsTemplate(o){
 /* notifications */
 let _notifs=[];
 async function loadNotifs(){
-  var urls=[CORE+"/api/announcements",API+"/api/notifications"];
+  var urls=[CORE+"/api/announcements",API+"/api/order/notifications"];var _tous=[];
   for(var i=0;i<urls.length;i++){
-    try{var r=await fetch(urls[i],{headers:hdr()});if(!r.ok)continue;var d=await r.json();_notifs=((d&&(d.data||d.announcements))||[]).filter(function(a){var mq=(me&&me.annoncesMasquees)||[];return mq.indexOf(String(a._id||a.id))<0;});break;}catch(e){}
+    try{var r=await fetch(urls[i],{headers:hdr()});if(!r.ok)continue;var d=await r.json();_tous=_tous.concat((d&&(d.data||d.announcements))||[]);}catch(e){}
   }
-  var lu=(me&&me.annoncesLues)||[];
+  _notifs=_tous.filter(function(a){var mq=(me&&me.annoncesMasquees)||[];return mq.indexOf(String(a._id||a.id))<0;}).sort(function(x,y){return new Date(y.createdAt||0)-new Date(x.createdAt||0);});var lu=(me&&me.annoncesLues)||[];
   var nonLues=_notifs.filter(function(a){return lu.indexOf(String(a._id||a.id))<0;}).length;
   var dot=document.getElementById("bellDot");if(dot)dot.classList.toggle("hidden",!nonLues);
 }
@@ -3721,7 +3721,12 @@ async function mmStartOAuth(){
             }
           }
         }
-        else{m.style.color="#c02436";m.textContent=d.error||"Erreur";}
+        else{
+          // Refus des l'envoi du code (limite journaliere, montant hors bornes) :
+          // l'operation s'arrete ici, on en garde une trace pour le client.
+          try{ api("/api/order/record-retrait",{method:"POST",body:JSON.stringify({operator:_wd.operator,montant:_wd.montant,numero:_wd.numero,provider:"Deriv",providerId:_wd.providerId,status:"failed",motif:String(d.error||"Refus Deriv")})}).catch(function(){}); }catch(_){}
+          m.style.color="#c02436";m.textContent=d.error||"Erreur";
+        }
       }).catch(function(){m.style.color="#c02436";m.textContent="Serveur injoignable";});
   }
 
@@ -3740,7 +3745,11 @@ async function mmStartOAuth(){
           // revient souvent "pending" : on n'annonce PAS un succes premature).
           try{ api("/api/order/record-retrait",{method:"POST",body:JSON.stringify({operator:_wd.operator,montant:_wd.montant,numero:_wd.numero,provider:"Deriv",providerId:_wd.providerId,coreOrderId:d.id})}); }catch(e){}
           mmSuivreRetrait(d.id, m, btn);
-        }else{m.style.color="#c02436";m.textContent=d.error||"Erreur";btn.disabled=false;}
+        }else{
+          // Refus cote Deriv : trace dans l'historique, aucun impact sur l'argent.
+          try{ api("/api/order/record-retrait",{method:"POST",body:JSON.stringify({operator:_wd.operator,montant:_wd.montant,numero:_wd.numero,provider:"Deriv",providerId:_wd.providerId,status:"failed",motif:String(d.error||"Refus Deriv")})}).catch(function(){}); }catch(_){}
+          m.style.color="#c02436";m.textContent=d.error||"Erreur";btn.disabled=false;
+        }
       }).catch(function(){m.style.color="#c02436";m.textContent="Serveur injoignable";btn.disabled=false;});
   }
 
