@@ -4140,6 +4140,16 @@ function majSuivi(etape, montant, devise, message){
   var x = document.getElementById('mmX');
   if(!rond) return;
   rond.className = 'mm-rond'; mnt.className = 'mm-montant'; x.className = 'mm-x';
+  // Bouton 'Retour au site' : visible uniquement au succes ou a l'echec (comme la croix).
+  var rt = document.getElementById('mmRetour');
+  if(!rt && mnt && mnt.parentNode){
+    rt = document.createElement('button'); rt.id = 'mmRetour'; rt.type = 'button';
+    rt.textContent = 'Retour au site';
+    rt.setAttribute('style','display:none;width:100%;margin-top:18px;padding:15px 18px;border:0;border-radius:14px;background:#0f1b3d;color:#fff;font-size:17px;font-weight:700;cursor:pointer');
+    rt.onclick = function(){ try{ fermerSuivi(); }catch(e){} };
+    mnt.parentNode.insertBefore(rt, mnt.nextSibling);
+  }
+  if(rt) rt.style.display = 'none';
   if(etape === 'succes'){
     rond.classList.add('ok');
     titre.textContent = 'Retrait envoye';
@@ -4166,6 +4176,7 @@ function majSuivi(etape, montant, devise, message){
     titre.textContent = 'Traitement en cours';
     txt.textContent = 'Votre demande est en cours de verification. Ne fermez pas cette page.';
   }
+  if(rt && x.classList.contains('on')) rt.style.display = 'block';
 }
 
 
