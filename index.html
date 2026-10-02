@@ -3782,7 +3782,9 @@ async function mmStartOAuth(){
     mmVerrouOrdre(true);
     try{ ouvrirSuivi(); }catch(e){}
     if(!id){ if(m){m.style.color="#16804a";m.textContent="Retrait confirmé — traitement en cours.";} return; }
-    var t0 = Date.now(), timer = null;
+    // Un seul ecran pendant le suivi : la carte mmSuivi reste, la fenetre du code (wdModal) se cache.
+    try{ var _sv=document.getElementById("mmSuivi"), _wm=document.getElementById("wdModal"); if(_sv && _sv.classList.contains("open") && _wm) _wm.style.display="none"; }catch(eH){}
+    var t0 = Date.now(), timer = null, ralenti = false;
     function tick(){
       fetch(CORE_URL+"/api/retrait/"+encodeURIComponent(id)+"/public-status")
         .then(function(r){return r.json();})
@@ -3816,11 +3818,13 @@ async function mmStartOAuth(){
             }, 2500);
           }
         }).catch(function(){});
-      // Au bout de 5 min on arrete le polling (le suivi continue dans l'historique)
-      if(Date.now()-t0 > 5*60*1000){
+      // Le client suit l'ordre jusqu'au bout : apres 5 min on interroge toutes les 15 s
+      // au lieu d'arreter. Tant que l'ordre est en cours, aucun bouton fermer : il
+      // n'apparait qu'au succes ou a l'echec (le serveur clot tout ordre en 1 h).
+      if(!ralenti && Date.now()-t0 > 5*60*1000){
+        ralenti = true;
         if(timer) clearInterval(timer);
-        mmVerrouOrdre(false);
-        if(m){ m.style.color="#b45309"; m.textContent="⏳ Traitement en cours — suivez dans l'historique."; }
+        timer = setInterval(tick, 15000);
       }
     }
     tick();
