@@ -204,6 +204,14 @@ header.nav{position:sticky;top:0;z-index:50;background:transparent;border-bottom
 .hero-cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;
   max-width:430px;margin:0 auto}
 @media (max-width:520px){.hero-cta{max-width:300px}}
+/* FIX 2026-10-03 : bouton Installer — bleu, reflet qui defile + halo pulse */
+.btn-install{position:relative;overflow:hidden;color:#fff!important;border:none!important;
+  background:linear-gradient(110deg,#0b5cff 0%,#2f8bff 45%,#7cc0ff 50%,#2f8bff 55%,#0b5cff 100%);
+  background-size:250% 100%;animation:instShine 2.8s linear infinite,instPulse 2s ease-out infinite}
+.btn-install .ic{stroke:#fff!important}
+@keyframes instShine{0%{background-position:100% 0}100%{background-position:-150% 0}}
+@keyframes instPulse{0%{box-shadow:0 0 0 0 rgba(47,139,255,.6)}70%{box-shadow:0 0 0 12px rgba(47,139,255,0)}100%{box-shadow:0 0 0 0 rgba(47,139,255,0)}}
+@media (prefers-reduced-motion:reduce){.btn-install{animation:none}}
 .hero-stats{display:flex;gap:30px;margin-top:38px;flex-wrap:wrap;justify-content:center}
 .stat .n{font-family:var(--font-d);font-weight:700;font-size:32px;color:var(--ink)}
 .stat .l{font-size:13px;color:var(--ink-dim);letter-spacing:.04em}
@@ -1371,7 +1379,7 @@ body.dash .dock{ display:grid; }
       <div class="hero-cta">
         <button class="btn btn-primary" onclick="openAuth('register')"><svg class="ic neon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg><span data-i18n="hero_cta1">S&#39;inscrire</span></button>
         <button class="btn btn-connexion" onclick="openAuth('login')"><svg class="ic neon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg><span data-i18n="hero_cta3">Connexion</span></button>
-        <button class="btn btn-ghost" id="btnInstallHero" onclick="installerApp()"><svg class="ic neon" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span data-i18n="hero_install">Installer l&#39;application</span></button>
+        <button class="btn btn-install" id="btnInstallHero" onclick="installerApp()"><svg class="ic neon" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span data-i18n="hero_install">Installer l&#39;application</span></button>
         <button class="btn btn-ghost" onclick="scrollToId('how')"><span data-i18n="hero_cta2">Comment ça marche ?</span></button>
       </div>
       <div class="hero-player">
