@@ -721,6 +721,8 @@ body:not(.dash) .install-banner.show{bottom:calc(env(safe-area-inset-bottom,0px)
   background:none;width:100%;text-align:left}
 .mnu-pan a:active,.mnu-pan a:hover{background:var(--field);color:var(--blue-1)}
 .mnu-sep{height:1px;background:var(--line);margin:10px 20px}
+.mnu-pan a.mnu-out{color:#d93025}
+.mnu-pan a.mnu-out:active,.mnu-pan a.mnu-out:hover{background:rgba(217,48,37,.08);color:#b3261e}
 body.dash .dash-only{display:grid !important}
 body.dash .landing-only{display:none !important}
 .tb-btn{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;border:1px solid var(--line);background:var(--panel);position:relative;transition:.16s;flex:none}
@@ -2496,9 +2498,16 @@ function ouvrirMenu(){
   h += '<div class="mnu-sep"></div>'
      + '<a onclick="depuisMenu(openSettings)">' + (lang==="fr"?"Param\u00e8tres":"Fandrindrana") + '</a>'
      + '<a onclick="depuisMenu(openNotif)">' + (lang==="fr"?"Notifications":"Fampandrenesana") + '</a>';
+  // FIX 2026-10-03 : deconnexion en bas du menu (seulement si connecte), avec confirmation.
+  if (token) h += '<div class="mnu-sep"></div>'
+     + '<a class="mnu-out" onclick="depuisMenu(confirmerDeconnexion)">' + (lang==="fr"?"D\u00e9connexion":"Hivoaka") + '</a>';
   pan.innerHTML = h;
   document.getElementById('mnuBd').classList.add('open');
   pan.classList.add('open');
+}
+function confirmerDeconnexion(){
+  var q = lang==="fr" ? "Voulez-vous vraiment vous d\u00e9connecter ?" : "Tena hivoaka ve ianao ?";
+  if (confirm(q)) logout();
 }
 function fermerMenu(){
   var bd = document.getElementById('mnuBd'), pan = document.getElementById('mnuPan');
