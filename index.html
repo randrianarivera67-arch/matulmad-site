@@ -1371,6 +1371,7 @@ body.dash .dock{ display:grid; }
       <div class="hero-cta">
         <button class="btn btn-primary" onclick="openAuth('register')"><svg class="ic neon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg><span data-i18n="hero_cta1">S&#39;inscrire</span></button>
         <button class="btn btn-connexion" onclick="openAuth('login')"><svg class="ic neon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg><span data-i18n="hero_cta3">Connexion</span></button>
+        <button class="btn btn-ghost" id="btnInstallHero" onclick="installerApp()"><svg class="ic neon" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span data-i18n="hero_install">Installer l&#39;application</span></button>
         <button class="btn btn-ghost" onclick="scrollToId('how')"><span data-i18n="hero_cta2">Comment ça marche ?</span></button>
       </div>
       <div class="hero-player">
@@ -1637,7 +1638,7 @@ body.dash .dock{ display:grid; }
           <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M3 7h18v12H3zM3 7l3-4h12l3 4M9 12h6"/></svg><select id="fProvider" onchange="onProviderChange()"><option value="">—</option></select></div>
         </div>
         <div class="field"><label data-i18n="lbl_provid">ID fournisseur</label>
-          <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg><select id="fProviderId"></select></div>
+          <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg><input id="fProviderId" list="fProviderIdList" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ID / Nickname" oninput="this.dataset.saisie='1'"><datalist id="fProviderIdList"></datalist></div>
         </div>
       </div>
       <div class="row2" id="bwCodeRow" style="display:none">
@@ -1969,7 +1970,7 @@ const I18N={
  fr:{nav_login:"Connexion",nav_logout:"Déconnexion",install:"Installer",add:"Ajouter",all:"Tout",
   hero_eyebrow:"",hero_title:'Dépôt et retrait <span class="grad">instantanés</span>',
   hero_lead:"Dépôt et retrait instantanés via MVola, Orange Money et Airtel Money. Créez votre compte, passez un ordre, payez. C'est tout.",
-  hero_cta1:"S&#39;inscrire",hero_cta2:"Comment ça marche ?",hero_cta3:"Connexion",stat1:"",stat2:"Traitement moyen",stat3:"Disponible",
+  hero_cta1:"S&#39;inscrire",hero_cta2:"Comment ça marche ?",hero_cta3:"Connexion",hero_install:"Installer l&#39;application",stat1:"",stat2:"Traitement moyen",stat3:"Disponible",
   feat_eyebrow:"Pourquoi MATUL MADA",feat_title:"Pensé pour vous",feat_sub:"Rapide, transparent, et fait pour le mobile money malgache.",
   f1t:"Instantané",f1d:"Validation automatique dès réception du paiement.",
   f3t:"Sécurisé",f3d:"Chaque transaction est vérifiée avant validation.",how_eyebrow:"En 4 étapes",how_title:"Comment ça marche",
@@ -1996,7 +1997,7 @@ const I18N={
  mg:{nav_login:"Hiditra",nav_logout:"Hivoaka",install:"Apetraho",add:"Hanampy",all:"Rehetra",
   hero_eyebrow:"",hero_title:'Fampidirana sy fisintonam-bola <span class="grad">avy hatrany</span>',
   hero_lead:"Dépôt sy retrait avy hatrany amin'ny MVola, Orange Money ary Airtel Money. Mamorona kaonty, manao ordre, mandoa. Vita.",
-  hero_cta1:"Hisoratra anarana",hero_cta2:"Ahoana no fombany?",hero_cta3:"Hiditra",stat1:"",stat2:"Faharetana antonony",stat3:"Misokatra",
+  hero_cta1:"Hisoratra anarana",hero_cta2:"Ahoana no fombany?",hero_cta3:"Hiditra",hero_install:"Hametraka ny app",stat1:"",stat2:"Faharetana antonony",stat3:"Misokatra",
   feat_eyebrow:"Nahoana MATUL MADA",feat_title:"Natao ho anao",feat_sub:"Haingana, mangarahara, natao ho an'ny mobile money malagasy.",
   f1t:"Avy hatrany",f1d:"Validation automatika raha vao tonga ny vola.",
   f3t:"Voaaro",f3d:"Hamarinina alohan'ny valider ny transaction tsirairay.",how_eyebrow:"Dingana 4",how_title:"Ahoana no fombany",
@@ -2233,21 +2234,23 @@ function remplirNumeros(){
 
 /** Remplit la liste des comptes du fournisseur choisi. */
 function remplirComptes(){
-  var sel=document.getElementById("fProviderId"); if(!sel) return;
-  var liste=comptesFournisseur(), avant=sel.value;
-  if(!liste.length){
-    var nom=(document.getElementById("fProvider")||{}).value||"";
-    sel.innerHTML='<option value="">'+(lang==="fr"
-      ? "Aucun compte "+(nom||"fournisseur")
-      : "Tsy misy compte "+(nom||"fournisseur"))+'</option>';
-    return;
-  }
-  sel.innerHTML=liste.map(function(p){
-    var id=p.accountId||"";
-    var etiquette=id+(p.label?" · "+p.label:"");
-    return '<option value="'+id+'">'+etiquette+'</option>';
+  // FIX 2026-10-03 : case ID fournisseur LIBRE (saisie, correction, effacement) ;
+  // les comptes enregistres restent proposes en suggestions (datalist).
+  var inp=document.getElementById("fProviderId"); if(!inp) return;
+  var dl=document.getElementById("fProviderIdList");
+  var liste=comptesFournisseur(), avant=(inp.value||"").trim();
+  var pv=(document.getElementById("fProvider")||{}).value||"";
+  var memeFournisseur=(inp.dataset.pv===pv);
+  inp.dataset.pv=pv;
+  if(dl) dl.innerHTML=liste.map(function(p){
+    var id=String(p.accountId||"").replace(/"/g,"&quot;");
+    return '<option value="'+id+'">'+String(p.label||"").replace(/</g,"&lt;")+'</option>';
   }).join("");
-  if(avant&&liste.some(function(p){return (p.accountId||"")===avant;})) sel.value=avant;
+  // La saisie du client est conservee tant que le fournisseur ne change pas.
+  if(memeFournisseur && inp.dataset.saisie==="1") return;
+  inp.dataset.saisie="";
+  if(avant&&liste.some(function(p){return (p.accountId||"")===avant;})){ inp.value=avant; return; }
+  inp.value = liste.length ? (liste[0].accountId||"") : "";
 }
 
 function onProviderChange(){ remplirComptes(); convAr(); }
@@ -3196,6 +3199,18 @@ window.addEventListener("appinstalled",function(){deferredPrompt=null;document.g
   var yes=b.querySelector(".ib-yes");if(yes)yes.style.display="none";
   b.classList.add("show");
 })();
+/* FIX 2026-10-03 : bouton "Installer l'application" sur l'accueil. */
+function installerApp(){
+  var fr=(typeof lang==="undefined"||lang==="fr");
+  var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+  if(deferredPrompt){ installPWA(); return; }
+  if(isIOS){ alert(fr?"Sur iPhone : touchez Partager, puis \u00ab Sur l\u2019\u00e9cran d\u2019accueil \u00bb.":"Amin'ny iPhone : tsindrio Partager, dia \u00ab Sur l\u2019\u00e9cran d\u2019accueil \u00bb."); return; }
+  alert(fr?"Ouvrez le menu \u22ee de votre navigateur, puis \u00ab Installer l\u2019application \u00bb (ou \u00ab Ajouter \u00e0 l\u2019\u00e9cran d\u2019accueil \u00bb).":"Sokafy ny menu \u22ee an'ny navigateur, dia \u00ab Installer l\u2019application \u00bb (na \u00ab Ajouter \u00e0 l\u2019\u00e9cran d\u2019accueil \u00bb).");
+}
+(function(){ try{
+  var std=window.matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+  var b=document.getElementById("btnInstallHero"); if(b&&std) b.style.display="none";
+}catch(e){} })();
 async function installPWA(){if(!deferredPrompt){document.getElementById("installBanner").classList.remove("show");return;}
   deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;document.getElementById("installBanner").classList.remove("show");}
 function dismissInstall(){document.getElementById("installBanner").classList.remove("show");localStorage.setItem("mm_pwa_dismiss","1");}
