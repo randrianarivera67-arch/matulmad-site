@@ -3955,26 +3955,48 @@ async function mmStartOAuth(){
       if(now<fin || P.length) requestAnimationFrame(anim); else c.remove(); })();
   }
   function ecranPaiement(etat){
+    // FIX 2026-10-04 : icones SVG neon en couleur (plus d'emoji), carte sombre, bouton colore.
     var fr=(typeof lang==="undefined"||lang==="fr");
     var T={
-      verif:  ["⏳", fr?"Vérification du paiement…":"Eo am-panamarinana ny fandoavana…", fr?"Merci de patienter quelques secondes.":"Miandrasa segondra vitsivitsy.", "#2f8bff"],
-      ok:     ["✅", fr?"Dépôt réussi !":"Vita ny dépôt !", fr?"Votre compte a été crédité.":"Voampidy ny kaontinao.", "#06a77d"],
-      ko:     ["❌", fr?"Paiement échoué":"Tsy vita ny fandoavana", fr?"Aucun montant n'a été débité si vous n'avez pas validé le paiement.":"Tsy nisy vola niala raha tsy nanamafy ny fandoavana ianao.", "#e63946"],
-      annule: ["↩️", fr?"Paiement annulé":"Nofoanana ny fandoavana", fr?"Vous pouvez recommencer quand vous voulez.":"Azonao averina amin'ny fotoana tianao.", "#6c757d"],
-      attente:["🕓", fr?"Paiement en cours de confirmation":"Mbola eo am-panamarinana", fr?"Le résultat apparaîtra dans votre historique dans un instant.":"Hiseho ao amin'ny tantara afaka kelikely ny valiny.", "#f4a261"]
-    }[etat]||null; if(!T) throw new Error("etat");
+      verif:  [fr?"Vérification du paiement…":"Eo am-panamarinana ny fandoavana…", fr?"Merci de patienter quelques secondes.":"Miandrasa segondra vitsivitsy.", "#00c8ff","#3a6bff"],
+      ok:     [fr?"Dépôt réussi !":"Vita ny dépôt !", fr?"Votre compte a été crédité.":"Voampidy ny kaontinao.", "#00e676","#00b8d4"],
+      ko:     [fr?"Paiement échoué":"Tsy vita ny fandoavana", fr?"Aucun montant n'a été débité si vous n'avez pas validé le paiement.":"Tsy nisy vola niala raha tsy nanamafy ny fandoavana ianao.", "#ff3d71","#ff6d00"],
+      annule: [fr?"Paiement annulé":"Nofoanana ny fandoavana", fr?"Vous pouvez recommencer quand vous voulez.":"Azonao averina amin'ny fotoana tianao.", "#ff9100","#ff3d71"],
+      attente:[fr?"Paiement en cours de confirmation":"Mbola eo am-panamarinana", fr?"Le résultat apparaîtra dans votre historique dans un instant.":"Hiseho ao amin'ny tantara afaka kelikely ny valiny.", "#ffc400","#ff9100"]
+    }[etat]; if(!T) throw new Error("etat");
+    var P={
+      ok:'<path class="epDraw" d="M20 33 L28.5 41.5 L45 24"/>',
+      ko:'<path class="epDraw" d="M23 23 L41 41"/><path class="epDraw" d="M41 23 L23 41"/>',
+      annule:'<path class="epDraw" d="M27 21 L19 29 L27 37"/><path class="epDraw" d="M19 29 H37 a8 8 0 0 1 0 16 H29"/>',
+      attente:'<path class="epDraw" d="M32 20 V32 L40.5 37"/>',
+      verif:'<path class="epSpin" d="M32 6 a26 26 0 0 1 26 26"/>'
+    }[etat];
+    if(!document.getElementById("ecranPayStyle")){
+      var st=document.createElement("style"); st.id="ecranPayStyle";
+      st.textContent="@keyframes epRot{to{transform:rotate(360deg)}}@keyframes epDash{to{stroke-dashoffset:0}}@keyframes epPop{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}@keyframes epGlow{0%,100%{opacity:.7}50%{opacity:1}}"
+        +".epSpin{transform-origin:32px 32px;animation:epRot .9s linear infinite}.epDraw{stroke-dasharray:70;stroke-dashoffset:70;animation:epDash .7s .15s ease-out forwards}.epCard{animation:epPop .35s ease-out}.epRing{animation:epGlow 1.8s ease-in-out infinite}"
+        +"@media (prefers-reduced-motion:reduce){.epSpin,.epDraw,.epCard,.epRing{animation:none;stroke-dashoffset:0}}";
+      document.head.appendChild(st);
+    }
+    var c1=T[2], c2=T[3];
+    var svg='<svg width="104" height="104" viewBox="0 0 64 64" fill="none" style="overflow:visible;filter:drop-shadow(0 0 4px '+c1+') drop-shadow(0 0 12px '+c1+')">'
+      +'<circle class="epRing" cx="32" cy="32" r="26" stroke="'+c1+'" stroke-width="2.5" opacity="'+(etat==="verif"?'.25':'.95')+'"/>'
+      +'<g stroke="'+c1+'" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">'+P+'</g></svg>';
     var o=document.getElementById("ecranPay");
     if(!o){ o=document.createElement("div"); o.id="ecranPay"; document.body.appendChild(o); }
-    o.style.cssText="position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(8,15,35,.72);backdrop-filter:blur(3px)";
-    o.innerHTML='<div style="max-width:360px;width:100%;background:#fff;border-radius:22px;padding:28px 22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35);font-family:inherit">'
-      +'<div style="font-size:54px;line-height:1">'+T[0]+'</div>'
-      +'<div style="margin-top:14px;font-size:21px;font-weight:800;color:'+T[3]+'">'+T[1]+'</div>'
-      +'<div style="margin-top:8px;font-size:14px;color:#555;line-height:1.45">'+T[2]+'</div>'
-      +(etat==="verif"?'':'<button type="button" id="ecranPayOk" style="margin-top:20px;width:100%;border:none;border-radius:14px;padding:13px;font-size:15px;font-weight:700;color:#fff;background:'+T[3]+'">OK</button>')
+    o.style.cssText="position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(4,8,22,.78);backdrop-filter:blur(4px)";
+    o.innerHTML='<div class="epCard" style="max-width:360px;width:100%;background:linear-gradient(160deg,#101a3a,#0a1128);border:1px solid '+c1+'55;border-radius:24px;padding:30px 22px 24px;text-align:center;box-shadow:0 0 30px '+c1+'40,0 20px 60px rgba(0,0,0,.5);font-family:inherit">'
+      +'<div style="display:flex;justify-content:center">'+svg+'</div>'
+      +'<div style="margin-top:16px;font-size:22px;font-weight:800;color:'+c1+';text-shadow:0 0 12px '+c1+'99">'+T[0]+'</div>'
+      +'<div style="margin-top:8px;font-size:14px;color:#c9d4f0;line-height:1.5">'+T[1]+'</div>'
+      +(etat==="verif"?'':'<button type="button" id="ecranPayOk" style="margin-top:22px;width:100%;border:none;border-radius:14px;padding:14px;font-size:16px;font-weight:800;letter-spacing:.5px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35);background:linear-gradient(135deg,'+c1+','+c2+');box-shadow:0 0 18px '+c1+'80">OK</button>')
       +'</div>';
     var b=document.getElementById("ecranPayOk"); if(b) b.onclick=function(){ o.remove(); };
     if(etat==="ok") feuArtifice(4500);
   }
+  // Apercu sans paiement : ?apercu=ok|ko|annule|attente|verif (affichage seul, aucun appel serveur).
+  try{ var apercu=new URLSearchParams(location.search).get("apercu")||"";
+    if(/^(ok|ko|annule|attente|verif)$/.test(apercu)) setTimeout(function(){ ecranPaiement(apercu); },300); }catch(e){}
 
   async function suivreStatut(orderId, essai){
     essai = essai || 0;
