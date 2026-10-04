@@ -1646,7 +1646,7 @@ body.dash .dock{ display:grid; }
           <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M3 7h18v12H3zM3 7l3-4h12l3 4M9 12h6"/></svg><select id="fProvider" onchange="onProviderChange()"><option value="">—</option></select></div>
         </div>
         <div class="field"><label data-i18n="lbl_provid">ID fournisseur</label>
-          <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg><input id="fProviderId" list="fProviderIdList" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ID / Nickname" oninput="this.dataset.saisie='1'"><datalist id="fProviderIdList"></datalist></div>
+          <div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg><select id="fProviderId"></select></div>
         </div>
       </div>
       <div class="row2" id="bwCodeRow" style="display:none">
@@ -2242,23 +2242,21 @@ function remplirNumeros(){
 
 /** Remplit la liste des comptes du fournisseur choisi. */
 function remplirComptes(){
-  // FIX 2026-10-03 : case ID fournisseur LIBRE (saisie, correction, effacement) ;
-  // les comptes enregistres restent proposes en suggestions (datalist).
-  var inp=document.getElementById("fProviderId"); if(!inp) return;
-  var dl=document.getElementById("fProviderIdList");
-  var liste=comptesFournisseur(), avant=(inp.value||"").trim();
-  var pv=(document.getElementById("fProvider")||{}).value||"";
-  var memeFournisseur=(inp.dataset.pv===pv);
-  inp.dataset.pv=pv;
-  if(dl) dl.innerHTML=liste.map(function(p){
-    var id=String(p.accountId||"").replace(/"/g,"&quot;");
-    return '<option value="'+id+'">'+String(p.label||"").replace(/</g,"&lt;")+'</option>';
+  var sel=document.getElementById("fProviderId"); if(!sel) return;
+  var liste=comptesFournisseur(), avant=sel.value;
+  if(!liste.length){
+    var nom=(document.getElementById("fProvider")||{}).value||"";
+    sel.innerHTML='<option value="">'+(lang==="fr"
+      ? "Aucun compte "+(nom||"fournisseur")
+      : "Tsy misy compte "+(nom||"fournisseur"))+'</option>';
+    return;
+  }
+  sel.innerHTML=liste.map(function(p){
+    var id=p.accountId||"";
+    var etiquette=id+(p.label?" · "+p.label:"");
+    return '<option value="'+id+'">'+etiquette+'</option>';
   }).join("");
-  // La saisie du client est conservee tant que le fournisseur ne change pas.
-  if(memeFournisseur && inp.dataset.saisie==="1") return;
-  inp.dataset.saisie="";
-  if(avant&&liste.some(function(p){return (p.accountId||"")===avant;})){ inp.value=avant; return; }
-  inp.value = liste.length ? (liste[0].accountId||"") : "";
+  if(avant&&liste.some(function(p){return (p.accountId||"")===avant;})) sel.value=avant;
 }
 
 function onProviderChange(){ remplirComptes(); convAr(); }
