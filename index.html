@@ -3930,8 +3930,50 @@ async function mmStartOAuth(){
     try{ history.replaceState(null,"",location.pathname); }catch(e){}
   }
   function dire(txt,kind){
+    // FIX 2026-10-04 : retour Orange en plein ecran (succes + feu d'artifice, echec,
+    // annulation, verification), sans aucun code ni numero.
+    var t=String(txt||"");
+    var etat = kind==="ok" ? "ok"
+             : (kind==="err" && /annul|nofoanana/i.test(t)) ? "annule"
+             : kind==="err" ? "ko"
+             : /non encore|mbola tsy/i.test(t) ? "attente" : "verif";
+    try{ ecranPaiement(etat); return; }catch(e){}
     try{ if(typeof toast==="function") return toast(txt,kind); }catch(e){}
     alert(txt);
+  }
+  function feuArtifice(dur){
+    try{ if(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return; }catch(e){}
+    var c=document.createElement("canvas"); c.style.cssText="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:100001";
+    document.body.appendChild(c); var g=c.getContext("2d"), r=window.devicePixelRatio||1, W=c.width=innerWidth*r, H=c.height=innerHeight*r;
+    var P=[], cols=["#ff5a5f","#ffd166","#06d6a0","#4cc9f0","#f72585","#ffffff"], fin=Date.now()+dur, next=0;
+    function bouquet(){ var cx=W*(0.2+Math.random()*0.6), cy=H*(0.15+Math.random()*0.35), col=cols[Math.floor(Math.random()*cols.length)];
+      for(var k=0;k<60;k++){ var a=Math.PI*2*k/60, v=(2+Math.random()*4)*r; P.push({x:cx,y:cy,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:60+Math.random()*30,c:col}); } }
+    (function anim(){ var now=Date.now(); if(now<fin && now>next){ bouquet(); next=now+450; }
+      g.clearRect(0,0,W,H);
+      for(var k=P.length-1;k>=0;k--){ var p=P[k]; p.vx*=0.985; p.vy=p.vy*0.985+0.06*r; p.x+=p.vx; p.y+=p.vy; p.l--;
+        if(p.l<=0){ P.splice(k,1); continue; } g.globalAlpha=Math.min(1,p.l/40); g.fillStyle=p.c; g.beginPath(); g.arc(p.x,p.y,2.2*r,0,7); g.fill(); }
+      if(now<fin || P.length) requestAnimationFrame(anim); else c.remove(); })();
+  }
+  function ecranPaiement(etat){
+    var fr=(typeof lang==="undefined"||lang==="fr");
+    var T={
+      verif:  ["⏳", fr?"Vérification du paiement…":"Eo am-panamarinana ny fandoavana…", fr?"Merci de patienter quelques secondes.":"Miandrasa segondra vitsivitsy.", "#2f8bff"],
+      ok:     ["✅", fr?"Dépôt réussi !":"Vita ny dépôt !", fr?"Votre compte a été crédité.":"Voampidy ny kaontinao.", "#06a77d"],
+      ko:     ["❌", fr?"Paiement échoué":"Tsy vita ny fandoavana", fr?"Aucun montant n'a été débité si vous n'avez pas validé le paiement.":"Tsy nisy vola niala raha tsy nanamafy ny fandoavana ianao.", "#e63946"],
+      annule: ["↩️", fr?"Paiement annulé":"Nofoanana ny fandoavana", fr?"Vous pouvez recommencer quand vous voulez.":"Azonao averina amin'ny fotoana tianao.", "#6c757d"],
+      attente:["🕓", fr?"Paiement en cours de confirmation":"Mbola eo am-panamarinana", fr?"Le résultat apparaîtra dans votre historique dans un instant.":"Hiseho ao amin'ny tantara afaka kelikely ny valiny.", "#f4a261"]
+    }[etat]||null; if(!T) throw new Error("etat");
+    var o=document.getElementById("ecranPay");
+    if(!o){ o=document.createElement("div"); o.id="ecranPay"; document.body.appendChild(o); }
+    o.style.cssText="position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(8,15,35,.72);backdrop-filter:blur(3px)";
+    o.innerHTML='<div style="max-width:360px;width:100%;background:#fff;border-radius:22px;padding:28px 22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35);font-family:inherit">'
+      +'<div style="font-size:54px;line-height:1">'+T[0]+'</div>'
+      +'<div style="margin-top:14px;font-size:21px;font-weight:800;color:'+T[3]+'">'+T[1]+'</div>'
+      +'<div style="margin-top:8px;font-size:14px;color:#555;line-height:1.45">'+T[2]+'</div>'
+      +(etat==="verif"?'':'<button type="button" id="ecranPayOk" style="margin-top:20px;width:100%;border:none;border-radius:14px;padding:13px;font-size:15px;font-weight:700;color:#fff;background:'+T[3]+'">OK</button>')
+      +'</div>';
+    var b=document.getElementById("ecranPayOk"); if(b) b.onclick=function(){ o.remove(); };
+    if(etat==="ok") feuArtifice(4500);
   }
 
   async function suivreStatut(orderId, essai){
