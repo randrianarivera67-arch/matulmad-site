@@ -1343,6 +1343,37 @@ body.dash .dock{ display:grid; }
   body.dash .dock>button.active .nv-txt{ color:var(--gold-1); background:rgba(230,52,85,.10); }
 }
 
+/* HERO-ANIME : ouverture cinema pilotee par le defilement.
+   Sans JS, appareil leger (html.lite), economie de donnees ou mouvement reduit :
+   simple image fixe (30 Ko) et titre deja visible. */
+.cine{position:relative;padding:0;margin-top:-64px;height:92vh;height:92svh;min-height:520px;background:#050a19;color:#fff;overflow:clip}
+.cine.cine-on{height:250vh;overflow:visible}
+.cine-pin{position:relative;height:92vh;height:92svh;min-height:520px;overflow:hidden}
+.cine.cine-on .cine-pin{position:sticky;top:0;height:100vh;height:100svh}
+.cine-v{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#050a19 center/cover no-repeat;pointer-events:none}
+.cine-voile{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(5,10,25,.78) 0%,rgba(5,10,25,.25) 42%,rgba(5,10,25,0) 62%),
+             linear-gradient(0deg,var(--bg) 0%,rgba(0,0,0,0) 16%)}
+.cine-txt{position:absolute;left:0;right:0;top:calc(64px + 7vh);padding:0 22px;max-width:var(--maxw);margin:0 auto;text-align:center}
+@media (min-aspect-ratio:1/1){.cine-txt{text-align:left;padding:0 40px;top:calc(64px + 9vh)}}
+.cine-eb{font-family:var(--font-d);font-weight:600;letter-spacing:.22em;text-transform:uppercase;font-size:clamp(11px,1.6vw,14px);color:#ffd9e0;margin-bottom:12px;opacity:.95;transition:opacity .8s ease .35s}
+.cine-h{font-family:var(--font-d);font-weight:700;font-size:clamp(42px,9vw,92px);line-height:.98;letter-spacing:-.01em;text-shadow:0 6px 30px rgba(0,0,0,.45)}
+.cine-h .cl{display:block;overflow:hidden;padding-bottom:.06em}
+.cine-h .cl>span{display:inline-block;transition:transform 1s cubic-bezier(.16,.84,.24,1),opacity .6s ease}
+.cine-h .cl:nth-child(2)>span{transition-delay:.12s}
+.cine-h .grad{background:linear-gradient(110deg,#ff8aa2,var(--gold-1) 55%,#ffd36e);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.cine.cine-anim .cine-txt:not(.on) .cl>span{transform:translateY(110%)}
+.cine.cine-anim .cine-txt.out .cl>span{transform:translateY(-110%)}
+.cine.cine-anim .cine-txt:not(.on) .cine-eb{opacity:0;transition-delay:0s}
+.cine-p2{pointer-events:none}
+.cine:not(.cine-anim) .cine-p2{display:none}
+.cine-hint{position:absolute;left:0;right:0;bottom:calc(9vh + env(safe-area-inset-bottom));text-align:center;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.85);transition:opacity .4s ease}
+.cine-hint i{display:block;font-style:normal;font-size:20px;margin-top:4px;animation:cineHint 1.6s ease-in-out infinite}
+@keyframes cineHint{0%,100%{transform:translateY(0);opacity:.55}50%{transform:translateY(7px);opacity:1}}
+.cine.bouge .cine-hint{opacity:0}
+.cine:not(.cine-on) .cine-hint{display:none}
+@media (prefers-reduced-motion:reduce){.cine-h .cl>span{transition:none}.cine-hint i{animation:none}}
+
 </style>
 </head>
 <body>
@@ -1367,6 +1398,22 @@ body.dash .dock{ display:grid; }
 
 <!-- VITRINE -->
 <main id="site">
+  <!-- HERO-ANIME : video d'ouverture pilotee par le defilement (accueil seulement). -->
+  <section class="cine" id="cine" aria-label="MatulMada">
+    <div class="cine-pin">
+      <video class="cine-v" id="cineV" muted playsinline preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video>
+      <div class="cine-voile"></div>
+      <div class="cine-txt cine-p1">
+        <div class="cine-eb" data-i18n="cine_eb">MVola · Orange Money · Airtel Money</div>
+        <h2 class="cine-h"><span class="cl"><span data-i18n="cine_1a">Votre argent</span></span><span class="cl"><span class="grad" data-i18n="cine_1b">en mouvement.</span></span></h2>
+      </div>
+      <div class="cine-txt cine-p2" aria-hidden="true">
+        <div class="cine-eb" data-i18n="cine_eb2">Madagascar · Comores</div>
+        <h2 class="cine-h"><span class="cl"><span data-i18n="cine_2a">Du téléphone</span></span><span class="cl"><span class="grad" data-i18n="cine_2b">au compte, en secondes.</span></span></h2>
+      </div>
+      <div class="cine-hint"><span data-i18n="cine_hint">Faites défiler</span><i>↓</i></div>
+    </div>
+  </section>
   <div class="wrap">
     <section class="hero">
             <h1 data-i18n="hero_title">Dépôt et retrait <span class="grad">instantanés</span></h1>
@@ -1976,6 +2023,7 @@ function opName(op){var o=OPS[op];return o?o.brand:(op||"").toUpperCase();}
 /* i18n */
 const I18N={
  fr:{nav_login:"Connexion",nav_logout:"Déconnexion",install:"Installer",add:"Ajouter",all:"Tout",
+  cine_eb:"MVola · Orange Money · Airtel Money",cine_1a:"Votre argent",cine_1b:"en mouvement.",cine_eb2:"Madagascar · Comores",cine_2a:"Du téléphone",cine_2b:"au compte, en secondes.",cine_hint:"Faites défiler",
   hero_eyebrow:"",hero_title:'Dépôt et retrait <span class="grad">instantanés</span>',
   hero_lead:"Dépôt et retrait instantanés via MVola, Orange Money et Airtel Money. Créez votre compte, passez un ordre, payez. C'est tout.",
   hero_cta1:"S&#39;inscrire",hero_cta2:"Comment ça marche ?",hero_cta3:"Connexion",hero_install:"Installer l&#39;application",stat1:"",stat2:"Traitement moyen",stat3:"Disponible",
@@ -2003,6 +2051,7 @@ const I18N={
   d_session:"Session",d_ussd:"Code USSD",d_sms:"Modèle SMS opérateur",st_created:"Créée",st_proc:"En traitement",st_done:"Terminée",st_fail:"Échec du traitement",
   m_added:"Ajouté",m_saved:"Enregistré",m_deleted:"Supprimé",m_err:"Erreur",confirm_del:"Supprimer ?"},
  mg:{nav_login:"Hiditra",nav_logout:"Hivoaka",install:"Apetraho",add:"Hanampy",all:"Rehetra",
+  cine_eb:"MVola · Orange Money · Airtel Money",cine_1a:"Ny volanao",cine_1b:"mandeha haingana.",cine_eb2:"Madagasikara · Comores",cine_2a:"Avy amin'ny finday",cine_2b:"ho amin'ny kaonty, segondra vitsy.",cine_hint:"Ampidino",
   hero_eyebrow:"",hero_title:'Fampidirana sy fisintonam-bola <span class="grad">avy hatrany</span>',
   hero_lead:"Dépôt sy retrait avy hatrany amin'ny MVola, Orange Money ary Airtel Money. Mamorona kaonty, manao ordre, mandoa. Vita.",
   hero_cta1:"Hisoratra anarana",hero_cta2:"Ahoana no fombany?",hero_cta3:"Hiditra",hero_install:"Hametraka ny app",stat1:"",stat2:"Faharetana antonony",stat3:"Misokatra",
@@ -3326,6 +3375,56 @@ async function saveProfile(){
     last=y;ticking=false;
   }
   window.addEventListener('scroll',function(){if(!ticking){window.requestAnimationFrame(onScroll);ticking=true;}},{passive:true});
+})();
+/* HERO-ANIME : la video d'ouverture avance et recule avec le defilement.
+   Une seule video est telechargee (portrait pour telephone, paysage pour PC).
+   Appareil leger (html.lite), economie de donnees, reseau 2G ou mouvement
+   reduit : image fixe seulement, aucune video telechargee. */
+(function(){
+  try{
+    var sec=document.getElementById('cine'), v=document.getElementById('cineV');
+    if(!sec||!v) return;
+    var p1=sec.querySelector('.cine-p1'), p2=sec.querySelector('.cine-p2');
+    var portrait=window.matchMedia&&window.matchMedia('(max-aspect-ratio: 1/1)').matches;
+    v.poster=portrait?'/cine-m.webp':'/cine-d.webp';
+    var c=navigator.connection||{};
+    var econ=!!c.saveData||/(^|-)2g$/.test(c.effectiveType||'');
+    var reduit=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var lite=document.documentElement.classList.contains('lite');
+    if(econ||reduit||lite){ p1.classList.add('on'); return; }
+    sec.classList.add('cine-on','cine-anim');
+    v.preload='auto'; v.src=portrait?'/cine-m.mp4':'/cine-d.mp4';
+    try{ var pr=v.play(); if(pr&&pr.then) pr.then(function(){v.pause();}).catch(function(){}); }catch(e){}
+    setTimeout(function(){ p1.classList.add('on'); }, 150);
+    var dur=0, cur=0, cible=0, boucle=false, attente=false, phase=1;
+    v.addEventListener('loadedmetadata',function(){ dur=v.duration||0; maj(); });
+    v.addEventListener('seeked',function(){ if(dur&&Math.abs(v.currentTime-cur)>0.04){ try{v.currentTime=cur;}catch(e){} } });
+    function progres(){
+      var total=sec.offsetHeight-window.innerHeight; if(total<=0) return 0;
+      var p=-sec.getBoundingClientRect().top/total; return p<0?0:(p>1?1:p);
+    }
+    function pas(){
+      cur+=(cible-cur)*0.2; if(Math.abs(cible-cur)<0.008) cur=cible;
+      if(!v.seeking&&Math.abs(v.currentTime-cur)>0.02){ try{v.currentTime=cur;}catch(e){} }
+      if(cur!==cible) requestAnimationFrame(pas); else boucle=false;
+    }
+    function maj(){
+      attente=false;
+      if(document.body.classList.contains('dash')) return;
+      var p=progres();
+      sec.classList.toggle('bouge',p>0.02);
+      var ph=p>0.55?2:1;
+      if(ph!==phase){
+        phase=ph;
+        if(ph===2){ p1.classList.remove('on'); p1.classList.add('out'); p2.classList.add('on'); }
+        else{ p2.classList.remove('on'); p1.classList.remove('out'); p1.classList.add('on'); }
+      }
+      if(dur){ cible=p*Math.max(0,dur-0.06); if(!boucle){ boucle=true; requestAnimationFrame(pas); } }
+    }
+    window.addEventListener('scroll',function(){ if(!attente){ attente=true; requestAnimationFrame(maj); } },{passive:true});
+    window.addEventListener('resize',maj);
+    maj();
+  }catch(e){ try{ var t=document.querySelector('.cine-p1'); if(t) t.classList.add('on'); }catch(_){} }
 })();
 /* Les panneaux d'accueil montent a l'approche du regard.
    IntersectionObserver plutot qu'un calcul au scroll : le navigateur previent
