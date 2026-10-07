@@ -1346,7 +1346,7 @@ body.dash .dock{ display:grid; }
 /* ACCUEIL-CINE (remplace HERO-ANIME) : accueil cinema, toujours sombre.
    Sans JS : page d'origine inchangee. */
 /* Fond video fixe, derriere toute la page d'accueil */
-.cf{position:fixed;inset:0;z-index:0;background:#050a19;pointer-events:none;overflow:hidden}
+.cf{position:fixed;top:0;left:0;right:0;height:100vh;height:100lvh;z-index:0;background:#050a19;pointer-events:none;overflow:hidden}
 .cf video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#050a19 center/cover no-repeat;transition:opacity .7s ease}
 .cf .cf-v2{opacity:0}
 .cf.v2 .cf-v2{opacity:1}
@@ -1374,7 +1374,7 @@ html.lite #site.cine-sombre .feature,html.lite #site.cine-sombre .step,html.lite
 
 /* Ouverture (texte sur la video) */
 .cine{position:relative;padding:0;margin-top:-64px;height:92vh;height:92svh;min-height:520px;color:#fff}
-.cine.cine-on{height:300vh}
+.cine.cine-on{height:175vh} /* ACCUEIL-RYTHME */
 .cine-pin{position:relative;height:92vh;height:92svh;min-height:520px;overflow:hidden}
 .cine.cine-on .cine-pin{position:sticky;top:0;height:100vh;height:100svh}
 .cine-txt{position:absolute;left:0;right:0;top:calc(64px + 7vh);padding:0 22px;max-width:var(--maxw);margin:0 auto;text-align:center}
@@ -1413,8 +1413,6 @@ html.lite #site.cine-sombre .feature,html.lite #site.cine-sombre .step,html.lite
 #site.cine-anim .illus{opacity:1;transform:none;clip-path:inset(14% 9% 14% 9% round 28px);
   transition:clip-path 1.15s cubic-bezier(.16,.84,.24,1)}
 #site.cine-anim .illus.vu{clip-path:inset(0 0 0 0 round 0)}
-#site.cine-anim .illus img{transform:scale(1.16);transition:transform 1.5s cubic-bezier(.16,.84,.24,1)}
-#site.cine-anim .illus.vu img{transform:none}
 
 /* « Comment ca marche » : defilement horizontal */
 #how.hz{padding:0}
@@ -3565,16 +3563,16 @@ var CINE_V2 = { m: '/cine2-m.mp4', d: '/cine2-d.mp4', pm: '/cine2-m.webp', pd: '
       var pRest=borne((y-finIntro)/(maxY-finIntro));
       sec.classList.toggle('bouge',pIn>0.02);
       // 1 : premier titre, 2 : second titre, 3 : moment logo (video 2 seule, sans texte)
-      var avecV2=!!(pv2&&pv2.dur), ph=pIn<=0.45?1:((pIn<=0.78||!srcV2)?2:3);
+      var avecV2=!!(pv2&&pv2.dur), ph=pIn<=0.3?1:((pIn<=0.62||!srcV2)?2:3);   // ACCUEIL-RYTHME
       if(ph!==phase){ phase=ph;
         p1.classList.toggle('on',ph===1); p1.classList.toggle('out',ph>1);
         p2.classList.toggle('on',ph===2); p2.classList.toggle('out',ph>2); }
       cf.style.setProperty('--nuit', borne((y-finIntro+ih*0.15)/(ih*0.65)).toFixed(3));
-      if(pIn>0.3) chargeV2();
+      if(pIn>0.02) chargeV2();
       if(avecV2){
-        pv1.vers(pIn/0.78);
-        pv2.vers(y<=finIntro ? borne((pIn-0.8)/0.2)*0.1 : 0.1+0.9*pRest);
-        cf.classList.toggle('v2', pIn>0.8||y>finIntro);
+        pv1.vers(pIn/0.62);
+        pv2.vers(y<=finIntro ? borne((pIn-0.64)/0.36)*0.1 : 0.1+0.9*pRest);
+        cf.classList.toggle('v2', pIn>0.64||y>finIntro);
       }
       else pv1.vers(y<=finIntro ? pIn*0.62 : 0.62+0.38*pRest);
       if(hzWrap){ var rh=hzWrap.getBoundingClientRect(); var ph2=borne(-rh.top/Math.max(1,hzWrap.offsetHeight-ih));
@@ -3587,7 +3585,7 @@ var CINE_V2 = { m: '/cine2-m.mp4', d: '/cine2-d.mp4', pm: '/cine2-m.webp', pd: '
           cartes[i].style.opacity=(0.18+0.82*f*f*f).toFixed(2); cartes[i].style.zIndex=String(100-Math.round(Math.abs(a))); dots.children[i].classList.toggle('on',i===actif); } }
     }
     window.addEventListener('scroll',function(){ if(!attente){ attente=true; requestAnimationFrame(maj); } },{passive:true});
-    window.addEventListener('resize',function(){ requestAnimationFrame(mesure); });
+    var largeur0=window.innerWidth; window.addEventListener('resize',function(){ if(Math.abs(window.innerWidth-largeur0)<2) return; largeur0=window.innerWidth; requestAnimationFrame(mesure); });
     window.addEventListener('load',mesure);
     try{ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(mesure); }catch(e){}
     mesure();
