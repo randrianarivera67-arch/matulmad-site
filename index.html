@@ -1343,23 +1343,46 @@ body.dash .dock{ display:grid; }
   body.dash .dock>button.active .nv-txt{ color:var(--gold-1); background:rgba(230,52,85,.10); }
 }
 
-/* HERO-ANIME : ouverture cinema pilotee par le defilement.
-   Sans JS, appareil leger (html.lite), economie de donnees ou mouvement reduit :
-   simple image fixe (30 Ko) et titre deja visible. */
-.cine{position:relative;padding:0;margin-top:-64px;height:92vh;height:92svh;min-height:520px;background:#050a19;color:#fff;overflow:clip}
-.cine.cine-on{height:250vh;overflow:visible}
+/* ACCUEIL-CINE (remplace HERO-ANIME) : accueil cinema, toujours sombre.
+   Sans JS : page d'origine inchangee. */
+/* Fond video fixe, derriere toute la page d'accueil */
+.cf{position:fixed;inset:0;z-index:0;background:#050a19;pointer-events:none;overflow:hidden}
+.cf video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#050a19 center/cover no-repeat;transition:opacity .7s ease}
+.cf .cf-v2{opacity:0}
+.cf.v2 .cf-v2{opacity:1}
+.cf-voile{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,10,25,.8) 0%,rgba(5,10,25,.22) 38%,rgba(5,10,25,.1) 60%,rgba(5,10,25,.55) 100%)}
+.cf-nuit{position:absolute;inset:0;background:rgba(5,10,25,.6);opacity:var(--nuit,0)}
+#site.cine-sombre>*:not(.cf){position:relative;z-index:1}
+#site.cine-sombre{color:var(--ink);
+  --bg:#0b1428;--bg-2:#0a1425;--panel:rgba(12,20,42,.56);--panel-solid:#14203d;
+  --ink:#f1f4fb;--ink-2:#cbd4e6;--ink-dim:#a3afc8;--line:rgba(205,220,255,.16);
+  --glow:rgba(230,52,85,.4);--navy-1:#3b5488;--navy-2:#26365c;--navy-3:#8ea8e0;
+  --blue-1:#9db8ff;--blue-2:#3b5488;--blue-soft:rgba(38,53,90,.5)}
+/* Panneaux en verre sur la video */
+#site.cine-sombre .feature,#site.cine-sombre .step,#site.cine-sombre .why-card{
+  background:rgba(12,20,42,.55);border:1px solid rgba(255,255,255,.13);
+  box-shadow:0 22px 50px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.08);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%)}
+html.lite #site.cine-sombre .feature,html.lite #site.cine-sombre .step,html.lite #site.cine-sombre .why-card{background:rgba(12,20,42,.86)}
+#site.cine-sombre .why-h h2{background:linear-gradient(100deg,#fff 10%,#ff8aa2 60%,#ffd36e);-webkit-background-clip:text;background-clip:text;color:transparent}
+#site.cine-sombre .why-end{background:linear-gradient(150deg,rgba(38,54,92,.88),rgba(15,27,51,.9));border:1px solid rgba(255,255,255,.12)}
+#site.cine-sombre .illus img{border-color:rgba(255,255,255,.12);box-shadow:0 30px 70px rgba(0,0,0,.5)}
+#site.cine-sombre .illus figcaption{color:#cbd4e6}
+#site.cine-sombre footer{background:linear-gradient(180deg,rgba(5,10,25,0),rgba(5,10,25,.88) 30%);border-top-color:rgba(255,255,255,.1)}
+#site.cine-sombre .foot-col:nth-child(3) span{color:#ff7b96}
+#site.cine-sombre .cta-band{background:linear-gradient(135deg,rgba(38,54,92,.92),rgba(12,22,44,.94));border:1px solid rgba(255,255,255,.13);box-shadow:0 30px 70px rgba(0,0,0,.45),0 0 60px rgba(230,52,85,.18)}
+
+/* Ouverture (texte sur la video) */
+.cine{position:relative;padding:0;margin-top:-64px;height:92vh;height:92svh;min-height:520px;color:#fff}
+.cine.cine-on{height:300vh}
 .cine-pin{position:relative;height:92vh;height:92svh;min-height:520px;overflow:hidden}
 .cine.cine-on .cine-pin{position:sticky;top:0;height:100vh;height:100svh}
-.cine-v{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#050a19 center/cover no-repeat;pointer-events:none}
-.cine-voile{position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,rgba(5,10,25,.78) 0%,rgba(5,10,25,.25) 42%,rgba(5,10,25,0) 62%),
-             linear-gradient(0deg,var(--bg) 0%,rgba(0,0,0,0) 16%)}
 .cine-txt{position:absolute;left:0;right:0;top:calc(64px + 7vh);padding:0 22px;max-width:var(--maxw);margin:0 auto;text-align:center}
 @media (min-aspect-ratio:1/1){.cine-txt{text-align:left;padding:0 40px;top:calc(64px + 9vh)}}
 .cine-eb{font-family:var(--font-d);font-weight:600;letter-spacing:.22em;text-transform:uppercase;font-size:clamp(11px,1.6vw,14px);color:#ffd9e0;margin-bottom:12px;opacity:.95;transition:opacity .8s ease .35s}
-.cine-h{font-family:var(--font-d);font-weight:700;font-size:clamp(42px,9vw,92px);line-height:.98;letter-spacing:-.01em;text-shadow:0 6px 30px rgba(0,0,0,.45)}
+.cine-h{font-family:var(--font-d);font-weight:700;font-size:clamp(42px,9vw,92px);line-height:.98;letter-spacing:-.01em;text-shadow:0 6px 30px rgba(0,0,0,.45);color:#fff}
 .cine-h .cl{display:block;overflow:hidden;padding-bottom:.06em}
-.cine-h .cl>span{display:inline-block;transition:transform 1s cubic-bezier(.16,.84,.24,1),opacity .6s ease}
+.cine-h .cl>span{display:inline-block;transition:transform 1s cubic-bezier(.16,.84,.24,1)}
 .cine-h .cl:nth-child(2)>span{transition-delay:.12s}
 .cine-h .grad{background:linear-gradient(110deg,#ff8aa2,var(--gold-1) 55%,#ffd36e);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
 .cine.cine-anim .cine-txt:not(.on) .cl>span{transform:translateY(110%)}
@@ -1372,7 +1395,57 @@ body.dash .dock{ display:grid; }
 @keyframes cineHint{0%,100%{transform:translateY(0);opacity:.55}50%{transform:translateY(7px);opacity:1}}
 .cine.bouge .cine-hint{opacity:0}
 .cine:not(.cine-on) .cine-hint{display:none}
-@media (prefers-reduced-motion:reduce){.cine-h .cl>span{transition:none}.cine-hint i{animation:none}}
+
+/* Bande de logos qui defile */
+.mq{width:100vw;margin:8px 0 0 calc(50% - 50vw);overflow:hidden;padding:16px 0;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.mq-t{display:flex;gap:28px;width:max-content;animation:mqDefile 28s linear infinite}
+.mq img{height:46px;width:46px;object-fit:cover;border-radius:13px;flex:none;box-shadow:0 8px 20px rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.14)}
+@keyframes mqDefile{to{transform:translateX(-50%)}}
+
+/* Revelations facon « Kinetic Grid » (seulement en mode anime) */
+#site.cine-anim .monte,#site.cine-anim .cine-up{opacity:0;transform:translateY(34px);filter:blur(6px);
+  transition:opacity .9s cubic-bezier(.16,.84,.24,1),transform .9s cubic-bezier(.16,.84,.24,1),filter .9s ease}
+#site.cine-anim .monte.vu,#site.cine-anim .cine-up.vu{opacity:1;transform:none;filter:none}
+#site.cine-anim .masque{opacity:1;filter:none;clip-path:inset(0 0 100% 0);transform:translateY(45%);
+  transition:clip-path 1.05s cubic-bezier(.16,.84,.24,1),transform 1.05s cubic-bezier(.16,.84,.24,1)}
+#site.cine-anim .masque.vu{clip-path:inset(-10% -5% -15% -5%);transform:none}
+#site.cine-anim .illus{opacity:1;transform:none;clip-path:inset(14% 9% 14% 9% round 28px);
+  transition:clip-path 1.15s cubic-bezier(.16,.84,.24,1)}
+#site.cine-anim .illus.vu{clip-path:inset(0 0 0 0 round 0)}
+#site.cine-anim .illus img{transform:scale(1.16);transition:transform 1.5s cubic-bezier(.16,.84,.24,1)}
+#site.cine-anim .illus.vu img{transform:none}
+
+/* « Comment ca marche » : defilement horizontal */
+#how.hz{padding:0}
+#how.hz .hz-wrap{position:relative}
+#how.hz .hz-pin{position:sticky;top:0;height:100vh;height:100svh;width:100vw;margin-left:calc(50% - 50vw);
+  display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+#how.hz .sec-head{margin-bottom:26px;padding:0 20px}
+#how.hz .steps{display:flex;gap:26px;width:max-content;padding:0 max(22px,calc((100vw - var(--maxw)) / 2 + 22px));will-change:transform}
+#how.hz .step{flex:none;width:min(76vw,360px);min-height:220px;padding:30px 26px}
+#how.hz .step .num{width:44px;height:44px;font-size:18px;border-color:#ff8aa2;color:#fff;box-shadow:0 0 18px rgba(230,52,85,.55)}
+#how.hz .step:not(:last-child)::after{content:"";position:absolute;top:52px;right:-27px;width:28px;height:2px;
+  background:linear-gradient(90deg,var(--gold-1),#ffd36e);box-shadow:0 0 12px var(--gold-1)}
+.hz-bar{margin:30px auto 0;width:min(56vw,300px);height:3px;border-radius:3px;background:rgba(255,255,255,.16);overflow:hidden}
+.hz-bar i{display:block;height:100%;transform-origin:0 50%;transform:scaleX(var(--hz,0));background:linear-gradient(90deg,var(--gold-1),#ffd36e)}
+
+/* « Pourquoi » : manege circulaire 3D */
+#whySection.ring{max-width:none;padding:0;margin-top:0}
+#whySection.ring .ring-wrap{position:relative}
+#whySection.ring .ring-pin{position:sticky;top:0;height:100vh;height:100svh;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;overflow:hidden;perspective:1100px;padding:0 18px}
+#whySection.ring .why-h{margin-bottom:20px}
+#whySection.ring .why-grid{position:relative;display:block;width:min(74vw,320px);height:clamp(300px,50vh,360px);
+  transform-style:preserve-3d;will-change:transform}
+#whySection.ring .why-card{position:absolute;inset:0;margin:0;opacity:1;transition:opacity .25s linear;
+  -webkit-backface-visibility:hidden;backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;
+  -webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(14,24,50,.88)}
+#whySection.ring .why-end{margin-left:18px;margin-right:18px}
+.ring-dots{display:flex;gap:8px;margin-top:26px}
+.ring-dots i{display:block;width:8px;height:8px;border-radius:5px;background:rgba(255,255,255,.3);transition:width .3s,background .3s}
+.ring-dots i.on{background:var(--gold-1);width:24px}
+@media (prefers-reduced-motion:reduce){.cine-h .cl>span{transition:none}.cine-hint i,.mq-t{animation:none}}
 
 </style>
 </head>
@@ -1398,11 +1471,13 @@ body.dash .dock{ display:grid; }
 
 <!-- VITRINE -->
 <main id="site">
-  <!-- HERO-ANIME : video d'ouverture pilotee par le defilement (accueil seulement). -->
+  <!-- ACCUEIL-CINE : fond video fixe de l'accueil (pilote par le defilement). -->
+  <div class="cf" id="cineFond" aria-hidden="true">
+    <video class="cf-v1" id="cineV" muted playsinline preload="none" disablepictureinpicture disableremoteplayback tabindex="-1"></video>
+    <div class="cf-voile"></div><div class="cf-nuit"></div>
+  </div>
   <section class="cine" id="cine" aria-label="MatulMada">
     <div class="cine-pin">
-      <video class="cine-v" id="cineV" muted playsinline preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video>
-      <div class="cine-voile"></div>
       <div class="cine-txt cine-p1">
         <div class="cine-eb" data-i18n="cine_eb">MVola · Orange Money · Airtel Money</div>
         <h2 class="cine-h"><span class="cl"><span data-i18n="cine_1a">Votre argent</span></span><span class="cl"><span class="grad" data-i18n="cine_1b">en mouvement.</span></span></h2>
@@ -1438,6 +1513,9 @@ body.dash .dock{ display:grid; }
         <div class="stat"><div class="n">24/7</div><div class="l" data-i18n="stat3">Disponible</div></div>
       </div>
     </section>
+
+    <!-- ACCUEIL-CINE : bande de logos (operateurs et fournisseurs) -->
+    <div class="mq" aria-hidden="true"><div class="mq-t"><img src="yas.png" alt="" loading="lazy" decoding="async"><img src="orange.png" alt="" loading="lazy" decoding="async"><img src="airtel.png" alt="" loading="lazy" decoding="async"><img src="mvola-km.png" alt="" loading="lazy" decoding="async"><img src="deriv.jpg" alt="" loading="lazy" decoding="async"><img src="betwinner.png" alt="" loading="lazy" decoding="async"><img src="1xbet.jpg" alt="" loading="lazy" decoding="async"><img src="1win.png" alt="" loading="lazy" decoding="async"><img src="yas.png" alt="" loading="lazy" decoding="async"><img src="orange.png" alt="" loading="lazy" decoding="async"><img src="airtel.png" alt="" loading="lazy" decoding="async"><img src="mvola-km.png" alt="" loading="lazy" decoding="async"><img src="deriv.jpg" alt="" loading="lazy" decoding="async"><img src="betwinner.png" alt="" loading="lazy" decoding="async"><img src="1xbet.jpg" alt="" loading="lazy" decoding="async"><img src="1win.png" alt="" loading="lazy" decoding="async"></div></div>
 
     <section id="features">
       <div class="sec-head">
@@ -3376,55 +3454,147 @@ async function saveProfile(){
   }
   window.addEventListener('scroll',function(){if(!ticking){window.requestAnimationFrame(onScroll);ticking=true;}},{passive:true});
 })();
-/* HERO-ANIME : la video d'ouverture avance et recule avec le defilement.
-   Une seule video est telechargee (portrait pour telephone, paysage pour PC).
-   Appareil leger (html.lite), economie de donnees, reseau 2G ou mouvement
-   reduit : image fixe seulement, aucune video telechargee. */
+/* ACCUEIL-CINE (remplace HERO-ANIME) : accueil cinema.
+   - Video de fond fixe pour toute la page d'accueil. L'ouverture la deroule
+     jusqu'a 62 %, le reste de la page jusqu'a la fin. Si une 2e video est
+     declaree (CINE_V2), l'ouverture deroule la 1re en entier et la 2e prend
+     le relais pour le reste de la page.
+   - Une seule video telechargee a la fois (portrait pour telephone, paysage
+     pour PC). Appareil leger, economie de donnees, 2G, mouvement reduit :
+     image fixe et mise en page normale. */
+var CINE_V2 = { m: '/cine2-m.mp4', d: '/cine2-d.mp4', pm: '/cine2-m.webp', pd: '/cine2-d.webp' };
 (function(){
+  var site=document.getElementById('site'), sec=document.getElementById('cine'),
+      v=document.getElementById('cineV'), cf=document.getElementById('cineFond');
+  if(!site||!sec||!v||!cf) return;
+  var p1=sec.querySelector('.cine-p1'), p2=sec.querySelector('.cine-p2');
   try{
-    var sec=document.getElementById('cine'), v=document.getElementById('cineV');
-    if(!sec||!v) return;
-    var p1=sec.querySelector('.cine-p1'), p2=sec.querySelector('.cine-p2');
     var portrait=window.matchMedia&&window.matchMedia('(max-aspect-ratio: 1/1)').matches;
     v.poster=portrait?'/cine-m.webp':'/cine-d.webp';
+    site.classList.add('cine-sombre');
     var c=navigator.connection||{};
     var econ=!!c.saveData||/(^|-)2g$/.test(c.effectiveType||'');
     var reduit=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var lite=document.documentElement.classList.contains('lite');
     if(econ||reduit||lite){ p1.classList.add('on'); return; }
-    sec.classList.add('cine-on','cine-anim');
+
+    site.classList.add('cine-anim'); sec.classList.add('cine-on','cine-anim');
     v.preload='auto'; v.src=portrait?'/cine-m.mp4':'/cine-d.mp4';
-    try{ var pr=v.play(); if(pr&&pr.then) pr.then(function(){v.pause();}).catch(function(){}); }catch(e){}
+    function debloque(el){ try{ var pr=el.play(); if(pr&&pr.then) pr.then(function(){el.pause();}).catch(function(){}); }catch(e){} }
+    debloque(v);
     setTimeout(function(){ p1.classList.add('on'); }, 150);
-    var dur=0, cur=0, cible=0, boucle=false, attente=false, phase=1;
-    v.addEventListener('loadedmetadata',function(){ dur=v.duration||0; maj(); });
-    v.addEventListener('seeked',function(){ if(dur&&Math.abs(v.currentTime-cur)>0.04){ try{v.currentTime=cur;}catch(e){} } });
-    function progres(){
-      var total=sec.offsetHeight-window.innerHeight; if(total<=0) return 0;
-      var p=-sec.getBoundingClientRect().top/total; return p<0?0:(p>1?1:p);
+    function borne(x){ return x<0?0:(x>1?1:x); }
+
+    /* Pilotage fluide d'une video vers un instant cible */
+    function Pilote(el){ var s=this; s.el=el; s.cur=0; s.cible=0; s.run=false; s.dur=0;
+      el.addEventListener('loadedmetadata',function(){ s.dur=el.duration||0; maj(); });
+      el.addEventListener('seeked',function(){ if(Math.abs(el.currentTime-s.cur)>0.04){ try{el.currentTime=s.cur;}catch(e){} } }); }
+    Pilote.prototype.vers=function(f){ var s=this; if(!s.dur) return; s.cible=borne(f)*Math.max(0,s.dur-0.06);
+      if(s.run) return; s.run=true;
+      requestAnimationFrame(function pas(){ s.cur+=(s.cible-s.cur)*0.2; if(Math.abs(s.cible-s.cur)<0.008) s.cur=s.cible;
+        if(!s.el.seeking&&Math.abs(s.el.currentTime-s.cur)>0.02){ try{s.el.currentTime=s.cur;}catch(e){} }
+        if(s.cur!==s.cible) requestAnimationFrame(pas); else s.run=false; }); };
+    var pv1=new Pilote(v), pv2=null;
+    var srcV2=portrait?CINE_V2.m:CINE_V2.d;
+    function chargeV2(){
+      if(pv2||!srcV2) return;
+      var e=document.createElement('video'); e.className='cf-v2'; e.muted=true; e.playsInline=true;
+      e.setAttribute('playsinline',''); e.setAttribute('muted',''); e.setAttribute('tabindex','-1');
+      e.preload='auto'; var po=portrait?CINE_V2.pm:CINE_V2.pd; if(po) e.poster=po; e.src=srcV2;
+      cf.insertBefore(e, cf.querySelector('.cf-voile')); pv2=new Pilote(e); debloque(e);
     }
-    function pas(){
-      cur+=(cible-cur)*0.2; if(Math.abs(cible-cur)<0.008) cur=cible;
-      if(!v.seeking&&Math.abs(v.currentTime-cur)>0.02){ try{v.currentTime=cur;}catch(e){} }
-      if(cur!==cible) requestAnimationFrame(pas); else boucle=false;
+
+    /* Revelations : titres par masque, blocs qui montent un par un */
+    site.querySelectorAll('.sec-head h2, .why-h h2, .cta-band h2').forEach(function(el){ el.classList.add('masque'); });
+    site.querySelectorAll('.sec-head .eyebrow, .sec-head p, .hero-logo, .hero-cta > *, .hero-player, #heroOps, .mq, .cta-band > :not(h2), .why-end > *')
+      .forEach(function(el){ if(!el.classList.contains('monte')) el.classList.add('cine-up'); });
+    // Un titre masque n'a aucune surface visible : on surveille son parent.
+    function revele(el){ if(el.classList.contains('cine-up')||el.classList.contains('masque')) el.classList.add('vu');
+      el.querySelectorAll(':scope > .masque').forEach(function(t){ t.classList.add('vu'); }); }
+    var aSurveiller=[];
+    site.querySelectorAll('.cine-up').forEach(function(el){ aSurveiller.push(el); });
+    site.querySelectorAll('.masque').forEach(function(el){ var pa=el.parentElement; if(pa&&aSurveiller.indexOf(pa)<0) aSurveiller.push(pa); });
+    if('IntersectionObserver' in window){
+      var obs=new IntersectionObserver(function(en){
+        en.filter(function(e){ return e.isIntersecting; }).forEach(function(e,rang){
+          var el=e.target; setTimeout(function(){ revele(el); }, rang*95); obs.unobserve(el); });
+      },{ threshold:0.15, rootMargin:'0px 0px -60px 0px' });
+      aSurveiller.forEach(function(el){ obs.observe(el); });
+    } else aSurveiller.forEach(revele);
+
+    /* « Comment ca marche » : defilement horizontal */
+    var how=document.getElementById('how'), steps=how&&how.querySelector('.steps'), hzWrap=null, hzBar=null, hzDist=0;
+    if(how&&steps){
+      hzWrap=document.createElement('div'); hzWrap.className='hz-wrap';
+      var hzPin=document.createElement('div'); hzPin.className='hz-pin';
+      while(how.firstChild) hzPin.appendChild(how.firstChild);
+      hzBar=document.createElement('div'); hzBar.className='hz-bar'; hzBar.innerHTML='<i></i>'; hzPin.appendChild(hzBar);
+      hzWrap.appendChild(hzPin); how.appendChild(hzWrap); how.classList.add('hz');
     }
+
+    /* « Pourquoi » : manege circulaire 3D */
+    var why=document.getElementById('whySection'), grid=why&&why.querySelector('.why-grid'),
+        cartes=grid?grid.querySelectorAll('.why-card'):[], ringWrap=null, dots=null, R=0, N=cartes.length, PAS=45;
+    if(why&&grid&&N>=3){
+      ringWrap=document.createElement('div'); ringWrap.className='ring-wrap';
+      var ringPin=document.createElement('div'); ringPin.className='ring-pin';
+      var h=why.querySelector('.why-h'), aff=why.querySelector('.aff-cours');
+      if(h) ringPin.appendChild(h); if(aff) ringPin.appendChild(aff); ringPin.appendChild(grid);
+      dots=document.createElement('div'); dots.className='ring-dots';
+      for(var i=0;i<N;i++) dots.appendChild(document.createElement('i'));
+      ringPin.appendChild(dots); ringWrap.appendChild(ringPin);
+      why.insertBefore(ringWrap, why.firstChild); why.classList.add('ring');
+    }
+
+    function mesure(){
+      var ih=window.innerHeight;
+      if(hzWrap){ hzDist=Math.max(0, steps.scrollWidth - hzWrap.firstChild.clientWidth); hzWrap.style.height=Math.round(ih+hzDist*1.15)+'px'; }
+      if(ringWrap){ var w=grid.clientWidth; R=Math.round(w*1.35); ringWrap.style.height=Math.round(ih*3)+'px';
+        for(var i=0;i<N;i++) cartes[i].style.transform='rotateY('+(i*PAS)+'deg) translateZ('+R+'px)'; }
+      maj();
+    }
+
+    var attente=false, phase=1;
     function maj(){
       attente=false;
       if(document.body.classList.contains('dash')) return;
-      var p=progres();
-      sec.classList.toggle('bouge',p>0.02);
-      var ph=p>0.55?2:1;
-      if(ph!==phase){
-        phase=ph;
-        if(ph===2){ p1.classList.remove('on'); p1.classList.add('out'); p2.classList.add('on'); }
-        else{ p2.classList.remove('on'); p1.classList.remove('out'); p1.classList.add('on'); }
+      var y=window.pageYOffset||document.documentElement.scrollTop, ih=window.innerHeight;
+      var r=sec.getBoundingClientRect(), cH=sec.offsetHeight;
+      var pIn=borne(-r.top/(cH-ih));
+      var finIntro=y+r.top+cH-ih, maxY=Math.max(finIntro+1,document.documentElement.scrollHeight-ih);
+      var pRest=borne((y-finIntro)/(maxY-finIntro));
+      sec.classList.toggle('bouge',pIn>0.02);
+      // 1 : premier titre, 2 : second titre, 3 : moment logo (video 2 seule, sans texte)
+      var avecV2=!!(pv2&&pv2.dur), ph=pIn<=0.45?1:((pIn<=0.78||!srcV2)?2:3);
+      if(ph!==phase){ phase=ph;
+        p1.classList.toggle('on',ph===1); p1.classList.toggle('out',ph>1);
+        p2.classList.toggle('on',ph===2); p2.classList.toggle('out',ph>2); }
+      cf.style.setProperty('--nuit', borne((y-finIntro+ih*0.15)/(ih*0.65)).toFixed(3));
+      if(pIn>0.3) chargeV2();
+      if(avecV2){
+        pv1.vers(pIn/0.78);
+        pv2.vers(y<=finIntro ? borne((pIn-0.8)/0.2)*0.1 : 0.1+0.9*pRest);
+        cf.classList.toggle('v2', pIn>0.8||y>finIntro);
       }
-      if(dur){ cible=p*Math.max(0,dur-0.06); if(!boucle){ boucle=true; requestAnimationFrame(pas); } }
+      else pv1.vers(y<=finIntro ? pIn*0.62 : 0.62+0.38*pRest);
+      if(hzWrap){ var rh=hzWrap.getBoundingClientRect(); var ph2=borne(-rh.top/Math.max(1,hzWrap.offsetHeight-ih));
+        steps.style.transform='translate3d('+(-ph2*hzDist).toFixed(1)+'px,0,0)'; hzBar.style.setProperty('--hz',ph2.toFixed(3)); }
+      if(ringWrap&&R){ var rr=ringWrap.getBoundingClientRect(); var pr=borne((borne(-rr.top/Math.max(1,ringWrap.offsetHeight-ih))-0.08)/0.84);
+        var rot=-pr*PAS*(N-1);
+        grid.style.transform='translateZ('+(-R)+'px) rotateY('+rot.toFixed(2)+'deg)';
+        var actif=Math.round(pr*(N-1));
+        for(var i=0;i<N;i++){ var a=i*PAS+rot, f=Math.max(0,Math.cos(a*Math.PI/180));
+          cartes[i].style.opacity=(0.18+0.82*f*f*f).toFixed(2); cartes[i].style.zIndex=String(100-Math.round(Math.abs(a))); dots.children[i].classList.toggle('on',i===actif); } }
     }
     window.addEventListener('scroll',function(){ if(!attente){ attente=true; requestAnimationFrame(maj); } },{passive:true});
-    window.addEventListener('resize',maj);
-    maj();
-  }catch(e){ try{ var t=document.querySelector('.cine-p1'); if(t) t.classList.add('on'); }catch(_){} }
+    window.addEventListener('resize',function(){ requestAnimationFrame(mesure); });
+    window.addEventListener('load',mesure);
+    try{ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(mesure); }catch(e){}
+    mesure();
+  }catch(e){
+    try{ p1.classList.add('on'); site.classList.remove('cine-anim'); sec.classList.remove('cine-on','cine-anim');
+      var a=document.getElementById('how'); if(a) a.classList.remove('hz'); var b=document.getElementById('whySection'); if(b) b.classList.remove('ring'); }catch(_){}
+  }
 })();
 /* Les panneaux d'accueil montent a l'approche du regard.
    IntersectionObserver plutot qu'un calcul au scroll : le navigateur previent
