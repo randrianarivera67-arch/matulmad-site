@@ -3478,7 +3478,7 @@ var CINE_V2 = { m: '/cine2-m.mp4', d: '/cine2-d.mp4', pm: '/cine2-m.webp', pd: '
 
     site.classList.add('cine-anim'); sec.classList.add('cine-on','cine-anim');
     v.preload='auto'; v.src=portrait?'/cine-m.mp4':'/cine-d.mp4';
-    function debloque(el){ try{ var pr=el.play(); if(pr&&pr.then) pr.then(function(){el.pause();}).catch(function(){}); }catch(e){} }
+    function debloque(el){ /* ACCUEIL-FIXE : jamais de lecture automatique */ try{ el.addEventListener('play',function(){ el.pause(); }); var pr=el.play(); el.pause(); if(pr&&pr.catch) pr.catch(function(){}); }catch(e){} }
     debloque(v);
     setTimeout(function(){ p1.classList.add('on'); }, 150);
     function borne(x){ return x<0?0:(x>1?1:x); }
