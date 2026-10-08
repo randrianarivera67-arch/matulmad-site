@@ -2665,7 +2665,7 @@ async function activerNotifs(){
     await chargerScript("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js");
     await chargerScript("https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js");
     if(!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
-    var reg = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+    var reg = await navigator.serviceWorker.register("/sw.js");   // PUSH-UNIQUE : meme service worker que le cache (notifications incluses)
     var jeton = await firebase.messaging().getToken({ vapidKey: FB_VAPID, serviceWorkerRegistration: reg });
     if(!jeton) return;
     // Le jeton change (reinstallation, nettoyage du navigateur) : on ne

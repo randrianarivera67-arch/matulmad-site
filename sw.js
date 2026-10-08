@@ -1,4 +1,8 @@
-const CACHE = 'matulmad-v68';
+const CACHE = 'matulmad-v69';
+// PUSH-UNIQUE : un seul service worker pour tout le site. Les notifications Firebase sont
+// chargees ici ; avant, sw.js et firebase-messaging-sw.js se remplacaient sur la meme portee "/"
+// et une notification arrivant pendant que sw.js etait actif etait perdue.
+try { importScripts('/firebase-messaging-sw.js'); } catch (e) { /* notifications indisponibles : le cache marche quand meme */ }
 const ASSETS = ['/', '/index.html', '/logo.png', '/icon-192.png', '/icon-512.png', '/manifest.json',
   '/nv-wallets.png', '/nv-fournisseurs.png', '/nv-depot.png', '/nv-retrait.png', '/nv-historique.png'];
 self.addEventListener('install', (e) => {
