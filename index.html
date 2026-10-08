@@ -1567,6 +1567,25 @@ html.lite body.dash .dock>button .nv-img,html.lite body.dash .dock>button::after
   body.dash .dock>button .nv-img,body.dash .dock>button::after{animation:none!important}
   #authModal .tabs::before,.dock .dk45{transition:none}}
 
+/* INSCRIPTION-DRAPEAUX : panneaux Madagascar | Comores */
+#acctMg,#acctKm{position:relative;overflow:hidden;min-height:96px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;
+  color:#fff!important;border:2px solid transparent!important;border-radius:16px!important;text-shadow:0 1px 3px rgba(0,0,0,.7);
+  box-shadow:0 10px 22px -12px rgba(0,0,0,.6)!important;filter:saturate(.6) brightness(.8);
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1),filter .3s ease;cursor:pointer}
+#acctMg{background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(6,12,30,.82)) padding-box,url(flag-mg.webp) center/cover padding-box,linear-gradient(#cfd6e3,#cfd6e3) border-box!important}
+#acctKm{background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(6,12,30,.82)) padding-box,url(flag-km.webp) center/cover padding-box,linear-gradient(#cfd6e3,#cfd6e3) border-box!important}
+#acctMg span,#acctKm span{color:#fff;opacity:.92!important}
+#acctMg.p-sel,#acctKm.p-sel{filter:none;transform:translateY(-3px);box-shadow:0 16px 30px -12px rgba(230,52,85,.75)!important;animation:pTour 6s linear infinite}
+#acctMg.p-sel{background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(6,12,30,.78)) padding-box,url(flag-mg.webp) center/cover padding-box,
+  conic-gradient(from var(--pa),#ff8aa2,#ffd36e 90deg,var(--gold-1) 180deg,#ff8aa2 270deg,#ffd36e 360deg) border-box!important}
+#acctKm.p-sel{background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(6,12,30,.78)) padding-box,url(flag-km.webp) center/cover padding-box,
+  conic-gradient(from var(--pa),#ff8aa2,#ffd36e 90deg,var(--gold-1) 180deg,#ff8aa2 270deg,#ffd36e 360deg) border-box!important}
+#acctMg.p-sel::after,#acctKm.p-sel::after{content:"\2713";position:absolute;top:7px;right:7px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;
+  font-size:13px;font-weight:900;color:#fff;background:linear-gradient(135deg,#ff6f8d,var(--gold-1));box-shadow:0 3px 8px rgba(0,0,0,.35)}
+#acctMg:active,#acctKm:active{transform:scale(.96)}
+html.lite #acctMg.p-sel,html.lite #acctKm.p-sel{animation:none}
+@media (prefers-reduced-motion:reduce){#acctMg,#acctKm{transition:none}#acctMg.p-sel,#acctKm.p-sel{animation:none}}
+
 </style>
 </head>
 <body>
@@ -4939,6 +4958,21 @@ function gdDemarrer(force){
       dansEspace=d; requestAnimationFrame(place);
     }).observe(document.body,{ attributes:true, attributeFilter:['class'] });
     place();
+  }catch(e){}
+})();
+</script>
+<script>
+/* INSCRIPTION-DRAPEAUX : marque le panneau choisi. pickAcctType garde tout son travail ; on ajoute seulement la classe. */
+(function(){
+  try{
+    function marque(){ var km=(document.getElementById('aKmAccount')||{}).value==='1';
+      var mg=document.getElementById('acctMg'), k=document.getElementById('acctKm');
+      if(mg) mg.classList.toggle('p-sel', !km); if(k) k.classList.toggle('p-sel', km); }
+    if(typeof window.pickAcctType==='function'){
+      var p0=window.pickAcctType;
+      window.pickAcctType=function(){ var r=p0.apply(this,arguments); try{ marque(); }catch(e){} return r; };
+    }
+    marque();
   }catch(e){}
 })();
 </script>
