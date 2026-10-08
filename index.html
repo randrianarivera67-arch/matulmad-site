@@ -4938,9 +4938,8 @@ function gdDemarrer(force){
     var ind=document.createElement('span'); ind.className='dk45'; ind.setAttribute('aria-hidden','true'); dock.insertBefore(ind, dock.firstChild);
     function place(){
       var a=dock.querySelector(':scope > button.active');
-      if(!a||!a.offsetWidth){ if(dock.classList.contains('dk-ok')) dock.classList.remove('dk-ok'); return; }
-      var l=a.offsetLeft+'px', w=a.offsetWidth+'px'; if(ind.style.left!==l) ind.style.left=l; if(ind.style.width!==w) ind.style.width=w;
-      if(!dock.classList.contains('dk-ok')) dock.classList.add('dk-ok');   // DOCK-SANS-BOUCLE : sans cela, boucle a chaque image
+      if(!a||!a.offsetWidth){ dock.classList.remove('dk-ok'); return; }
+      ind.style.left=a.offsetLeft+'px'; ind.style.width=a.offsetWidth+'px'; dock.classList.add('dk-ok');
     }
     new MutationObserver(function(){ requestAnimationFrame(place); }).observe(dock,{ subtree:true, attributes:true, attributeFilter:['class'] });
     window.addEventListener('resize', function(){ requestAnimationFrame(place); });
