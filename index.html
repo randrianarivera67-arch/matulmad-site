@@ -1445,6 +1445,37 @@ html.lite #site.cine-sombre .feature,html.lite #site.cine-sombre .step,html.lite
 .ring-dots i.on{background:var(--gold-1);width:24px}
 @media (prefers-reduced-motion:reduce){.cine-h .cl>span{transition:none}.cine-hint i,.mq-t{animation:none}}
 
+/* ACCUEIL-SOCIAL : boutons flottants premium */
+@property --sa{syntax:'<angle>';inherits:false;initial-value:0deg}
+.social-fab{gap:13px}
+.social-fab a{position:relative;isolation:isolate;border-radius:17px;overflow:visible;
+  box-shadow:0 12px 26px -8px var(--sb,rgba(0,0,0,.5)),0 2px 6px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.45),inset 0 -3px 8px rgba(0,0,0,.18)}
+.social-fab .s-wa{--sb:#25d366;background:linear-gradient(155deg,#5ff09a,#25d366 45%,#11994a)}
+.social-fab .s-tg{--sb:#2aa7e8;background:linear-gradient(155deg,#6fd0ff,#2aa7e8 45%,#1479b8)}
+.social-fab .s-fb{--sb:#1877f2;background:linear-gradient(155deg,#7aa9ff,#1877f2 45%,#0b4fb3)}
+.social-fab a::before{content:"";position:absolute;inset:-3px;border-radius:20px;padding:2px;z-index:1;pointer-events:none;
+  background:conic-gradient(from var(--sa),transparent 0deg,#ff8aa2 50deg,#ffd36e 95deg,var(--sb,#fff) 140deg,transparent 200deg,transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
+  animation:socialTour 4.5s linear infinite}
+.social-fab a::after{content:"";position:absolute;inset:0;border-radius:inherit;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.38),rgba(255,255,255,0) 52%)}
+.social-fab a svg{position:relative;z-index:2;filter:drop-shadow(0 2px 3px rgba(0,0,0,.28))}
+.social-fab a:nth-child(2)::before{animation-delay:-1.5s}.social-fab a:nth-child(3)::before{animation-delay:-3s}
+@keyframes socialTour{to{--sa:360deg}}
+@keyframes socialOnde{0%{box-shadow:0 12px 26px -8px var(--sb),0 0 0 0 rgba(37,211,102,.55),inset 0 1px 0 rgba(255,255,255,.45)}
+  70%,100%{box-shadow:0 12px 26px -8px var(--sb),0 0 0 16px rgba(37,211,102,0),inset 0 1px 0 rgba(255,255,255,.45)}}
+/* Arrivee et defilement (seulement quand le script est actif) */
+.social-fab.sf-anim a{transition:opacity .55s ease,translate .8s cubic-bezier(.34,1.56,.64,1),scale .8s cubic-bezier(.34,1.56,.64,1),filter .55s ease;
+  transition-delay:calc(var(--k,0) * 120ms)}
+.social-fab.sf-anim:not(.sf-on) a{opacity:0;translate:70px 0;scale:.55;filter:blur(5px);transition:none}
+.social-fab.sf-anim.sf-on.sf-scroll a{opacity:.8;translate:12px 0;scale:.82;transition-delay:calc(var(--k,0) * 45ms)}
+.social-fab.sf-anim.sf-on:not(.sf-scroll) .s-wa{animation:socialOnde 3.4s ease-out 2.2s infinite}
+.social-fab.sf-anim.sf-on:not(.sf-scroll) a:hover{scale:1.08}
+html.lite .social-fab a::before{animation:none}
+@media (prefers-reduced-motion:reduce){.social-fab a::before,.social-fab .s-wa{animation:none!important}
+  .social-fab.sf-anim a{transition:none!important;opacity:1!important;translate:none!important;scale:none!important;filter:none!important}}
+
 </style>
 </head>
 <body>
@@ -4746,6 +4777,24 @@ function gdDemarrer(force){
   setTimeout(function(){ gdEtape(0); }, 250);
 }
 
+</script>
+<script>
+/* ACCUEIL-SOCIAL : arrivee des boutons flottants, discretion pendant le defilement, retour avec rebond. */
+(function(){
+  try{
+    var fab=document.getElementById('socialFab'); if(!fab) return;
+    if(document.documentElement.classList.contains('lite')) return;
+    if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var liens=fab.querySelectorAll('a'); for(var i=0;i<liens.length;i++) liens[i].style.setProperty('--k', String(i));
+    fab.classList.add('sf-anim');
+    setTimeout(function(){ fab.classList.add('sf-on'); }, 700);
+    var minuteur=null;
+    window.addEventListener('scroll',function(){
+      if(!fab.classList.contains('sf-scroll')) fab.classList.add('sf-scroll');
+      clearTimeout(minuteur); minuteur=setTimeout(function(){ fab.classList.remove('sf-scroll'); }, 220);
+    },{passive:true});
+  }catch(e){ try{ var f=document.getElementById('socialFab'); if(f) f.classList.remove('sf-anim'); }catch(_){} }
+})();
 </script>
 </body>
 </html>
