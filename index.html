@@ -1476,6 +1476,97 @@ html.lite .social-fab a::before{animation:none}
 @media (prefers-reduced-motion:reduce){.social-fab a::before,.social-fab .s-wa{animation:none!important}
   .social-fab.sf-anim a{transition:none!important;opacity:1!important;translate:none!important;scale:none!important;filter:none!important}}
 
+/* ESPACE-PREMIUM : Connexion / Inscription + barre de l'espace client */
+@property --pa{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes pTour{to{--pa:360deg}}
+/* --- Connexion / Inscription --- */
+#authModal{background:radial-gradient(60% 45% at 18% 22%,rgba(230,52,85,.38),transparent 70%),
+  radial-gradient(55% 45% at 85% 80%,rgba(255,196,90,.30),transparent 70%),rgba(6,16,38,.62);
+  background-size:140% 140%,140% 140%,auto;animation:pAurore 9s ease-in-out infinite alternate}
+@keyframes pAurore{to{background-position:30% 20%,70% 80%,0 0}}
+#authModal .modal-card{border:2px solid transparent;border-radius:24px;
+  background:linear-gradient(var(--panel-solid),var(--panel-solid)) padding-box,
+             conic-gradient(from var(--pa),rgba(230,52,85,.15),#ff8aa2 60deg,#ffd36e 110deg,var(--gold-1) 160deg,rgba(230,52,85,.15) 230deg,rgba(230,52,85,.15) 360deg) border-box;
+  box-shadow:0 30px 70px -25px rgba(230,52,85,.55),0 18px 40px -20px rgba(6,16,38,.7);
+  animation:pTour 6s linear infinite}
+#authModal .modal-card .logo-mark{box-shadow:0 0 0 2px rgba(255,211,110,.55),0 8px 22px -6px rgba(230,52,85,.6)}
+#authModal .modal-card .sub{font-weight:600;letter-spacing:.02em}
+#authModal .tabs{position:relative;isolation:isolate}
+#authModal .tabs::before{content:"";position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:9px;z-index:0;
+  background:linear-gradient(120deg,#ff6f8d,var(--gold-1) 55%,#ffb347);box-shadow:0 8px 18px -8px rgba(230,52,85,.75);
+  transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
+#authModal .tabs.p-reg::before{transform:translateX(100%)}
+#authModal .tab{position:relative;z-index:1}
+#authModal .tab.active{background:transparent;box-shadow:none;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+#authModal .inp:focus-within{border-color:transparent;
+  box-shadow:inset 0 3px 7px rgba(16,50,110,.08),0 0 0 2px rgba(230,52,85,.65),0 10px 24px -12px rgba(230,52,85,.7)}
+#authModal .inp:focus-within .ic{color:var(--gold-1)}
+#authModal .field label{letter-spacing:.05em}
+#authSubmit{height:54px;border-radius:16px;font-size:17px;letter-spacing:.05em;
+  background:linear-gradient(115deg,#ff6f8d,var(--gold-1) 35%,#c62544 60%,#ffb347 85%,#ff6f8d);background-size:250% 100%;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.35),inset 0 -3px 9px rgba(0,0,0,.22),0 14px 28px -10px rgba(230,52,85,.75);
+  animation:pDegrade 6s linear infinite;transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .2s}
+#authSubmit:hover{transform:translateY(-2px);box-shadow:inset 0 2px 0 rgba(255,255,255,.35),0 18px 34px -10px rgba(230,52,85,.85)}
+#authSubmit:active{transform:scale(.96)}
+#authSubmit::after{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);animation:pReflet 3.4s ease-in-out infinite}
+@keyframes pDegrade{to{background-position:250% 0}}
+@keyframes pReflet{0%,55%{left:-70%}85%,100%{left:130%}}
+#authModal .modal-foot a,#forgotRow a{transition:color .2s}
+@media (prefers-reduced-motion:no-preference){
+  html:not(.lite) #authModal.open .modal-card{animation:pTour 6s linear infinite,pCarte .75s cubic-bezier(.16,.84,.24,1) both}
+}
+@keyframes pCarte{from{opacity:0;transform:translateY(46px) scale(.93);filter:blur(10px)}to{opacity:1;transform:none;filter:none}}
+#authModal .modal-card.p-go > :not(.modal-x){animation:pElt .55s cubic-bezier(.16,.84,.24,1) both;animation-delay:calc(var(--d,0) * 45ms + .12s)}
+#authModal .modal-card.p-go.p-onglet > .brand,#authModal .modal-card.p-go.p-onglet > .sub,#authModal .modal-card.p-go.p-onglet > .tabs{animation:none}
+@keyframes pElt{from{opacity:0;transform:translateY(16px);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+
+/* --- Barre de l'espace client : telephone et tablette --- */
+@media (max-width:1023px){
+  body.dash .dock{border:1.5px solid transparent;
+    background:linear-gradient(rgba(255,255,255,.95),rgba(255,255,255,.95)) padding-box,
+               conic-gradient(from var(--pa),rgba(230,52,85,.12),#ff8aa2 60deg,#ffd36e 110deg,var(--gold-1) 160deg,rgba(230,52,85,.12) 230deg,rgba(230,52,85,.12) 360deg) border-box;
+    box-shadow:0 18px 44px -14px rgba(230,52,85,.40),0 10px 26px -12px rgba(20,40,90,.35),inset 0 1px 0 rgba(255,255,255,.8);
+    animation:pTour 7s linear infinite}
+  html[data-theme="dark"] body.dash .dock{
+    background:linear-gradient(rgba(22,28,44,.95),rgba(22,28,44,.95)) padding-box,
+               conic-gradient(from var(--pa),rgba(230,52,85,.15),#ff8aa2 60deg,#ffd36e 110deg,var(--gold-1) 160deg,rgba(230,52,85,.15) 230deg,rgba(230,52,85,.15) 360deg) border-box}
+  body.dash .dock>button{z-index:1}
+  .dock .dk45{position:absolute;z-index:0;top:4px;bottom:4px;left:0;width:0;border-radius:16px;pointer-events:none;opacity:0;
+    background:linear-gradient(160deg,rgba(255,138,162,.22),rgba(255,211,110,.26));
+    box-shadow:inset 0 0 0 1.5px rgba(230,52,85,.35),0 8px 20px -10px rgba(230,52,85,.6);
+    transition:left .55s cubic-bezier(.34,1.56,.64,1),width .45s ease,opacity .3s}
+  .dock .dk45::after{content:"";position:absolute;left:28%;right:28%;bottom:2px;height:3px;border-radius:9px;
+    background:linear-gradient(90deg,#ff6f8d,var(--gold-1),#ffb347)}
+  .dock.dk-ok .dk45{opacity:1}
+  body.dash .dock>button.active .nv-img{filter:drop-shadow(0 6px 10px rgba(230,52,85,.45));animation:pFlotte 2.8s ease-in-out infinite}
+  body.dash .dock>button.dk-pop .nv-img{animation:pPop .5s cubic-bezier(.34,1.56,.64,1)}
+  body.dash .dock>button[data-go="depot"]::after{content:"";display:block;position:absolute;inset:8% 12%;border-radius:18px;z-index:-1;pointer-events:none;
+    background:radial-gradient(closest-side,rgba(230,52,85,.38),transparent);animation:pRespire 2.6s ease-in-out infinite}
+  body.dash .dock.dk-arrivee{animation:pTour 7s linear infinite,pDock .7s cubic-bezier(.34,1.56,.64,1) both}
+  body.dash .dock.dk-arrivee>button{animation:pVignette .55s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--n,0) * 70ms + .2s)}
+}
+@keyframes pFlotte{0%,100%{transform:translateY(-2px) scale(1.06)}50%{transform:translateY(-6px) scale(1.08)}}
+@keyframes pPop{0%{transform:scale(.8)}55%{transform:translateY(-8px) scale(1.16)}100%{transform:translateY(-2px) scale(1.06)}}
+@keyframes pRespire{0%,100%{opacity:.55;transform:scale(.92)}50%{opacity:1;transform:scale(1.08)}}
+@keyframes pDock{from{translate:0 130%;opacity:0}to{translate:0 0;opacity:1}}
+@keyframes pVignette{from{opacity:0;translate:0 18px;scale:.7}to{opacity:1;translate:0 0;scale:1}}
+/* --- PC : barre texte dans l'en-tete --- */
+@media (min-width:1024px){
+  body.dash .dock>button .nv-txt{transition:color .2s,background .3s,box-shadow .3s,transform .25s cubic-bezier(.34,1.56,.64,1)}
+  body.dash .dock>button:hover .nv-txt{transform:translateY(-1px)}
+  body.dash .dock>button.active .nv-txt{color:var(--gold-1);background:linear-gradient(120deg,rgba(255,138,162,.20),rgba(255,211,110,.24));
+    box-shadow:inset 0 0 0 1px rgba(230,52,85,.28),0 6px 16px -8px rgba(230,52,85,.55)}
+  .dock .dk45{display:none}
+}
+/* --- Sobriete --- */
+html.lite #authModal,html.lite #authModal .modal-card,html.lite #authSubmit,html.lite #authSubmit::after,html.lite body.dash .dock,
+html.lite body.dash .dock>button .nv-img,html.lite body.dash .dock>button::after{animation:none!important}
+@media (prefers-reduced-motion:reduce){
+  #authModal,#authModal .modal-card,#authSubmit,#authSubmit::after,body.dash .dock,body.dash .dock>button,
+  body.dash .dock>button .nv-img,body.dash .dock>button::after{animation:none!important}
+  #authModal .tabs::before,.dock .dk45{transition:none}}
+
 </style>
 </head>
 <body>
@@ -4794,6 +4885,61 @@ function gdDemarrer(force){
       clearTimeout(minuteur); minuteur=setTimeout(function(){ fab.classList.remove('sf-scroll'); }, 220);
     },{passive:true});
   }catch(e){ try{ var f=document.getElementById('socialFab'); if(f) f.classList.remove('sf-anim'); }catch(_){} }
+})();
+</script>
+<script>
+/* ESPACE-PREMIUM : cascade des champs (Connexion / Inscription), pastille d'onglet,
+   pastille glissante et rebonds de la barre de l'espace client. Aucune logique metier touchee. */
+(function(){
+  try{
+    var calme = document.documentElement.classList.contains('lite')
+      || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    /* --- Connexion / Inscription --- */
+    var modal=document.getElementById('authModal'), carte=modal&&modal.querySelector('.modal-card'), onglets=modal&&modal.querySelector('.tabs');
+    function cascade(complet){
+      if(!carte) return;
+      try{ if(onglets) onglets.classList.toggle('p-reg', document.getElementById('tabReg').classList.contains('active')); }catch(e){}
+      if(calme) return;
+      var vus=[].filter.call(carte.children,function(el){ return !el.classList.contains('modal-x') && el.offsetParent!==null; });
+      vus.sort(function(a,b){ return a.offsetTop-b.offsetTop; });
+      vus.forEach(function(el,i){ el.style.setProperty('--d', String(i)); });
+      carte.classList.toggle('p-onglet', !complet);
+      carte.classList.remove('p-go'); void carte.offsetWidth; carte.classList.add('p-go');
+    }
+    if(typeof window.switchTab==='function'){
+      var sw0=window.switchTab;
+      window.switchTab=function(){ var ouvert=!!(modal&&modal.classList.contains('open'));
+        var r=sw0.apply(this,arguments); try{ requestAnimationFrame(function(){ cascade(!ouvert); }); }catch(e){} return r; };
+    }
+    /* --- Barre de l'espace client --- */
+    var dock=document.getElementById('dock');
+    if(!dock) return;
+    var btns=dock.querySelectorAll(':scope > button');
+    for(var i=0;i<btns.length;i++) btns[i].style.setProperty('--n', String(i));
+    var ind=document.createElement('span'); ind.className='dk45'; ind.setAttribute('aria-hidden','true'); dock.insertBefore(ind, dock.firstChild);
+    function place(){
+      var a=dock.querySelector(':scope > button.active');
+      if(!a||!a.offsetWidth){ dock.classList.remove('dk-ok'); return; }
+      ind.style.left=a.offsetLeft+'px'; ind.style.width=a.offsetWidth+'px'; dock.classList.add('dk-ok');
+    }
+    new MutationObserver(function(){ requestAnimationFrame(place); }).observe(dock,{ subtree:true, attributes:true, attributeFilter:['class'] });
+    window.addEventListener('resize', function(){ requestAnimationFrame(place); });
+    dock.addEventListener('click', function(ev){
+      if(calme) return;
+      var b=ev.target.closest && ev.target.closest('.dock > button'); if(!b) return;
+      b.classList.remove('dk-pop'); void b.offsetWidth; b.classList.add('dk-pop');
+      setTimeout(function(){ b.classList.remove('dk-pop'); }, 520);
+    });
+    // Arrivee de la barre quand on entre dans l'espace client.
+    var dansEspace=document.body.classList.contains('dash');
+    new MutationObserver(function(){
+      var d=document.body.classList.contains('dash');
+      if(d&&!dansEspace&&!calme){ dock.classList.remove('dk-arrivee'); void dock.offsetWidth; dock.classList.add('dk-arrivee');
+        setTimeout(function(){ dock.classList.remove('dk-arrivee'); }, 1400); }
+      dansEspace=d; requestAnimationFrame(place);
+    }).observe(document.body,{ attributes:true, attributeFilter:['class'] });
+    place();
+  }catch(e){}
 })();
 </script>
 </body>
