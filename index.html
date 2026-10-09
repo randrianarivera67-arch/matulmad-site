@@ -1586,6 +1586,11 @@ html.lite body.dash .dock>button .nv-img,html.lite body.dash .dock>button::after
 html.lite #acctMg.p-sel,html.lite #acctKm.p-sel{animation:none}
 @media (prefers-reduced-motion:reduce){#acctMg,#acctKm{transition:none}#acctMg.p-sel,#acctKm.p-sel{animation:none}}
 
+
+/* MM-PC-CENTRE : version PC — banniere centree, menu (hamburger) aussi sur PC */
+#whySection.ring .why-end{margin-left:auto!important;margin-right:auto!important;width:calc(100% - 36px);max-width:1080px;box-sizing:border-box}
+@media (min-width:861px){ body.dash .tb-menu{display:grid !important} }
+
 </style>
 </head>
 <body>
@@ -4974,6 +4979,32 @@ function gdDemarrer(force){
       window.pickAcctType=function(){ var r=p0.apply(this,arguments); try{ marque(); }catch(e){} return r; };
     }
     marque();
+  }catch(e){}
+})();
+</script>
+<script>
+/* MM-PC-CENTRE : la bande de logos est repetee autant que necessaire pour couvrir toute la largeur
+   (sur grand ecran elle ne laissait plus de vide a droite). Meme vitesse de defilement qu'avant. */
+(function(){
+  try{
+    var mq=document.querySelector('.mq'), t=mq&&mq.querySelector('.mq-t'); if(!t) return;
+    var n=t.children.length/2; if(n<1||n!==Math.floor(n)) return;
+    var lot=[].slice.call(t.children,0,n).map(function(e){ return e.cloneNode(true); });
+    var d0=parseFloat(getComputedStyle(t).animationDuration)||28, k0=1, larg1=0;
+    function remplir(){
+      if(!larg1) larg1=t.scrollWidth/(2*k0);
+      if(!larg1||!mq.clientWidth) return;
+      var k=Math.max(1,Math.ceil(mq.clientWidth/larg1));
+      if(k===k0) return;
+      var f=document.createDocumentFragment();
+      for(var i=0;i<2*k;i++) lot.forEach(function(e){ f.appendChild(e.cloneNode(true)); });
+      t.innerHTML=''; t.appendChild(f);
+      t.style.animationDuration=(d0*k)+'s'; k0=k;
+    }
+    var m=null;
+    window.addEventListener('resize',function(){ clearTimeout(m); m=setTimeout(remplir,200); });
+    if(document.readyState==='complete') remplir(); else window.addEventListener('load',remplir);
+    setTimeout(remplir,600);
   }catch(e){}
 })();
 </script>
